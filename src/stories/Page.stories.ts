@@ -22,11 +22,15 @@ export const LoggedIn: Story = {
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
     const loginButton = canvas.getByRole('button', { name: /Log in/i });
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-call
     await expect(loginButton).toBeInTheDocument();
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-call
     await userEvent.click(loginButton);
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-call
     await expect(loginButton).not.toBeInTheDocument();
 
     const logoutButton = canvas.getByRole('button', { name: /Log out/i });
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-call
     await expect(logoutButton).toBeInTheDocument();
   },
 };

@@ -1,4 +1,5 @@
 import "~/styles/globals.css";
+import { SpeedInsights } from '@vercel/speed-insights/next';
 
 import { Inter } from "next/font/google";
 
@@ -24,6 +25,7 @@ export default function RootLayout({
     <html lang="en">
       <body className={`font-sans ${inter.variable}`}>
         <TRPCReactProvider>{children}</TRPCReactProvider>
+        <SpeedInsights />
       </body>
     </html>
   );

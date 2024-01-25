@@ -26,7 +26,7 @@ export const env = createEnv({
    */
   runtimeEnv: {
     NODE_ENV: process.env.NODE_ENV,
-    HIGHLIGHT_PROJECT_ID: process.env.HIGHLIGHT_PROJECT_ID,
+    HIGHLIGHT_PROJECT_ID: process.env.HIGHLIGHT_PROJECT_ID ?? "no-project-id",
     // NEXT_PUBLIC_CLIENTVAR: process.env.NEXT_PUBLIC_CLIENTVAR,
   },
   /**

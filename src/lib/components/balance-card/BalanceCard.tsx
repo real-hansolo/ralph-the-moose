@@ -63,7 +63,7 @@ export const BalanceCard = (props: BalanceCardProps) => {
     activeVariant.value = BalanceCardVariants.VARIANT_UNWRAP;
   };
   return (
-    <div className="flex flex-row w-full">
+    <div className="w-full">
       {activeVariant.value === BalanceCardVariants.VARIANT_PRIMARY && (
         <BalanceCardPrimaryVariant
           showWrapVariant={showWrapVariant}

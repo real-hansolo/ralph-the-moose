@@ -43,7 +43,7 @@ export const BalanceCardPrimaryVariant = ({
     <Modal>
       <div className="w-full flex flex-col items-start justify-center gap-4">
         <Heading title="Balance" variant={HeadingVariant.H4} />
-        <div className="w-full flex flex-row items-center justify-between gap-4">
+        <div className="w-full grid grid-cols-2 items-center justify-between gap-4">
           <InscriptionBalance
             inscriptionBalance={inscriptionBalance}
             tokenShortName={tokenShortName}

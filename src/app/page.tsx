@@ -1,20 +1,64 @@
+"use client";
+import { signal } from "@preact/signals-react";
 import { unstable_noStore as noStore } from "next/cache";
+import { Button, TextButton, WalletCard, MintCard, BalanceCard, PageTemplate } from "~/lib";
 
-export default async function Home() {
+
+const connectButton = <Button variant="primary" label="Connect Wallet" />;
+const disconnectButton = (
+  <TextButton text="Disconnect" size="medium" onClick={() => {console.log("Disconnect Wallet")}}></TextButton>
+);
+const walletCard = (
+  <WalletCard
+    status="disconnected"
+    address="0x1234...5678"
+    connectButton={connectButton}
+    disconnectButton={disconnectButton}
+  />
+);
+
+const mintCard = (
+  <MintCard
+    mintedPercentage={0.5}
+    mintLimit={100000}
+    totalSupply={100000}
+    totalMinted={50000}
+    mintingFee={10}
+    mintingDisabled={false}
+    tokenShortName="PR"
+    isMinting={signal(false)}
+    onMint={() => console.log('mint')}
+    // children={
+    // <MintCompletedStatusFrame
+    //   tokenShortName="PR"
+    //   amountMinted={10000}
+    //   timestamp="2024-02-14 @ 16:03"
+    //   explorerLink="nowhere"
+    // />
+    // }
+  />
+);
+const balanceCard = (
+  <BalanceCard
+    inscriptionBalance={80000}
+    wrappedBalance={20000}
+    tokenShortName="PR"
+    icon={<div />}
+    fee={2}
+    onWrap={() => {console.log('wrap')}}
+    onUnwrap={() => {console.log('unwrap')}}
+  />
+);
+export default function Home() {
   noStore();
 
   return (
-    <main className="flex min-h-screen flex-col items-center justify-center bg-gradient-to-b from-[#2e026d] to-[#15162c] text-white">
-      <div className="container flex flex-col items-center justify-center gap-12 px-4 py-16 ">
-        <h1 className="text-5xl font-extrabold tracking-tight sm:text-[5rem]">
-          Welcome to <span className="text-[hsl(280,100%,70%)]">Ralph Le Moose</span> dAPP
-        </h1>
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:gap-8">
-          
-        </div>
-        <div className="flex flex-col items-center gap-2">
-        </div>
-      </div>
-    </main>
-  );
+    <div className="">
+      <PageTemplate>
+        {walletCard}
+        {mintCard}
+        {balanceCard}
+      </PageTemplate>
+    </div>
+  )
 }

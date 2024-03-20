@@ -15,7 +15,10 @@ export interface WalletCardProps {
    * The address of the wallet.
    */
   address: string;
-
+  /**
+   * The walletId of the wallet.
+   */
+  walletId: string;
   /**
    * The React node for the connect button.
    */
@@ -35,12 +38,14 @@ export const WalletCard = ({
   address,
   connectButton,
   disconnectButton,
+  walletId,
 }: WalletCardProps) => {
   return (
     <Card>
       {status === "connected" ? (
         <WalletCard.Connected
           address={address}
+          walletId={walletId}
           disconnectButton={disconnectButton}
         />
       ) : (
@@ -56,9 +61,9 @@ WalletCard.Disconnected = ({
   connectButton: React.ReactNode;
 }) => {
   return (
-    <div className="flex-1 w-full relative flex flex-col items-center justify-start gap-[30px] text-left text-base text-button-primary-text font-link-medium">
+    <div className="text-button-primary-text font-link-medium relative flex w-full flex-1 flex-col items-center justify-start gap-[30px] text-left text-base">
       <Image
-        className="w-[135.24px] relative h-[117.56px] object-cover"
+        className="relative h-[117.56px] w-[135.24px] object-cover"
         alt=""
         src={ralphConnectWallet}
       />
@@ -69,17 +74,19 @@ WalletCard.Disconnected = ({
 
 WalletCard.Connected = ({
   address,
+  walletId,
   disconnectButton,
 }: {
   address: string;
+  walletId: string;
   disconnectButton: React.ReactNode;
 }) => {
   return (
-    <div className="self-stretch flex flex-row items-center justify-between gap-[16px]">
+    <div className="flex flex-row items-center justify-between gap-[16px] self-stretch">
       {/** Wallet Addres div, pinned to the left of the parent */}
-      <div className="flex-1 flex flex-col items-start justify-start gap-[8px]">
-        <div className="self-stretch text-sm relative leading-[14px] text-text-secondary font-varela">
-          Wallet
+      <div className="flex flex-1 flex-col items-start justify-start gap-[8px]">
+        <div className="relative self-stretch font-varela text-sm leading-[14px] text-text-secondary">
+          {walletId}
         </div>
         <Label variant="small" label={address} />
       </div>

@@ -1,7 +1,7 @@
 "use client";
 import { signal } from "@preact/signals-react";
 import { unstable_noStore as noStore } from "next/cache";
-import { Button, TextButton, WalletCard, MintCard, BalanceCard, PageTemplate } from "~/lib";
+import { Button, TextButton, WalletCard, MintCard, BalanceCard, PageTemplate, Modal, WrapCard } from "~/lib";
 
 
 const connectButton = <Button variant="primary" label="Connect Wallet" />;
@@ -53,7 +53,10 @@ export default function Home() {
   noStore();
 
   return (
+
+    
     <div className="">
+      {/* <Modal><div><h1>Hello</h1></div></Modal> */}
       <PageTemplate>
         {walletCard}
         {mintCard}

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { IconError, IconSuccess, IconWarning, Modal } from "..";
+import { IconError, IconSuccess, IconWarning, Card } from "..";
 
 /**
  * Props for the Toast component.
@@ -52,7 +52,7 @@ export const Toast = ({
     setTimeout(() => {
       if (isPermanent) return;
       setViewStatus(ToastViewStatus.Fading);
-    }, 3000);
+    }, 8000);
   });
 
   useEffect(() => {
@@ -76,7 +76,7 @@ export const Toast = ({
 
   return (
     <div className={classList()}>
-      <Modal>
+      <Card>
         <div className="w-full h-10 flex flex-row items-center justify-start gap-4">
           <div>
             {status === "success" && <IconSuccess size={12} />}
@@ -99,7 +99,7 @@ export const Toast = ({
             )}
           </div>
         </div>
-      </Modal>
+      </Card>
     </div>
   );
 };

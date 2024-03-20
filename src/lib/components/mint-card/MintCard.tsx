@@ -1,5 +1,5 @@
 import { useSignals } from "@preact/signals-react/runtime";
-import { Button, Heading, HeadingVariant, Label, Modal } from "..";
+import { Button, Heading, HeadingVariant, Label, Card } from "..";
 import { formatNumber } from "../../utils/tokenUtils";
 import { type Signal } from "@preact/signals-react";
 
@@ -27,7 +27,7 @@ export const MintCard = (props: MintCardProps) => {
     props.onMint();
   };
   return (
-    <Modal>
+    <Card>
       <div className="w-full flex flex-col items-start justify-center gap-4 text-wrap">
         <Heading title="Mint" variant={HeadingVariant.H4} />
         <div className="w-full flex flex-col items-center justify-between gap-2 text-text-secondary font-varela text-base">
@@ -56,6 +56,6 @@ export const MintCard = (props: MintCardProps) => {
           onClick={handleMint}
         />
       </div>
-    </Modal>
+    </Card>
   );
 };

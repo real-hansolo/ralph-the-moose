@@ -63,8 +63,31 @@ export const BalanceCard = (props: BalanceCardProps) => {
     activeVariant.value = BalanceCardVariants.VARIANT_UNWRAP;
   };
   return (
-    <div className="w-full">
-      {activeVariant.value === BalanceCardVariants.VARIANT_PRIMARY && (
+    <div className="w-full border-none">
+
+      <BalanceCardPrimaryVariant
+        showWrapVariant={showWrapVariant}
+        showUnwrapVariant={showUnwrapVariant}
+        {...props}
+      ></BalanceCardPrimaryVariant>
+
+      {activeVariant.value === BalanceCardVariants.VARIANT_WRAP && (
+        <WrapCard
+          amountToWrap={amountToWrap}
+          onClose={returnToPrimaryVariant}
+          {...props}
+        ></WrapCard>
+      )}
+      
+      {activeVariant.value === BalanceCardVariants.VARIANT_UNWRAP && (
+        <UnwrapCard
+          amountToUnwrap={amountToUnwrap}
+          onClose={returnToPrimaryVariant}
+          {...props}
+        ></UnwrapCard>
+      )}
+
+      {/* {activeVariant.value === BalanceCardVariants.VARIANT_PRIMARY && (
         <BalanceCardPrimaryVariant
           showWrapVariant={showWrapVariant}
           showUnwrapVariant={showUnwrapVariant}
@@ -84,7 +107,7 @@ export const BalanceCard = (props: BalanceCardProps) => {
           onClose={returnToPrimaryVariant}
           {...props}
         ></UnwrapCard>
-      )}
+      )} */}
     </div>
   );
 };

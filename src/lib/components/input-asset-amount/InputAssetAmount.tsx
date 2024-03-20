@@ -62,7 +62,7 @@ export const InputAssetAmount = ({
         defaultValue={amount.value}
         placeholder="Enter a Value"
         className={[
-          "flex-1 relative tracking-[0.02em] leading-[16px] min-w-[14rem] border-none",
+          "flex-1 relative tracking-[0.02em] leading-[16px] min-w-[10rem] border-none",
           "bg-white text-left appearance-none",
           "focus:outline-none",
           "focus:ring-0",

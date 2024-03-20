@@ -1,4 +1,5 @@
 export * from "./balance-card";
+export * from "./card";
 export * from "./button";
 export * from "./dropdown";
 export * from "./heading";

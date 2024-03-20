@@ -1,5 +1,5 @@
 import Image from "next/image";
-import { Label, Modal } from "..";
+import { Label, Card } from "..";
 import ralphConnectWallet from "@/assets/ralph-connect-wallet.svg";
 /**
  * Represents the props for the WalletCard component.
@@ -37,7 +37,7 @@ export const WalletCard = ({
   disconnectButton,
 }: WalletCardProps) => {
   return (
-    <Modal>
+    <Card>
       {status === "connected" ? (
         <WalletCard.Connected
           address={address}
@@ -46,7 +46,7 @@ export const WalletCard = ({
       ) : (
         <WalletCard.Disconnected connectButton={connectButton} />
       )}
-    </Modal>
+    </Card>
   );
 };
 

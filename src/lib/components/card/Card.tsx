@@ -23,6 +23,7 @@ export const Card = ({ children }: CardProps) => {
         "p-6",
         "gap-[8px]",
         "w-max[440px]",
+        "shadow-lg"
       ].join(" ")}
       >
       <div className="flex flex-col items-start w-full p-0 z-[1]">

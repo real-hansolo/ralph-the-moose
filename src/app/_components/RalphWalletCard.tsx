@@ -1,9 +1,9 @@
 import {
   ConnectWallet,
-  type WalletInstance,
   darkTheme,
   useDisconnect,
   useWallet,
+  useAddress,
 } from "@thirdweb-dev/react";
 import { TextButton, WalletCard } from "~/lib";
 import { RALPH_PUBLIC_ICON_URL } from "~/lib/infrastructure/config/ralph_public_assets";
@@ -15,7 +15,8 @@ export const RalphWalletCard = () => {
   /**
    * Hooks and Wallet Information
    */
-  const connectedWallet: WalletInstance | undefined = useWallet();
+  const walletAddress = useAddress();
+  const wallet = useWallet();
   const disconnect = useDisconnect();
   /**
    * Theme for the Connect Wallet Modal
@@ -81,13 +82,14 @@ export const RalphWalletCard = () => {
   const disconnectButton = (
     <TextButton text="Disconnect" size="medium" onClick={disconnect} />
   );
-
+  
   return (
     <WalletCard
-      status={connectedWallet === undefined ? "disconnected" : "connected"}
+      status={walletAddress === undefined ? "disconnected" : "connected"}
       address={
-        connectedWallet ? connectedWallet.walletId : "Oops, no wallet conneced!"
+        walletAddress ? `${walletAddress}` : "Oops, no wallet conneced!"
       }
+      walletId={wallet? wallet.walletId: ""}
       connectButton={connectButton}
       disconnectButton={disconnectButton}
     />

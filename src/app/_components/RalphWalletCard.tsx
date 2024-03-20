@@ -1,23 +1,38 @@
 import {
   ConnectWallet,
   darkTheme,
-  useDisconnect,
-  useWallet,
-  useAddress,
 } from "@thirdweb-dev/react";
 import { TextButton, WalletCard } from "~/lib";
 import { RALPH_PUBLIC_ICON_URL } from "~/lib/infrastructure/config/ralph_public_assets";
 
 /**
+ * Props for the RalphWalletCard component.
+ */
+export interface RalphWalletCardProps {
+  /**
+   * The status of the wallet connection.
+   * Possible values are "connected" or "disconnected".
+   */
+  status: "connected" | "disconnected",
+  /**
+   * The address of the wallet.
+   */
+  walletAddress: string,
+  /**
+   * The ID of the wallet.
+   */
+  walletId: string,
+  /**
+   * Callback function to be called when the wallet is disconnected.
+   */
+  onDisconnect: () => void,
+}
+
+/**
  * Wraps the WalletCard component with the ThirdWeb ConnectWallet component
  */
-export const RalphWalletCard = () => {
-  /**
-   * Hooks and Wallet Information
-   */
-  const walletAddress = useAddress();
-  const wallet = useWallet();
-  const disconnect = useDisconnect();
+export const RalphWalletCard = (props: RalphWalletCardProps) => {
+
   /**
    * Theme for the Connect Wallet Modal
    */
@@ -80,16 +95,16 @@ export const RalphWalletCard = () => {
    * The Disconnect Wallet Button
    */
   const disconnectButton = (
-    <TextButton text="Disconnect" size="medium" onClick={disconnect} />
+    <TextButton text="Disconnect" size="medium" onClick={props.onDisconnect} />
   );
   
   return (
     <WalletCard
-      status={walletAddress === undefined ? "disconnected" : "connected"}
+      status={props.status}
       address={
-        walletAddress ? `${walletAddress}` : "Oops, no wallet conneced!"
+        props.walletAddress ? `${props.walletAddress}` : "Oops, no wallet conneced!"
       }
-      walletId={wallet? wallet.walletId: ""}
+      walletId={props.walletAddress? props.walletId: ""}
       connectButton={connectButton}
       disconnectButton={disconnectButton}
     />

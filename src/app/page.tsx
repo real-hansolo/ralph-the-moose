@@ -1,21 +1,19 @@
 "use client";
 import { signal } from "@preact/signals-react";
 import { unstable_noStore as noStore } from "next/cache";
-import { Button, TextButton, WalletCard, MintCard, BalanceCard, PageTemplate, Modal, WrapCard } from "~/lib";
+import {
+  MintCard,
+  BalanceCard,
+  PageTemplate,
+} from "~/lib";
 
-
-const connectButton = <Button variant="primary" label="Connect Wallet" />;
-const disconnectButton = (
-  <TextButton text="Disconnect" size="medium" onClick={() => {console.log("Disconnect Wallet")}}></TextButton>
-);
-const walletCard = (
-  <WalletCard
-    status="disconnected"
-    address="0x1234...5678"
-    connectButton={connectButton}
-    disconnectButton={disconnectButton}
-  />
-);
+import {
+  ThirdwebProvider,
+} from "@thirdweb-dev/react";
+import { useSignals } from "@preact/signals-react/runtime";
+import { RalphWalletCard } from "./_components/RalphWalletCard";
+import { SUPPORTED_WALLETS } from "~/lib/infrastructure/config/wallets";
+import { DEFAULT_CHAIN, SUPPORTED_CHAINS } from "~/lib/infrastructure/config/chains";
 
 const mintCard = (
   <MintCard
@@ -27,7 +25,7 @@ const mintCard = (
     mintingDisabled={false}
     tokenShortName="PR"
     isMinting={signal(false)}
-    onMint={() => console.log('mint')}
+    onMint={() => console.log("mint")}
     // children={
     // <MintCompletedStatusFrame
     //   tokenShortName="PR"
@@ -45,23 +43,30 @@ const balanceCard = (
     tokenShortName="PR"
     icon={<div />}
     fee={2}
-    onWrap={() => {console.log('wrap')}}
-    onUnwrap={() => {console.log('unwrap')}}
+    onWrap={() => {
+      console.log("wrap");
+    }}
+    onUnwrap={() => {
+      console.log("unwrap");
+    }}
   />
 );
 export default function Home() {
   noStore();
-
+  useSignals();
   return (
-
-    
-    <div className="">
-      {/* <Modal><div><h1>Hello</h1></div></Modal> */}
-      <PageTemplate>
-        {walletCard}
-        {mintCard}
-        {balanceCard}
-      </PageTemplate>
-    </div>
-  )
+    <ThirdwebProvider
+      activeChain={DEFAULT_CHAIN}
+      supportedChains={SUPPORTED_CHAINS}
+      supportedWallets={SUPPORTED_WALLETS}
+    >
+      <div id="app-container">
+        <PageTemplate>
+          <RalphWalletCard />
+          {mintCard}
+          {balanceCard}
+        </PageTemplate>
+      </div>
+    </ThirdwebProvider>
+  );
 }

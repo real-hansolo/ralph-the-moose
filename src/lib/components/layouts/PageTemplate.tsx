@@ -46,7 +46,7 @@ export const PageTemplate = ({ children }: { children: React.ReactNode }) => {
           <PageFooter menuOpenSignal={menuOpenSignal} />
         </div>
 
-        <div className="fixed bottom-4 right-4 ml-4 flex flex-col gap-3 ">
+        <div className="fixed bottom-4 right-4 ml-4 flex flex-col gap-3 z-50">
           <Toast status="success" title="Toast Title" message="Toast message"/>
           <Toast status="error" title="Wrong Network" message="please connect your wallet to the right network" isPermanent={true}/>
         </div>

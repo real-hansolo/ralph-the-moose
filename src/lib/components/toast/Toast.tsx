@@ -52,8 +52,8 @@ export const Toast = ({
     setTimeout(() => {
       if (isPermanent) return;
       setViewStatus(ToastViewStatus.Fading);
-    }, 8000);
-  });
+    }, 2000);
+  }, []);
 
   useEffect(() => {
     if (viewStatus === ToastViewStatus.Fading) {
@@ -61,7 +61,7 @@ export const Toast = ({
         setViewStatus(ToastViewStatus.Hide);
       }, 3000);
     }
-  });
+  }, [viewStatus]);
 
   const classList = () => {
     switch (viewStatus) {
@@ -75,7 +75,7 @@ export const Toast = ({
   };
 
   return (
-    <div className={classList()}>
+    <div className={`${classList()}`}>
       <Card>
         <div className="w-full h-10 flex flex-row items-center justify-start gap-4">
           <div>

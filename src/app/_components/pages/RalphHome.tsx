@@ -2,6 +2,7 @@ import { BalanceCard, MintCard, PageTemplate } from "~/lib";
 import { RalphWalletCard } from "../RalphWalletCard";
 import { signal } from "@preact/signals-react";
 import { useAddress, useDisconnect, useWallet } from "@thirdweb-dev/react";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 
 const mintCard = (
   <MintCard
@@ -47,6 +48,16 @@ export const RalphHome = () => {
   const wallet = useWallet();
   const disconnect = useDisconnect();
   const isWalletConnected = walletAddress !== undefined;
+
+  /**
+   * Query Clients
+   */
+  // 1. query for current network, return a signal with current network
+  // 2. query for network mismatch, return a signal checking the wallet netowkr and the current network
+  // const queryClient = useQueryClient();
+  // const query = useQuery("totalSupply", () => {
+  //   return 100000;
+  // });
   return (
     <div id="app-container">
       <PageTemplate>

@@ -6,10 +6,10 @@ export const RalphMintCard = (props: MintCardViewModel) => {
   if (props.status === "success") {
     return (
       <MintCard
-        mintedPercentage={props.data.mintedPercentage}
-        mintLimit={props.data.mintLimit}
-        totalSupply={props.data.totalSupply}
-        totalMinted={props.data.totalMinted}
+        mintedPercentage={props.data.mintedPercentage.value}
+        mintLimit={props.data.mintLimit.value}
+        totalSupply={props.data.totalSupply.value}
+        totalMinted={props.data.totalMinted.value}
         mintingFee={10}
         mintingDisabled={false}
         tokenShortName="PR"

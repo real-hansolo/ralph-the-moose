@@ -1,10 +1,11 @@
+import { type Signal } from "@preact/signals-react";
 import { type BaseViewModel } from "./base";
 
 export interface MintCardData {
-    mintedPercentage: number;
-    mintLimit: number;
-    totalSupply: number;
-    totalMinted: number;
+    mintedPercentage: Signal<number>;
+    mintLimit: Signal<number>;
+    totalSupply: Signal<number>;
+    totalMinted: Signal<number>;
 }
 
 type MintCardViewModel = BaseViewModel<MintCardData>;

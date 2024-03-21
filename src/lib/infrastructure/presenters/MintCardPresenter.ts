@@ -1,5 +1,5 @@
-import { Signal, signal } from "@preact/signals-react";
-import MintCardViewModel from "../view-models/MintCardViewModel";
+import { type Signal, signal } from "@preact/signals-react";
+import type MintCardViewModel from "../view-models/MintCardViewModel";
 
 export default class MintCardPresenter {
     public mintedPercentage: Signal<number>;
@@ -21,10 +21,10 @@ export default class MintCardPresenter {
         return {
             status: "success",
             data: {
-                mintedPercentage: this.mintedPercentage.value,
-                mintLimit: this.mintLimit.value,
-                totalSupply: this.totalSupply.value,
-                totalMinted: this.totalMinted.value,
+                mintedPercentage: this.mintedPercentage,
+                mintLimit: this.mintLimit,
+                totalSupply: this.totalSupply,
+                totalMinted: this.totalMinted,
             }
         } as MintCardViewModel;
     }

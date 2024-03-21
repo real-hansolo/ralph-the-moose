@@ -4,8 +4,7 @@ import { useAddress, useDisconnect, useWallet } from "@thirdweb-dev/react";
 import { RalphMintCard } from "../_components/RalphMintCard";
 import MintCardPresenter from "~/lib/infrastructure/presenters/MintCardPresenter";
 import { useQuery } from "@tanstack/react-query";
-import MintCardViewModel from "~/lib/infrastructure/view-models/MintCardViewModel";
-
+import type MintCardViewModel from "~/lib/infrastructure/view-models/MintCardViewModel";
 
 const balanceCard = (
   <BalanceCard
@@ -37,16 +36,14 @@ export const RalphHome = () => {
   // 1. query for current network, return a signal with current network
   // 2. query for network mismatch, return a signal checking the wallet netowkr and the current network
   // 3. Signal for toasts
-  // const queryClient = useQueryClient();
-  // const query = useQuery("totalSupply", () => {
-  //   return 100000;
-  // });
   const mintCardPresenter = new MintCardPresenter();
   const { data: mintCardViewModel } = useQuery<MintCardViewModel>({
-    queryKey: ["mintCard"],
+    queryKey: ["MintCard"],
     queryFn: async () => {
-       return mintCardPresenter.getViewModel();
+      const viewModel = await mintCardPresenter.getViewModel();
+      return viewModel;
     },
+    refetchInterval: 1000,
   });
 
   return (
@@ -60,7 +57,7 @@ export const RalphHome = () => {
             onDisconnect={disconnect}
           />
         )}
-        {mintCardViewModel && <RalphMintCard {...mintCardViewModel}/>}
+        {mintCardViewModel && <RalphMintCard {...mintCardViewModel} />}
         {balanceCard}
         {isWalletConnected && (
           <RalphWalletCard

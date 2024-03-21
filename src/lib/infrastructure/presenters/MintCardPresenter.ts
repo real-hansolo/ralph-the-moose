@@ -16,7 +16,7 @@ export default class MintCardPresenter {
         this.totalMinted = signal(0);
     }
 
-    getViewModel(): MintCardViewModel {
+    async getViewModel(): Promise<MintCardViewModel> {
         // present the view model
         return {
             status: "success",

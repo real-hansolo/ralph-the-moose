@@ -1,4 +1,4 @@
-import { GetAllocationLimitDTO, type GetAllMintedDTO } from "../dto/indexer-dto";
+import { type GetAllocationLimitDTO, type GetAllMintedDTO } from "../dto/indexer-dto";
 
 export default class IndexerGateway {
     constructor(
@@ -7,10 +7,9 @@ export default class IndexerGateway {
         this.indexer_url = indexer_url;
     }
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     async _call<T>(endpoint: string, method?: string, body?: object): Promise<T> {
-        console.log("Making request to indexer")
-        console.log(`${this.indexer_url}/${endpoint}`);
+        // console.log("Making request to indexer")
+        // console.log(`${this.indexer_url}/${endpoint}`);
         const response = await fetch(`${this.indexer_url}/${endpoint}`, {
             method: method ?? "GET",
             headers: {

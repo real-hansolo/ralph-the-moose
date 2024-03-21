@@ -9,6 +9,7 @@ export const env = createEnv({
   server: {
     NODE_ENV: z.enum(["development", "test", "production"]),
     HIGHLIGHT_PROJECT_ID: z.string(),
+    THIRDWEB_SECRET_KEY: z.string(),
   },
 
   /**
@@ -20,6 +21,7 @@ export const env = createEnv({
     // NEXT_PUBLIC_CLIENTVAR: z.string(),
     NEXT_PUBLIC_USE_MAINNETS: z.boolean(),
     NEXT_PUBLIC_INDEXER_URL: z.string(),
+    NEXT_PUBLIC_THIRDWEB_CLIENT_ID: z.string(),
     NEXT_PUBLIC_FEE_WALLET_ADDRESS: z.string()
   },
 
@@ -30,8 +32,9 @@ export const env = createEnv({
   runtimeEnv: {
     NODE_ENV: process.env.NODE_ENV,
     HIGHLIGHT_PROJECT_ID: process.env.HIGHLIGHT_PROJECT_ID ?? "no-project-id",
-    // NEXT_PUBLIC_CLIENTVAR: process.env.NEXT_PUBLIC_CLIENTVAR,
+    THIRDWEB_SECRET_KEY: process.env.THIRDWEB_SECRET_KEY,
     NEXT_PUBLIC_USE_MAINNETS: process.env.NEXT_PUBLIC_USE_MAINNETS?.trim().toLocaleLowerCase() === "true",
+    NEXT_PUBLIC_THIRDWEB_CLIENT_ID: process.env.NEXT_PUBLIC_THIRDWEB_CLIENT_ID,
     NEXT_PUBLIC_INDEXER_URL: process.env.NEXT_PUBLIC_INDEXER_URL ?? "http://localhost:8080",
     NEXT_PUBLIC_FEE_WALLET_ADDRESS: process.env.NEXT_PUBLIC_FEE_WALLET_ADDRESS,
   },

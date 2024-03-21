@@ -3,6 +3,8 @@ import { RalphWalletCard } from "../_components/RalphWalletCard";
 import { useAddress, useDisconnect, useWallet } from "@thirdweb-dev/react";
 import { RalphMintCard } from "../_components/RalphMintCard";
 import MintCardPresenter from "~/lib/infrastructure/presenters/MintCardPresenter";
+import { useQuery } from "@tanstack/react-query";
+import MintCardViewModel from "~/lib/infrastructure/view-models/MintCardViewModel";
 
 
 const balanceCard = (
@@ -39,9 +41,14 @@ export const RalphHome = () => {
   // const query = useQuery("totalSupply", () => {
   //   return 100000;
   // });
-
   const mintCardPresenter = new MintCardPresenter();
-  const mintCardViewModel = mintCardPresenter.getViewModel();
+  const { data: mintCardViewModel } = useQuery<MintCardViewModel>({
+    queryKey: ["mintCard"],
+    queryFn: async () => {
+       return mintCardPresenter.getViewModel();
+    },
+  });
+
   return (
     <div id="app-container">
       <PageTemplate>
@@ -53,7 +60,7 @@ export const RalphHome = () => {
             onDisconnect={disconnect}
           />
         )}
-        <RalphMintCard {...mintCardViewModel}/>
+        {mintCardViewModel && <RalphMintCard {...mintCardViewModel}/>}
         {balanceCard}
         {isWalletConnected && (
           <RalphWalletCard

@@ -1,11 +1,7 @@
 import { type BaseDTO } from "./base";
 
-export type MintResponseSuccessDTO = {
-    success: true;
-    data: {
-        minted: number;
-        chain: string;
-    };
+export type MintResponseSuccessData = {
+    minted: number;
 };
 
-export type MintResponseDTO = BaseDTO<MintResponseSuccessDTO>
+export type MintResponseDTO = BaseDTO<MintResponseSuccessData>

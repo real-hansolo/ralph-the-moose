@@ -2,7 +2,7 @@ import { type Signal, signal } from "@preact/signals-react";
 import type MintCardViewModel from "../view-models/MintCardViewModel";
 import IndexerGateway from "../gateways/indexer";
 import { env } from "~/env";
-import { GetAllocationLimitDTO, type GetAllMintedDTO } from "../dto/indexer-dto";
+import { type GetAllocationLimitDTO, type GetAllMintedDTO } from "../dto/indexer-dto";
 
 export default class MintCardPresenter {
     public mintedPercentage: Signal<number>;

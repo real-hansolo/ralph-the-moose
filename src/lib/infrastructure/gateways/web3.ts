@@ -1,11 +1,20 @@
+import { env } from "~/env";
+
 export default class Web3Gateway {
+    private feeWalletAddress: string;
     constructor(
-        
     ) {
+        this.feeWalletAddress = env.NEXT_PUBLIC_FEE_WALLET_ADDRESS;
     }
 
-    async getBalance(walletAddress: string) {
-        // await this.web3.eth.getBalance(walletAddress);
-        return 100000;
+
+    async mintRequest(amount: number) {
+        const message = {
+            p: "elkrc-404",
+            tick: "PR",
+            op: "mint",
+            amount: amount,
+        }
+        
     }
 }

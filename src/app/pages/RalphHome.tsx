@@ -13,6 +13,8 @@ import type MintCardViewModel from "~/lib/infrastructure/view-models/MintCardVie
 import BalanceCardPresenter from "~/lib/infrastructure/presenters/BalanceCardPresenter";
 import type BalanceCardViewModel from "~/lib/infrastructure/view-models/BalanceCardViewModel";
 import { RalphBalaceCard } from "../_components/RalphBalanceCard";
+import { toasts } from "~/lib/infrastructure/signals";
+import { useEffect } from "react";
 
 export const RalphHome = () => {
   /**
@@ -22,6 +24,27 @@ export const RalphHome = () => {
   const wallet: WalletInstance | undefined = useWallet();
   const disconnect = useDisconnect();
   const isWalletConnected = walletAddress !== undefined;
+
+  useEffect(() => {
+    if (wallet) {
+      wallet.on("disconnect", () => {
+        toasts.value = [{
+          title: "Wallet Disconnected!",
+          message: "Hasta la vista, baby!",
+          status: "warning",
+          isPermanent: false,
+        }];
+      });
+      wallet.on("change", () => {
+        toasts.value = [{
+          title: "Wallet Changed!",
+          message: "Wallet has been changed!",
+          status: "warning",
+          isPermanent: false,
+        }];
+      });
+    }
+  }, [wallet]);
   /**
    * Query Clients
    */
@@ -29,14 +52,13 @@ export const RalphHome = () => {
   // 2. query for network mismatch, return a signal checking the wallet netowkr and the current network
   // 3. Signal for toasts
   const mintCardPresenter = new MintCardPresenter(wallet);
-
   const { data: mintCardViewModel } = useQuery<MintCardViewModel>({
     queryKey: ["MintCard"],
     queryFn: async () => {
       const viewModel = await mintCardPresenter.present();
       return viewModel;
     },
-    refetchInterval: 1000,
+    refetchInterval: 3000,
   });
 
   const balanceCardPresenter = new BalanceCardPresenter();
@@ -51,7 +73,7 @@ export const RalphHome = () => {
 
   return (
     <div id="app-container">
-      <PageTemplate>
+      <PageTemplate toasts={toasts}>
         {!isWalletConnected && (
           <RalphWalletCard
             status={isWalletConnected ? "connected" : "disconnected"}

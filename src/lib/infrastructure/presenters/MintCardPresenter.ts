@@ -8,6 +8,9 @@ import {
 } from "../dto/indexer-dto";
 import Web3Gateway from "../gateways/web3";
 import { type WalletInstance } from "@thirdweb-dev/react";
+import { type MintResponseDTO } from "../dto/web3-dto";
+import { toasts } from "../signals";
+import { ToastProps } from "~/lib";
 
 export default class MintCardPresenter {
   public mintedPercentage: Signal<number>;
@@ -24,12 +27,29 @@ export default class MintCardPresenter {
     this.totalMinted = signal<number>(0);
     const indexerHost = env.NEXT_PUBLIC_INDEXER_URL;
     this.indexer = new IndexerGateway(indexerHost);
-    this.web3Gateway = new Web3Gateway(wallet);
+    this.web3Gateway = new Web3Gateway(wallet, toasts);
   }
 
   mint = async () => {
-    console.log("Minting card");
-    await this.web3Gateway.mintRequest(1230000000000000);
+    const mintResponse: MintResponseDTO =
+      await this.web3Gateway.mintRequest(1230000000000000);
+    if (mintResponse.success) {
+      console.log("Minted");
+      toasts.value.push({
+        title: "Minting",
+        message: "Minting successful!",
+        status: "success",
+        isPermanent: false,
+      } as ToastProps);
+    } else {
+      console.log("Error minting", mintResponse.msg);
+      toasts.value.push({
+        title: "Minting failed",
+        message: mintResponse.msg,
+        status: "error",
+        isPermanent: false,
+      });
+    }
   };
 
   async present(): Promise<MintCardViewModel> {

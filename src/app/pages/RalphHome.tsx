@@ -1,5 +1,5 @@
 import { BalanceCard, MintCard, PageTemplate } from "~/lib";
-import { RalphWalletCard } from "../RalphWalletCard";
+import { RalphWalletCard } from "../_components/RalphWalletCard";
 import { signal } from "@preact/signals-react";
 import { useAddress, useDisconnect, useWallet } from "@thirdweb-dev/react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
@@ -54,6 +54,7 @@ export const RalphHome = () => {
    */
   // 1. query for current network, return a signal with current network
   // 2. query for network mismatch, return a signal checking the wallet netowkr and the current network
+  // 3. Signal for toasts
   // const queryClient = useQueryClient();
   // const query = useQuery("totalSupply", () => {
   //   return 100000;

@@ -18,7 +18,8 @@ export const env = createEnv({
    */
   client: {
     // NEXT_PUBLIC_CLIENTVAR: z.string(),
-    NEXT_PUBLIC_USE_MAINNETS: z.boolean()
+    NEXT_PUBLIC_USE_MAINNETS: z.boolean(),
+    NEXT_PUBLIC_INDEXER_URL: z.string()
   },
 
   /**
@@ -30,6 +31,7 @@ export const env = createEnv({
     HIGHLIGHT_PROJECT_ID: process.env.HIGHLIGHT_PROJECT_ID ?? "no-project-id",
     // NEXT_PUBLIC_CLIENTVAR: process.env.NEXT_PUBLIC_CLIENTVAR,
     NEXT_PUBLIC_USE_MAINNETS: process.env.NEXT_PUBLIC_USE_MAINNETS?.trim().toLocaleLowerCase() === "true",
+    NEXT_PUBLIC_INDEXER_URL: process.env.NEXT_PUBLIC_INDEXER_URL ?? "http://localhost:8080"
   },
   /**
    * Run `build` or `dev` with `SKIP_ENV_VALIDATION` to skip env validation. This is especially

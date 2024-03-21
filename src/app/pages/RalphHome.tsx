@@ -1,26 +1,15 @@
-import { BalanceCard, PageTemplate } from "~/lib";
+import { PageTemplate } from "~/lib";
 import { RalphWalletCard } from "../_components/RalphWalletCard";
 import { useAddress, useDisconnect, useWallet } from "@thirdweb-dev/react";
 import { RalphMintCard } from "../_components/RalphMintCard";
 import MintCardPresenter from "~/lib/infrastructure/presenters/MintCardPresenter";
 import { useQuery } from "@tanstack/react-query";
 import type MintCardViewModel from "~/lib/infrastructure/view-models/MintCardViewModel";
+import BalanceCardPresenter from "~/lib/infrastructure/presenters/BalanceCardPresenter";
+import type BalanceCardViewModel from "~/lib/infrastructure/view-models/BalanceCardViewModel";
+import { RalphBalaceCard } from "../_components/RalphBalanceCard";
 
-const balanceCard = (
-  <BalanceCard
-    inscriptionBalance={80000}
-    wrappedBalance={20000}
-    tokenShortName="PR"
-    icon={<div />}
-    fee={2}
-    onWrap={() => {
-      console.log("wrap");
-    }}
-    onUnwrap={() => {
-      console.log("unwrap");
-    }}
-  />
-);
+
 export const RalphHome = () => {
   /**
    * Hooks and Wallet Information
@@ -40,12 +29,21 @@ export const RalphHome = () => {
   const { data: mintCardViewModel } = useQuery<MintCardViewModel>({
     queryKey: ["MintCard"],
     queryFn: async () => {
-      const viewModel = await mintCardPresenter.getViewModel();
+      const viewModel = await mintCardPresenter.present();
       return viewModel;
     },
     refetchInterval: 1000,
   });
 
+  const balanceCardPresenter = new BalanceCardPresenter();
+  const {data: balanceCardViewModel} = useQuery<BalanceCardViewModel>({
+    queryKey: ["BalanceCard"],
+    queryFn: async () => {
+      const viewModel = await balanceCardPresenter.present();
+      return viewModel;
+    },
+    refetchInterval: 1000,
+  })
   return (
     <div id="app-container">
       <PageTemplate>
@@ -58,7 +56,7 @@ export const RalphHome = () => {
           />
         )}
         {mintCardViewModel && <RalphMintCard {...mintCardViewModel} />}
-        {balanceCard}
+        {balanceCardViewModel && <RalphBalaceCard {...balanceCardViewModel} />}
         {isWalletConnected && (
           <RalphWalletCard
             status={isWalletConnected ? "connected" : "disconnected"}

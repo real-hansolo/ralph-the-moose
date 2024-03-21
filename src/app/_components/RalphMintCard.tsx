@@ -2,7 +2,8 @@ import { signal } from "@preact/signals-react";
 import { MintCard } from "~/lib";
 import type MintCardViewModel from "~/lib/infrastructure/view-models/MintCardViewModel";
 
-export const RalphMintCard = (props: MintCardViewModel) => {
+export const RalphMintCard = (props: MintCardViewModel ) => {
+  
   if (props.status === "success") {
     return (
       <MintCard
@@ -14,7 +15,7 @@ export const RalphMintCard = (props: MintCardViewModel) => {
         mintingDisabled={false}
         tokenShortName="PR"
         isMinting={signal(false)}
-        onMint={() => console.log("mint")}
+        onMint={props.data.mint}
         // children={
         // <MintCompletedStatusFrame
         //   tokenShortName="PR"

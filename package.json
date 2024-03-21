@@ -21,6 +21,7 @@
     "@t3-oss/env-nextjs": "^0.7.1",
     "@tailwindcss/typography": "^0.5.10",
     "@tanstack/react-query": "^4.36.1",
+    "@tanstack/react-query-devtools": "^4.36.1",
     "@thirdweb-dev/react": "^4.4.21",
     "@thirdweb-dev/sdk": "^4.0.48",
     "@trpc/client": "^10.43.6",

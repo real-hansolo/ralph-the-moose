@@ -1,30 +1,10 @@
-import { BalanceCard, MintCard, PageTemplate } from "~/lib";
+import { BalanceCard, PageTemplate } from "~/lib";
 import { RalphWalletCard } from "../_components/RalphWalletCard";
-import { signal } from "@preact/signals-react";
 import { useAddress, useDisconnect, useWallet } from "@thirdweb-dev/react";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { RalphMintCard } from "../_components/RalphMintCard";
+import MintCardPresenter from "~/lib/infrastructure/presenters/MintCardPresenter";
 
-const mintCard = (
-  <MintCard
-    mintedPercentage={0.5}
-    mintLimit={100000}
-    totalSupply={100000}
-    totalMinted={50000}
-    mintingFee={10}
-    mintingDisabled={false}
-    tokenShortName="PR"
-    isMinting={signal(false)}
-    onMint={() => console.log("mint")}
-    // children={
-    // <MintCompletedStatusFrame
-    //   tokenShortName="PR"
-    //   amountMinted={10000}
-    //   timestamp="2024-02-14 @ 16:03"
-    //   explorerLink="nowhere"
-    // />
-    // }
-  />
-);
+
 const balanceCard = (
   <BalanceCard
     inscriptionBalance={80000}
@@ -59,6 +39,9 @@ export const RalphHome = () => {
   // const query = useQuery("totalSupply", () => {
   //   return 100000;
   // });
+
+  const mintCardPresenter = new MintCardPresenter();
+  const mintCardViewModel = mintCardPresenter.getViewModel();
   return (
     <div id="app-container">
       <PageTemplate>
@@ -70,7 +53,7 @@ export const RalphHome = () => {
             onDisconnect={disconnect}
           />
         )}
-        {mintCard}
+        <RalphMintCard {...mintCardViewModel}/>
         {balanceCard}
         {isWalletConnected && (
           <RalphWalletCard

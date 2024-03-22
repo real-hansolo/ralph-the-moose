@@ -184,7 +184,7 @@ export const RalphMintCard = ({
     }
 
     // Poll the indexer for transaction hash
-    const maxAttempts = 20;
+    const maxAttempts = 60;
     try {
       const inscriptionStatus = await pollIndexer(
         indexerGateway,

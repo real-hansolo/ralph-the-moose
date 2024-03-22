@@ -61,27 +61,22 @@ export const RalphMintCard = ({
       return;
     }
     if (!data || isLoading) {
-      console.log("[Mint - Disabled]: Data not loaded");
       SdisableMinting.value = true;
       return;
     }
     if (isError) {
-      console.log("[Mint - Disabled]: Error loading data");
       SdisableMinting.value = true;
       return;
     }
     if (!data.status) {
-      console.log("[Mint - Disabled]: Data status not available");
       SdisableMinting.value = true;
       return;
     }
     if (data.status === "success") {
-      console.log("[Mint - Enabled]: Data status is success");
       SdisableMinting.value = false;
       return;
     }
     if (SisMinting.value) {
-      console.log("[Mint - Disabled]: Minting in progress");
       SdisableMinting.value = true;
       return;
     }

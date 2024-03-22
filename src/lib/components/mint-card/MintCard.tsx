@@ -21,7 +21,7 @@ export const MintCard = (props: MintCardProps) => {
   const formattedMintLimit = formatNumber(props.mintLimit);
   const formattedTotalSupply = formatNumber(props.totalSupply);
   const formattedTotalMinted = formatNumber(props.totalMinted);
-
+  
   const handleMint = () => {
     props.isMinting.value = true;
     props.onMint();
@@ -53,9 +53,7 @@ export const MintCard = (props: MintCardProps) => {
           disabled={props.mintingDisabled}
           label="Mint"
           variant="primary"
-          onClick={() => {
-            console.log("Minting");
-          }}
+          onClick={props.onMint}
         />
       </div>
     </Card>

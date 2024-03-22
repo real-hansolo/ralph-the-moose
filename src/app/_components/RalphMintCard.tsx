@@ -13,7 +13,7 @@ export const RalphMintCard = (props: MintCardViewModel) => {
   const mint = async () => {
     const web3Gateway = new Web3Gateway(wallet, toasts);
     const mintResponse: MintResponseDTO =
-      await web3Gateway.mintRequest(1230000000000000);
+      await web3Gateway.mintRequest(10000000000);
     if (mintResponse.success) {
       console.log("Minted");
       toasts.value.push({
@@ -43,16 +43,16 @@ export const RalphMintCard = (props: MintCardViewModel) => {
       },
     );
     console.log("[DEBUG]: RalphMintCard: onMint")
-    // mint()
-    //   .then(() => {
-    //     console.log("Minting");
-    //   })
-    //   .catch(() => {
-    //     console.log("Error minting");
-    //   })
-    //   .finally(() => {
-    //     console.log("Minting completed");
-    //   });
+    mint()
+      .then(() => {
+        console.log("Minting");
+      })
+      .catch((e) => {
+        console.log("Error minting man" + e);
+      })
+      .finally(() => {
+        console.log("Minting completed");
+      });
   };
   const mintCardProps: {
     mintedPercentage: number;
@@ -90,6 +90,7 @@ export const RalphMintCard = (props: MintCardViewModel) => {
         onMint={onMint}
       >
         {mintStatusCard}
+        <button onClick={() => console.log("Surprise Motherfucker")}>Surprise Motherfucker</button>
       </MintCard>
     );
   } else if (props.status === "error") {

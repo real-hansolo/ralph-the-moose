@@ -15,7 +15,6 @@ import type BalanceCardViewModel from "~/lib/infrastructure/view-models/BalanceC
 import { RalphBalaceCard } from "../_components/RalphBalanceCard";
 import { toasts } from "~/lib/infrastructure/signals";
 import { useEffect } from "react";
-import { stat } from "fs";
 import { signal } from "@preact/signals-react";
 
 export const RalphHome = () => {
@@ -88,6 +87,7 @@ export const RalphHome = () => {
             onDisconnect={disconnect}
           />
         )}
+        <button onClick={() => console.log("Surprise Motherfucker")}>Disconnect</button>
         <MintCard
           mintedPercentage={0}
           mintLimit={0}

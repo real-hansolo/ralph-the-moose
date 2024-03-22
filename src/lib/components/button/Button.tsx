@@ -46,7 +46,7 @@ export const Button = ({
 
   return (
     <div className={containerClasses} aria-disabled={disabled}>
-      <div
+      <button
         aria-disabled={disabled}
         role="button"
         className={buttonClasses}
@@ -54,7 +54,7 @@ export const Button = ({
         {...props}
       >
         {label}
-      </div>
+      </button>
     </div>
   );
 };

@@ -21,3 +21,19 @@ export type GetAllocationForAddressSuccessDTO = {
 }
 
 export type GetAllocationForAddressDTO = BaseDTO<GetAllocationForAddressSuccessDTO>;
+
+
+export type GetInscriptionSuccessDTO = {
+    tx_hash: string,
+    block_number: number,
+    sender: string,
+    timestamp: number,
+    p: string,
+    op: string,
+    tick: string,
+    receiver: string,
+    amount: number,
+    valid: number
+}
+
+export type GetInscriptionStatusDTO = BaseDTO<GetInscriptionSuccessDTO>;

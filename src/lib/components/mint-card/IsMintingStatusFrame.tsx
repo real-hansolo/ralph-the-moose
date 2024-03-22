@@ -15,6 +15,11 @@ export interface IsMintingStatusFrameProps {
    * The short name of the token.
    */
   tokenShortName: string;
+
+  /**
+   * A message to display to the user.
+   */
+  message: string;
 }
 
 /**
@@ -29,6 +34,9 @@ export const IsMintingStatusFrame = (props: IsMintingStatusFrameProps) => {
         <IconHourglass size={12} />
         <div className="w-full font-gluten font-bold relative text-lg tracking-[-0.04em] leading-[18px] inline-block font-heading-h5 text-text-primary text-center overflow-auto whitespace-normal">
           {`${formattedIsMintingAmount} ${props.tokenShortName} are being minted!`}
+        </div>
+        <div className="w-full flex flex-row items-center justify-center text-center">
+          <p className="text-center">{props.message}</p>
         </div>
         <div className="w-full flex flex-row items-center justify-center text-center">
           <p className="text-center">Do not refresh this page!</p>

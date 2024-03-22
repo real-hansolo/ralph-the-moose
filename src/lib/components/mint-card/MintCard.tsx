@@ -13,6 +13,7 @@ export interface MintCardProps {
   tokenShortName: string;
   isMinting: Signal<boolean>;
   children?: React.ReactNode;
+  
   onMint: () => void;
 }
 
@@ -23,7 +24,6 @@ export const MintCard = (props: MintCardProps) => {
   const formattedTotalMinted = formatNumber(props.totalMinted);
   
   const handleMint = () => {
-    props.isMinting.value = true;
     props.onMint();
   };
   return (
@@ -53,7 +53,7 @@ export const MintCard = (props: MintCardProps) => {
           disabled={props.mintingDisabled}
           label="Mint"
           variant="primary"
-          onClick={props.onMint}
+          onClick={handleMint}
         />
       </div>
     </Card>

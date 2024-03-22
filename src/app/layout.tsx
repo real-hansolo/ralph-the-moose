@@ -35,7 +35,7 @@ export default function RootLayout({
   console.log('HIGHLIGHT_PROJECT_ID', HIGHLIGHT_PROJECT_ID)
   return (
     <>
-      <HighlightInit
+      {/* <HighlightInit
 				projectId={HIGHLIGHT_PROJECT_ID}
 				serviceName="ralph-the-moose-frontend"
 				tracingOrigins
@@ -44,10 +44,10 @@ export default function RootLayout({
 					recordHeadersAndBody: true,
 					urlBlocklist: [],
 				}}
-			/>
+			/> */}
       <html lang="en">
-        <AxiomWebVitals />
-        <SpeedInsights />
+        {/* <AxiomWebVitals /> */}
+        {/* <SpeedInsights /> */}
         <body className={`font-sans ${inter.variable}`}>
           <TRPCReactProvider>{children}</TRPCReactProvider>
         </body>

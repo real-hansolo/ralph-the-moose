@@ -1,4 +1,4 @@
-import { MintCard, PageTemplate } from "~/lib";
+import { PageTemplate, type ToastProps } from "~/lib";
 import { RalphWalletCard } from "../_components/RalphWalletCard";
 import {
   type WalletInstance,
@@ -7,17 +7,17 @@ import {
   useWallet,
 } from "@thirdweb-dev/react";
 import { RalphMintCard } from "../_components/RalphMintCard";
-import MintCardPresenter from "~/lib/infrastructure/presenters/MintCardPresenter";
 import { useQuery } from "@tanstack/react-query";
-import type MintCardViewModel from "~/lib/infrastructure/view-models/MintCardViewModel";
 import BalanceCardPresenter from "~/lib/infrastructure/presenters/BalanceCardPresenter";
 import type BalanceCardViewModel from "~/lib/infrastructure/view-models/BalanceCardViewModel";
 import { RalphBalaceCard } from "../_components/RalphBalanceCard";
-import { toasts } from "~/lib/infrastructure/signals";
+import { signal, useSignal } from "@preact/signals-react";
 import { useEffect } from "react";
-import { signal } from "@preact/signals-react";
+import { DEFAULT_CHAIN, SUPPORTED_CHAINS, TChainConfig } from "~/lib/infrastructure/config/chains";
+import { useSignals } from "@preact/signals-react/runtime";
 
 export const RalphHome = () => {
+  useSignals();
   /**
    * Hooks and Wallet Information
    */
@@ -26,45 +26,31 @@ export const RalphHome = () => {
   const disconnect = useDisconnect();
   const isWalletConnected = walletAddress !== undefined;
 
-  // useEffect(() => {
-  //   // toasts.value = [];
-  // }, []);
-
-  // useEffect(() => {
-  //   if (wallet) {
-  //     wallet.on("disconnect", () => {
-  //       toasts.value.push({
-  //         title: "Wallet Disconnected!",
-  //         message: "Hasta la vista, baby!",
-  //         status: "warning",
-  //         isPermanent: false,
-  //       });
-  //     });
-  //     wallet.on("change", () => {
-  //       toasts.value.push({
-  //         title: "Wallet Changed!",
-  //         message: "Wallet has been changed!",
-  //         status: "warning",
-  //         isPermanent: false,
-  //       });
-  //     });
-  //   }
-  // }, [wallet]);
   /**
-   * Query Clients
+   * [Signal] Toasts: Store the toasts to be displayed on the screen.
    */
-  // 1. query for current network, return a signal with current network
-  // 2. query for network mismatch, return a signal checking the wallet netowkr and the current network
-  // 3. Signal for toasts
-  const mintCardPresenter = new MintCardPresenter(wallet);
-  const { data: mintCardViewModel } = useQuery<MintCardViewModel>({
-    queryKey: ["MintCard"],
-    queryFn: async () => {
-      const viewModel = await mintCardPresenter.present();
-      return viewModel;
-    },
-    refetchInterval: 10000,
-  });
+  const toasts = signal<ToastProps[]>([]);
+  const activeNetwork = useSignal<TChainConfig>(DEFAULT_CHAIN);
+  useEffect(() => {
+    if (wallet) {
+      wallet.on("disconnect", () => {
+        toasts.value.push({
+          title: "Wallet Disconnected!",
+          message: "Hasta la vista, baby!",
+          status: "warning",
+          isPermanent: false,
+        });
+      });
+      wallet.on("change", () => {
+        toasts.value.push({
+          title: "Wallet Changed!",
+          message: "Wallet has been changed!",
+          status: "warning",
+          isPermanent: false,
+        });
+      });
+    }
+  }, [wallet, toasts.value]);
 
   const balanceCardPresenter = new BalanceCardPresenter();
   const { data: balanceCardViewModel } = useQuery<BalanceCardViewModel>({
@@ -78,7 +64,7 @@ export const RalphHome = () => {
 
   return (
     <div id="app-container">
-      <PageTemplate toasts={toasts}>
+      <PageTemplate toasts={toasts} supportedNetworks={SUPPORTED_CHAINS} activeNetwork={activeNetwork}>
         {!isWalletConnected && (
           <RalphWalletCard
             status={isWalletConnected ? "connected" : "disconnected"}
@@ -87,21 +73,7 @@ export const RalphHome = () => {
             onDisconnect={disconnect}
           />
         )}
-        <button onClick={() => console.log("Surprise Motherfucker")}>Disconnect</button>
-        <MintCard
-          mintedPercentage={0}
-          mintLimit={0}
-          totalSupply={0}
-          totalMinted={0}
-          mintingFee={0}
-          mintingDisabled={false}
-          tokenShortName="PR"
-          isMinting={signal(false)}
-          onMint={() => {
-            console.log("Minting");
-          }}
-        />
-        {mintCardViewModel && <RalphMintCard {...mintCardViewModel} />}
+        <RalphMintCard toasts={toasts} activeNetwork={activeNetwork}/>
         {balanceCardViewModel && <RalphBalaceCard {...balanceCardViewModel} />}
         {isWalletConnected && (
           <RalphWalletCard

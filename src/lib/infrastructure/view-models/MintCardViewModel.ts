@@ -6,6 +6,7 @@ export interface MintCardData {
     mintLimit: Signal<number>;
     totalSupply: Signal<number>;
     totalMinted: Signal<number>;
+    allocation: Signal<number>;
 }
 
 type MintCardViewModel = BaseViewModel<MintCardData>;

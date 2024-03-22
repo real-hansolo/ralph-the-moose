@@ -13,3 +13,11 @@ export type GetAllocationLimitSSuccessDTO = {
 }
 
 export type GetAllocationLimitDTO = BaseDTO<GetAllocationLimitSSuccessDTO>;
+
+
+export type GetAllocationForAddressSuccessDTO = {
+    "address": string,
+    "allocation_amount": number,
+}
+
+export type GetAllocationForAddressDTO = BaseDTO<GetAllocationForAddressSuccessDTO>;

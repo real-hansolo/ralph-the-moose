@@ -9,7 +9,6 @@ export const env = createEnv({
   server: {
     NODE_ENV: z.enum(["development", "test", "production"]),
     HIGHLIGHT_PROJECT_ID: z.string(),
-    THIRDWEB_SECRET_KEY: z.string(),
   },
 
   /**
@@ -32,11 +31,10 @@ export const env = createEnv({
   runtimeEnv: {
     NODE_ENV: process.env.NODE_ENV,
     HIGHLIGHT_PROJECT_ID: process.env.HIGHLIGHT_PROJECT_ID ?? "no-project-id",
-    THIRDWEB_SECRET_KEY: process.env.THIRDWEB_SECRET_KEY,
     NEXT_PUBLIC_ENABLE_TESTNETS: process.env.NEXT_PUBLIC_ENABLE_TESTNETS?.trim().toLocaleLowerCase() === "true",
-    NEXT_PUBLIC_THIRDWEB_CLIENT_ID: process.env.NEXT_PUBLIC_THIRDWEB_CLIENT_ID,
+    NEXT_PUBLIC_THIRDWEB_CLIENT_ID: process.env.NEXT_PUBLIC_THIRDWEB_CLIENT_ID ?? "no-client-id",
     NEXT_PUBLIC_INDEXER_URL: process.env.NEXT_PUBLIC_INDEXER_URL ?? "http://localhost:8080",
-    NEXT_PUBLIC_FEE_WALLET_ADDRESS: process.env.NEXT_PUBLIC_FEE_WALLET_ADDRESS,
+    NEXT_PUBLIC_FEE_WALLET_ADDRESS: process.env.NEXT_PUBLIC_FEE_WALLET_ADDRESS ?? "0x",
   },
   /**
    * Run `build` or `dev` with `SKIP_ENV_VALIDATION` to skip env validation. This is especially

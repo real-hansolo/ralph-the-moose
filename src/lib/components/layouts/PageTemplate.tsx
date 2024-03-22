@@ -4,7 +4,7 @@ import { PageHeader, type SupportedNetworkProps } from "./PageHeader";
 import { Menu, Toast, type ToastProps } from "..";
 import { useSignal, useSignals } from "@preact/signals-react/runtime";
 import { type Signal } from "@preact/signals-react";
-import { DEFAULT_CHAIN, SUPPORTED_CHAINS, type TChainConfig } from "~/lib/infrastructure/config/chains";
+import { SUPPORTED_CHAINS, type TChainConfig } from "~/lib/infrastructure/config/chains";
 export const PageTemplate = ({
   children,
   toasts,
@@ -19,10 +19,10 @@ export const PageTemplate = ({
   useSignals();
   const menuOpenSignal = useSignal<boolean>(false);
   const handleNetworkChange = (network: SupportedNetworkProps) => {
-    const newChain = (SUPPORTED_CHAINS as TChainConfig[]).find((chain) => chain.chainId === network.chainId);
-    if (newChain) {
-      activeNetwork.value = newChain;
-    }
+    // const newChain = (SUPPORTED_CHAINS as TChainConfig[]).find((chain) => chain.chainId === network.chainId);
+    // if (newChain) {
+    //   activeNetwork.value = newChain;
+    // }
     // TODO: Network change failed!
     toasts.value.push({
       status: "success",

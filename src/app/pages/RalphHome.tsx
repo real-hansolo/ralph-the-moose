@@ -11,7 +11,7 @@ import { useQuery } from "@tanstack/react-query";
 import BalanceCardPresenter from "~/lib/infrastructure/presenters/BalanceCardPresenter";
 import type BalanceCardViewModel from "~/lib/infrastructure/view-models/BalanceCardViewModel";
 import { RalphBalaceCard } from "../_components/RalphBalanceCard";
-import { signal, useSignal } from "@preact/signals-react";
+import { useSignal } from "@preact/signals-react";
 import { useEffect } from "react";
 import { DEFAULT_CHAIN, SUPPORTED_CHAINS, type TChainConfig } from "~/lib/infrastructure/config/chains";
 import { useSignals } from "@preact/signals-react/runtime";

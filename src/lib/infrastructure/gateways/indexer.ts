@@ -2,6 +2,7 @@ import {
   type GetAllocationLimitDTO,
   type GetAllMintedDTO,
   type GetAllocationForAddressDTO,
+  type GetInscriptionStatusDTO,
 } from "../dto/indexer-dto";
 
 export default class IndexerGateway {
@@ -50,4 +51,13 @@ export default class IndexerGateway {
     );
     return response;
   }
+
+  async getInscriptionStatus(txHash: string): Promise<GetInscriptionStatusDTO> {
+    const response = await this._call<GetInscriptionStatusDTO>(
+      `inscriptions/${txHash}`,
+    );
+    return response;
+  }
 }
+
+

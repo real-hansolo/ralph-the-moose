@@ -36,7 +36,7 @@ export default class Web3Gateway {
     return hex;
   };
 
-  async mintRequest(
+  async sendMintTransaction(
     amount: number,
     chain: TChainConfig,
     statusMessage: Signal<string>,

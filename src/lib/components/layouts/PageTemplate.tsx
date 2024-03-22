@@ -24,6 +24,12 @@ export const PageTemplate = ({
       activeNetwork.value = newChain;
     }
     // TODO: Network change failed!
+    toasts.value.push({
+      status: "success",
+      title: `Use ${activeNetwork.value.name} Network`,
+      message: `Ralph's coming to more chains soon!`,
+      isPermanent: false,
+    });
   }
   return (
     <div

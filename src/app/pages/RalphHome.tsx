@@ -13,7 +13,7 @@ import type BalanceCardViewModel from "~/lib/infrastructure/view-models/BalanceC
 import { RalphBalaceCard } from "../_components/RalphBalanceCard";
 import { signal, useSignal } from "@preact/signals-react";
 import { useEffect } from "react";
-import { DEFAULT_CHAIN, SUPPORTED_CHAINS, TChainConfig } from "~/lib/infrastructure/config/chains";
+import { DEFAULT_CHAIN, SUPPORTED_CHAINS, type TChainConfig } from "~/lib/infrastructure/config/chains";
 import { useSignals } from "@preact/signals-react/runtime";
 
 export const RalphHome = () => {
@@ -29,7 +29,7 @@ export const RalphHome = () => {
   /**
    * [Signal] Toasts: Store the toasts to be displayed on the screen.
    */
-  const toasts = signal<ToastProps[]>([]);
+  const toasts = useSignal<ToastProps[]>([]);
   const activeNetwork = useSignal<TChainConfig>(DEFAULT_CHAIN);
   useEffect(() => {
     if (wallet) {
@@ -41,14 +41,14 @@ export const RalphHome = () => {
           isPermanent: false,
         });
       });
-      wallet.on("change", () => {
-        toasts.value.push({
-          title: "Wallet Changed!",
-          message: "Wallet has been changed!",
-          status: "warning",
-          isPermanent: false,
-        });
-      });
+      // wallet.on("change", () => {
+      //   toasts.value.push({
+      //     title: "Wallet and Account Connected!",
+      //     message: "",
+      //     status: "success",
+      //     isPermanent: false,
+      //   });
+      // });
     }
   }, [wallet, toasts.value]);
 

@@ -29,7 +29,7 @@ export const BASE_MAINNET: TChainConfig = {
 
 export const BASE_SEPOLIA_TESTNET: TChainConfig = {
   chainId: BaseSepoliaTestnet.chainId,
-  name: "Base Sepolia Testnet",
+  name: "Base Sepolia",
   rpcUrl: "https://sepolia.base.org",
   explorerUrl: BaseSepoliaTestnet.explorers[0].url,
   explorerName: BaseSepoliaTestnet.explorers[0].name,

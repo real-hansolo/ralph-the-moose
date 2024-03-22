@@ -1,4 +1,4 @@
-import { PageTemplate } from "~/lib";
+import { MintCard, PageTemplate } from "~/lib";
 import { RalphWalletCard } from "../_components/RalphWalletCard";
 import {
   type WalletInstance,
@@ -15,6 +15,8 @@ import type BalanceCardViewModel from "~/lib/infrastructure/view-models/BalanceC
 import { RalphBalaceCard } from "../_components/RalphBalanceCard";
 import { toasts } from "~/lib/infrastructure/signals";
 import { useEffect } from "react";
+import { stat } from "fs";
+import { signal } from "@preact/signals-react";
 
 export const RalphHome = () => {
   /**
@@ -25,26 +27,30 @@ export const RalphHome = () => {
   const disconnect = useDisconnect();
   const isWalletConnected = walletAddress !== undefined;
 
-  useEffect(() => {
-    if (wallet) {
-      wallet.on("disconnect", () => {
-        toasts.value = [{
-          title: "Wallet Disconnected!",
-          message: "Hasta la vista, baby!",
-          status: "warning",
-          isPermanent: false,
-        }];
-      });
-      wallet.on("change", () => {
-        toasts.value = [{
-          title: "Wallet Changed!",
-          message: "Wallet has been changed!",
-          status: "warning",
-          isPermanent: false,
-        }];
-      });
-    }
-  }, [wallet]);
+  // useEffect(() => {
+  //   // toasts.value = [];
+  // }, []);
+
+  // useEffect(() => {
+  //   if (wallet) {
+  //     wallet.on("disconnect", () => {
+  //       toasts.value.push({
+  //         title: "Wallet Disconnected!",
+  //         message: "Hasta la vista, baby!",
+  //         status: "warning",
+  //         isPermanent: false,
+  //       });
+  //     });
+  //     wallet.on("change", () => {
+  //       toasts.value.push({
+  //         title: "Wallet Changed!",
+  //         message: "Wallet has been changed!",
+  //         status: "warning",
+  //         isPermanent: false,
+  //       });
+  //     });
+  //   }
+  // }, [wallet]);
   /**
    * Query Clients
    */
@@ -58,7 +64,7 @@ export const RalphHome = () => {
       const viewModel = await mintCardPresenter.present();
       return viewModel;
     },
-    refetchInterval: 3000,
+    refetchInterval: 10000,
   });
 
   const balanceCardPresenter = new BalanceCardPresenter();
@@ -82,6 +88,19 @@ export const RalphHome = () => {
             onDisconnect={disconnect}
           />
         )}
+        <MintCard
+          mintedPercentage={0}
+          mintLimit={0}
+          totalSupply={0}
+          totalMinted={0}
+          mintingFee={0}
+          mintingDisabled={false}
+          tokenShortName="PR"
+          isMinting={signal(false)}
+          onMint={() => {
+            console.log("Minting");
+          }}
+        />
         {mintCardViewModel && <RalphMintCard {...mintCardViewModel} />}
         {balanceCardViewModel && <RalphBalaceCard {...balanceCardViewModel} />}
         {isWalletConnected && (

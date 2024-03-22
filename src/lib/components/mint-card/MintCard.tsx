@@ -53,7 +53,9 @@ export const MintCard = (props: MintCardProps) => {
           disabled={props.mintingDisabled}
           label="Mint"
           variant="primary"
-          onClick={handleMint}
+          onClick={() => {
+            console.log("Minting");
+          }}
         />
       </div>
     </Card>

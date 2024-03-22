@@ -3,6 +3,7 @@ import { RalphLogo } from "../ralph-logo";
 import { DropdownTrigger, IconClose, IconMenu, IconNetworkBase } from "..";
 import { type Signal } from "@preact/signals-react";
 import { Menu } from "./Menu";
+import { useSignals } from "@preact/signals-react/runtime";
 
 export interface SupportedNetworkProps {
   name: string;
@@ -17,6 +18,7 @@ export interface PageHeaderProps {
   menuOpenSignal: Signal<boolean>;
 }
 export const PageHeader = (props: PageHeaderProps) => {
+  useSignals();
   return (
     <div
       className={twMerge(
@@ -40,12 +42,15 @@ export const PageHeader = (props: PageHeaderProps) => {
             className="flex flex-row items-start justify-start p-2"
           >
             {!props.menuOpenSignal.value ? (
-              <div className="flex flex-row gap-4 cursor-pointer">
+              <div className="flex flex-row gap-4 cursor-pointer" onClick={
+                () => props.onNetworkChange(props.activeNetwork)
+              }>
+                 {/* TODO: Implement network change and dropdown content */}
                 <DropdownTrigger
                   title=""
                   variant="small"
-                  expanded={false}
-                  selectedOption="Base"
+                  expanded={true}
+                  selectedOption={props.activeNetwork.name}
                   icon={<IconNetworkBase />}
                 />
                 <div
@@ -82,12 +87,13 @@ export const PageHeader = (props: PageHeaderProps) => {
         <div className="flex flex-row items-center justify-between text-base ml-40 mr-40">
           <Menu />
         </div>
-        <div className="cursor-pointer">
+        {/* TODO: Implement network change and dropdown content */}
+        <div className="cursor-pointer" onClick={() => props.onNetworkChange(props.activeNetwork)}>
           <DropdownTrigger
             title=""
             variant="large"
             expanded={false}
-            selectedOption="Base"
+            selectedOption={props.activeNetwork.name}
             icon={<IconNetworkBase />}
           />
         </div>

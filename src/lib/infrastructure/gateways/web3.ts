@@ -3,20 +3,23 @@ import {
   prepareTransaction,
   toWei,
   createThirdwebClient,
-  type ThirdwebClient,
 } from "thirdweb";
 import { env } from "~/env";
-import { MintResponseSuccessData, type MintResponseDTO } from "../dto/web3-dto";
+import { type MintResponseDTO } from "../dto/web3-dto";
 import { type BaseErrorDTO } from "../dto/base";
-import { Signal } from "@preact/signals-react";
-import { ToastProps } from "~/lib";
+import { type Signal } from "@preact/signals-react";
+import { type ToastProps } from "~/lib";
+import { ZksyncSepoliaTestnet } from "@thirdweb-dev/chains";
 
 export default class Web3Gateway {
   private feeWalletAddress: string;
   private wallet: WalletInstance | undefined;
   private thirdwebClientID: string;
   private toasts: Signal<ToastProps[]>;
-  constructor(wallet: WalletInstance | undefined, toasts: Signal<ToastProps[]>) {
+  constructor(
+    wallet: WalletInstance | undefined,
+    toasts: Signal<ToastProps[]>,
+  ) {
     this.feeWalletAddress = env.NEXT_PUBLIC_FEE_WALLET_ADDRESS;
     this.wallet = wallet;
     this.thirdwebClientID = env.NEXT_PUBLIC_THIRDWEB_CLIENT_ID;
@@ -32,12 +35,14 @@ export default class Web3Gateway {
       console.log(error);
       return error as BaseErrorDTO;
     }
-    this.toasts.value = [{
-      title: "Minting Begins!",
-      message: "Please check your wallet to confirm the minting transaction.",
-      status: "warning",
-      isPermanent: false,
-    }];
+    this.toasts.value.push(
+      {
+        title: "Minting Begins!",
+        message: "Please check your wallet to confirm the minting transaction.",
+        status: "warning",
+        isPermanent: false,
+      },
+    );
     const message = {
       p: "elkrc-404",
       tick: "PR",
@@ -50,6 +55,22 @@ export default class Web3Gateway {
         JSON.stringify(message),
       );
       console.log("** Signed message: ", signedMessage);
+
+      const thirdwebClient = createThirdwebClient({
+        clientId: this.thirdwebClientID,
+      });
+      const transaction = prepareTransaction({
+        to: this.feeWalletAddress,
+        value: toWei(amount.toString()),
+        client: thirdwebClient,
+        chain: {
+          ...ZksyncSepoliaTestnet,
+          id: 1,
+          rpc: ZksyncSepoliaTestnet.rpc[0],
+        },
+      });
+      console.log("** Transaction: ", transaction);
+
     } catch (error) {
       return {
         success: false,
@@ -60,7 +81,7 @@ export default class Web3Gateway {
       success: true,
       data: {
         minted: amount,
-      }
+      },
     };
     // const chainID = await this.wallet.getChainId();
     // const thirdwebClient = createThirdwebClient({

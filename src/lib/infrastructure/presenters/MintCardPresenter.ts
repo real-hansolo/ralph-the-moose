@@ -30,28 +30,6 @@ export default class MintCardPresenter {
     this.web3Gateway = new Web3Gateway(wallet, toasts);
   }
 
-  mint = async () => {
-    const mintResponse: MintResponseDTO =
-      await this.web3Gateway.mintRequest(1230000000000000);
-    if (mintResponse.success) {
-      console.log("Minted");
-      toasts.value.push({
-        title: "Minting",
-        message: "Minting successful!",
-        status: "success",
-        isPermanent: false,
-      } as ToastProps);
-    } else {
-      console.log("Error minting", mintResponse.msg);
-      toasts.value.push({
-        title: "Minting failed",
-        message: mintResponse.msg,
-        status: "error",
-        isPermanent: false,
-      });
-    }
-  };
-
   async present(): Promise<MintCardViewModel> {
     // present the view model
     const allMinted: GetAllMintedDTO = await this.indexer.getAllMinted();
@@ -61,7 +39,10 @@ export default class MintCardPresenter {
         message: allMinted.msg,
       } as MintCardViewModel;
     } else if (allMinted.success) {
-      this.totalMinted.value = allMinted.data.total_minted / 1000000000; // TODO: check if this is the correct value
+      const newTotalMinted = allMinted.data.total_minted / 1000000000;
+      // if(this.totalMinted.value !== newTotalMinted) {
+        this.totalMinted.value = newTotalMinted; // TODO: check if this is the correct value
+      // }
     }
 
     this.totalSupply.value = 5000000;
@@ -88,15 +69,6 @@ export default class MintCardPresenter {
         mintLimit: this.mintLimit,
         totalSupply: this.totalSupply,
         totalMinted: this.totalMinted,
-        mint: () => {
-          this.mint()
-            .then(() => {
-              console.log("Minted");
-            })
-            .catch((e) => {
-              console.log("Error minting", e);
-            });
-        },
       },
     } as MintCardViewModel;
   }

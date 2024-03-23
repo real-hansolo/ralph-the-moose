@@ -210,7 +210,6 @@ export const RalphMintCard = ({
             explorerLink={mintResponse.data.explorerLink}
           />
         );
-        // SisMinting.value = false;
         return;
       } else {
         if (inscriptionStatus.data.valid === 0) {

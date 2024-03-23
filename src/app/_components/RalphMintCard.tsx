@@ -56,7 +56,6 @@ export const RalphMintCard = ({
   // Effect to enable or disable minting
   effect(() => {
     if (!wallet) {
-      console.log("[Mint - Disabled]: Wallet not connected");
       SdisableMinting.value = true;
       return;
     }
@@ -157,9 +156,6 @@ export const RalphMintCard = ({
     const chain = activeNetwork;
     const walletChainID = await wallet.getChainId();
     if (walletChainID !== chain.value.chainId) {
-      console.log(
-        `[Mint - Error]: Wrong network detected. ${walletChainID} !== ${chain.value.chainId}`,
-      );
       statusFrame.value = (
         <MintErrorStatusFrame
           error="Oh Snap!"
@@ -237,14 +233,11 @@ export const RalphMintCard = ({
   const onMint = () => {
     mint()
       .then(() => {
-        console.log("Minting");
+        console.log("[Mint Status]: Minting Ended!");
       })
       .catch((e) => {
-        console.log("Error minting man" + e);
+        console.log("[Mint Status]: Error minting" + e);
       })
-      .finally(() => {
-        console.log("Minting completed");
-      });
   };
 
   const mintCardViewModel: {

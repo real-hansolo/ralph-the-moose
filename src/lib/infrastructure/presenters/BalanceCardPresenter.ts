@@ -54,17 +54,14 @@ export default class BalanceCardPresenter {
   }
 
   async __presentClaimableWrappedBalance() {
-    console.log(`[BalanceCardPresenter] Fetching claimable wrapped balance`)
     this.claimableWrappedBalance.value = 0;
     if(!this.walletChainId || !this.walletAddress || !this.activeNetwork.value) {
         return;
     }
     const claimableBalance = await this.web3Gateway.fetchClaimableAmount(this.activeNetwork.value);
     if(!claimableBalance.success) {
-      console.log(`[BalanceCardPresenter] Error fetching claimable balance: ${claimableBalance.msg}`);  
       return;
     }
-    console.log(`[BalanceCardPresenter] Claimable balance: ${claimableBalance.data.amount}`)
     this.claimableWrappedBalance.value = claimableBalance.data.amount / 1000000000;
   }
 

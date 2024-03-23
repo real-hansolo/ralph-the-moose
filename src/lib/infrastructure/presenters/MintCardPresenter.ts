@@ -66,6 +66,7 @@ export default class MintCardPresenter {
   async __presentAllocationForAddress() {
     if (!this.walletAddress) {
       this.allocation.value = this.DEFAULT_ALLOCATION.value; // TODO: disable minting
+      return;
     } else {
       const allocationForAcountDTO = await this.indexer.getAllocationForAddress(
         this.walletAddress,
@@ -85,15 +86,16 @@ export default class MintCardPresenter {
             allocationForAcountDTO.data.allocation_amount
           ) {
             this.allocation.value = this.DEFAULT_ALLOCATION.value;
+            return;
           } else {
             this.allocation.value =
               allocationForAcountDTO.data.allocation_amount / 1000000000;
+            return;
           }
         } else {
           this.allocation.value = this.DEFAULT_ALLOCATION.value;
+          return;
         }
-        this.allocation.value =
-          this.DEFAULT_ALLOCATION.value / 1000000000;
       }
     }
   }

@@ -72,8 +72,6 @@ export default class MintCardPresenter {
         this.walletAddress,
       );
       if (!allocationForAcountDTO.success) {
-        //const errorMessage = allocationForAcountDTO.msg;
-        //console.log(`[Mint/allocation]: ${errorMessage}`);
         this.allocation.value = this.DEFAULT_ALLOCATION.value;
       } else {
         // TODO check balance, if balance is less than allocation, set allocation to (allocation - balance)

@@ -88,37 +88,6 @@ export default class Web3Gateway {
         msg: "Transaction failed. Try again or get in touch?",
       };
     }
-
-    // const chainID = await this.wallet.getChainId();
-
-    // const baseSepoliaTestnet = BaseSepoliaTestnet; // TODO: Obtain chain form config
-
-    // if (chainID !== baseSepoliaTestnet.chainId) { // TODO: do this check not in the gateway
-    //   const error = {
-    //     success: false,
-    //     msg: "Wrong Network",
-    //   };
-    //   return error as BaseErrorDTO;
-    // }
-
-    // const tx = prepareTransaction({
-    //   to: `0x${this.feeWalletAddress}`,
-    //   value: toWei("0.00123"),
-    //   chain: {
-    //     ...BaseSepoliaTestnet,
-    //     rpc: "https://sepolia.base.org",
-    //     id: 84532,
-    //   },
-    //   data: `0x${message}`,
-    //   client: createThirdwebClient({
-    //     clientId: this.thirdwebClientID,
-    //   }),
-    // });
-    // console.log("Tx: ", tx);
-    // const gas = await estimateGas({
-    //   transaction: tx,
-    // });
-    // console.log("Gas: ", gas);
   }
 
   async fetchClaimableAmount(chain: TChainConfig): Promise<ClaimableDTO> {
@@ -135,7 +104,6 @@ export default class Web3Gateway {
         msg: "Wrong Network",
       } as BaseErrorDTO;
     }
-    console.log(`[Web3Gateway] RPC: ${chain.jsonRpcProvider}`)
     const provider = new ethers.providers.JsonRpcProvider(
       chain.jsonRpcProvider as string,
     );
@@ -149,7 +117,6 @@ export default class Web3Gateway {
     try {
       // eslint-disable-next-line @typescript-eslint/no-unsafe-call
       const claimable = await contract.claimable(walletAddress);
-      console.log(`[Web3Gateway] Claimable balance: ${claimable}`);
       return {
         success: true,
         data: {

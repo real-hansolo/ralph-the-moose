@@ -32,7 +32,6 @@ export default function RootLayout({
 }: {
   children: React.ReactNode;
 }) {
-  console.log('HIGHLIGHT_PROJECT_ID', HIGHLIGHT_PROJECT_ID)
   return (
     <>
       <HighlightInit

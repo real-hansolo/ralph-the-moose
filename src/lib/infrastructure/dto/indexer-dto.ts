@@ -37,3 +37,10 @@ export type GetInscriptionSuccessDTO = {
 }
 
 export type GetInscriptionStatusDTO = BaseDTO<GetInscriptionSuccessDTO>;
+
+
+export type GetLatestBlockSuccessDTO = {
+    latest_block: number
+}
+
+export type GetLatestBlockDTO = BaseDTO<GetLatestBlockSuccessDTO>;

@@ -67,35 +67,33 @@ export default class MintCardPresenter {
     if (!this.walletAddress) {
       this.allocation.value = this.DEFAULT_ALLOCATION.value; // TODO: disable minting
       return;
-    } else {
-      const allocationForAcountDTO = await this.indexer.getAllocationForAddress(
-        this.walletAddress,
-      );
-      if (!allocationForAcountDTO.success) {
-        this.allocation.value = this.DEFAULT_ALLOCATION.value;
-      } else {
-        // TODO check balance, if balance is less than allocation, set allocation to (allocation - balance)
-        const totalMintedDTO = await this.indexer.getTotalMintedForAccount(
-          this.walletAddress,
-        );
-        if (totalMintedDTO.success) {
-          if (
-            totalMintedDTO.data.minted >=
-            allocationForAcountDTO.data.allocation_amount
-          ) {
-            this.allocation.value = this.DEFAULT_ALLOCATION.value;
-            return;
-          } else {
-            this.allocation.value =
-              allocationForAcountDTO.data.allocation_amount / 1000000000;
-            return;
-          }
-        } else {
-          this.allocation.value = this.DEFAULT_ALLOCATION.value;
-          return;
-        }
-      }
     }
+    const allocationForAcountDTO = await this.indexer.getAllocationForAddress(
+      this.walletAddress,
+    );
+    if (!allocationForAcountDTO.success) {
+      this.allocation.value = this.DEFAULT_ALLOCATION.value;
+      return;
+    }
+    // TODO check balance, if balance is less than allocation, set allocation to (allocation - balance)
+    const totalMintedDTO = await this.indexer.getTotalMintedForAccount(
+      this.walletAddress,
+    );
+    if (!totalMintedDTO.success) {
+      this.allocation.value = this.DEFAULT_ALLOCATION.value;
+      return;
+    }
+    // TODO: check if this is the correct value
+    if (
+      totalMintedDTO.data.minted < allocationForAcountDTO.data.allocation_amount
+    ) {
+      this.allocation.value =
+        allocationForAcountDTO.data.allocation_amount / 1000000000; // TODO: process 0's
+    }
+
+    this.allocation.value =
+      allocationForAcountDTO.data.allocation_amount / 1000000000;
+    return;
   }
 
   async present(): Promise<MintCardViewModel> {

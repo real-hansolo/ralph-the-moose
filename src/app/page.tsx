@@ -8,6 +8,7 @@ import { SUPPORTED_WALLETS } from "~/lib/infrastructure/config/wallets";
 //   SUPPORTED_CHAINS,
 // } from "~/lib/infrastructure/config/chains";
 import { RalphHome } from "./pages/RalphHome";
+import { env } from "~/env";
 
 export default function Home() {
   noStore();
@@ -17,6 +18,7 @@ export default function Home() {
   return (
     <ThirdwebProvider
       supportedWallets={SUPPORTED_WALLETS}
+      clientId={env.NEXT_PUBLIC_THIRDWEB_CLIENT_ID}
     >
       <RalphHome />
     </ThirdwebProvider>

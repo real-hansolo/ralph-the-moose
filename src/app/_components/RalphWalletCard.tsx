@@ -88,6 +88,7 @@ export const RalphWalletCard = (props: RalphWalletCardProps) => {
         }}
         modalTitleIconUrl={RALPH_PUBLIC_ICON_URL}
         showThirdwebBranding={false}
+        
       />
     </div>
   );

@@ -85,7 +85,8 @@ export default class MintCardPresenter {
     }
     // TODO: check if this is the correct value
     if (
-      totalMintedDTO.data.minted >= allocationForAcountDTO.data.allocation_amount
+      totalMintedDTO.data.minted >=
+      allocationForAcountDTO.data.allocation_amount
     ) {
       this.allocation.value = this.DEFAULT_ALLOCATION.value;
       return;
@@ -94,11 +95,8 @@ export default class MintCardPresenter {
         (allocationForAcountDTO.data.allocation_amount -
           totalMintedDTO.data.minted) /
         1000000000;
+      return;
     }
-
-    this.allocation.value =
-      allocationForAcountDTO.data.allocation_amount / 1000000000;
-    return;
   }
 
   async present(): Promise<MintCardViewModel> {

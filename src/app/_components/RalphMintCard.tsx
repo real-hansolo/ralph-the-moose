@@ -18,6 +18,7 @@ import { env } from "~/env";
 import IndexerGateway from "~/lib/infrastructure/gateways/indexer";
 import { type TChainConfig } from "~/lib/infrastructure/config/chains";
 import { MintWarningStatusFrame } from "~/lib/components/mint-card/MintWarningStatusFrame";
+import { toHex } from "thirdweb";
 
 export const RalphMintCard = ({
   toasts,
@@ -155,7 +156,7 @@ export const RalphMintCard = ({
     // Network Validation!
     const chain = activeNetwork;
     const walletChainID = await wallet.getChainId();
-    if (walletChainID !== chain.value.chainId) {
+    if (toHex(walletChainID) !== toHex(chain.value.chainId)) {
       statusFrame.value = (
         <MintErrorStatusFrame
           error="Oh Snap!"

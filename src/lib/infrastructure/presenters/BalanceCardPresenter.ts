@@ -54,6 +54,17 @@ export default class BalanceCardPresenter {
     this.inscriptionBalance.value = balanceForAccount.data.balance / 1000000000;
   }
 
+  async __presentWrappedBalance() {
+    this.wrappedBalance.value = 0;
+    if(!this.walletChainId || !this.walletAddress || !this.activeNetwork.value) {
+        return;
+    }
+    const wrappedBalance = await this.web3Gateway.getPRTokenBalance(this.activeNetwork.value)
+    if(!wrappedBalance.success) {
+      return;
+    }
+    this.wrappedBalance.value = wrappedBalance.data.balance / 1000000000; // TODO: 0's
+  }
   async __presentClaimableWrappedBalance() {
     this.claimableWrappedBalance.value = 0;
     if(!this.walletChainId || !this.walletAddress || !this.activeNetwork.value) {
@@ -69,6 +80,7 @@ export default class BalanceCardPresenter {
   async present(): Promise<BalanceCardViewModel> {
     await this.__presentInscriptionBalance();
     await this.__presentClaimableWrappedBalance();
+    await this.__presentWrappedBalance();
     return {
       status: "success",
       data: {

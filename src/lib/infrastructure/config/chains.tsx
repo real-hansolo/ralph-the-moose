@@ -14,7 +14,7 @@ export type TChainConfig = {
   mintingFeeCurrency: string;
   mintingFee: number;
   ralphReservoirAddress: string;
-  ralphTokenAddress?: string;
+  ralphTokenAddress: string;
 };
 
 export const BASE_MAINNET: TChainConfig = {

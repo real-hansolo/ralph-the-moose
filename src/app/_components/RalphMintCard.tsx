@@ -172,7 +172,7 @@ export const RalphMintCard = ({
       statusFrame.value = (
         <MintErrorStatusFrame
           error="Oh Snap!"
-          message="You are on the wrong network." // TODO: Please use one of the recommended wallets.
+          message="You are on the wrong network pal." // TODO: Please use one of the recommended wallets.
         />
       );
       return;

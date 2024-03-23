@@ -3,6 +3,7 @@ import {
   type GetAllMintedDTO,
   type GetAllocationForAddressDTO,
   type GetInscriptionStatusDTO,
+  GetLatestBlockDTO,
 } from "../dto/indexer-dto";
 
 export default class IndexerGateway {
@@ -56,6 +57,11 @@ export default class IndexerGateway {
     const response = await this._call<GetInscriptionStatusDTO>(
       `inscriptions/${txHash}`,
     );
+    return response;
+  }
+
+  async getLatestBlock(): Promise<GetLatestBlockDTO> {
+    const response = await this._call<GetLatestBlockDTO>("latest_block");
     return response;
   }
 }

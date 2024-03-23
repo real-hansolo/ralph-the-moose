@@ -88,11 +88,13 @@ export const RalphBalaceCard = ({
     <BalanceCard
       inscriptionBalance={balanceCardViewModel.inscriptionBalance}
       wrappedBalance={balanceCardViewModel.wrappedBalance}
+      claimableAmount={balanceCardViewModel.claimableWrappedBalance}
       fee={balanceCardViewModel.fee}
       tokenShortName={balanceCardViewModel.tokenShortName}
       icon={balanceCardViewModel.icon} 
       onWrap={() => {}} // TODO: implement
       onUnwrap={() => {}} // TODO: implement
+      onClaim={() => {}} // TODO: implement
     />
   )
 };

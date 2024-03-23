@@ -17,9 +17,24 @@ export default class BalanceCardPresenter {
   }
 
   async __presentInscriptionBalance() {
-    this.inscriptionBalance.value = 0;
+    const latestBlock = await this.indexer.getLatestBlock();
+    if(!latestBlock.success) {
+        this.inscriptionBalance.value = 0;
+        return;
+    }
+    if(!this.walletAddress) {
+        this.inscriptionBalance.value = 0;
+        return;
+    }
+    const balanceForAccount = await this.indexer.getBalanceForAccount(this.walletAddress, latestBlock.data.latest_block);
+    if(!balanceForAccount.success) {
+        this.inscriptionBalance.value = 0;
+        return;
+    }
+    this.inscriptionBalance.value = balanceForAccount.data.balance / 1000000000;
   }
   async present(): Promise<BalanceCardViewModel> {
+    await this.__presentInscriptionBalance();
     return {
       status: "success",
       data: {

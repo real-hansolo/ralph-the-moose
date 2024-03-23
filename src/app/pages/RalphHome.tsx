@@ -7,9 +7,6 @@ import {
   useWallet,
 } from "@thirdweb-dev/react";
 import { RalphMintCard } from "../_components/RalphMintCard";
-import { useQuery } from "@tanstack/react-query";
-import BalanceCardPresenter from "~/lib/infrastructure/presenters/BalanceCardPresenter";
-import type BalanceCardViewModel from "~/lib/infrastructure/view-models/BalanceCardViewModel";
 import { RalphBalaceCard } from "../_components/RalphBalanceCard";
 import { useSignal } from "@preact/signals-react";
 import { useEffect } from "react";
@@ -41,26 +38,9 @@ export const RalphHome = () => {
           isPermanent: false,
         });
       });
-      // wallet.on("change", () => {
-      //   toasts.value.push({
-      //     title: "Wallet and Account Connected!",
-      //     message: "",
-      //     status: "success",
-      //     isPermanent: false,
-      //   });
-      // });
     }
   }, [wallet, toasts.value]);
 
-  const balanceCardPresenter = new BalanceCardPresenter();
-  const { data: balanceCardViewModel } = useQuery<BalanceCardViewModel>({
-    queryKey: ["BalanceCard"],
-    queryFn: async () => {
-      const viewModel = await balanceCardPresenter.present();
-      return viewModel;
-    },
-    refetchInterval: 1000,
-  });
 
   return (
     <div id="app-container">
@@ -74,7 +54,7 @@ export const RalphHome = () => {
           />
         )}
         <RalphMintCard toasts={toasts} activeNetwork={activeNetwork}/>
-        {balanceCardViewModel && <RalphBalaceCard {...balanceCardViewModel} />}
+        {<RalphBalaceCard toasts={toasts} activeNetwork={activeNetwork} />}
         {isWalletConnected && (
           <RalphWalletCard
             status={isWalletConnected ? "connected" : "disconnected"}

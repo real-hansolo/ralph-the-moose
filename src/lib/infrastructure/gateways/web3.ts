@@ -1,7 +1,7 @@
 import { type WalletInstance } from "@thirdweb-dev/react";
 import { toWei } from "thirdweb";
 import { env } from "~/env";
-import { type ClaimableSuccessData, type ClaimableDTO, type MintResponseDTO } from "../dto/web3-dto";
+import { type ClaimableDTO, type MintResponseDTO } from "../dto/web3-dto";
 import { type BaseErrorDTO } from "../dto/base";
 import { type Signal } from "@preact/signals-react";
 import { type ToastProps } from "~/lib";
@@ -105,10 +105,10 @@ export default class Web3Gateway {
       } as BaseErrorDTO;
     }
     const provider = new ethers.providers.JsonRpcProvider(
-      chain.jsonRpcProvider as string,
+      chain.jsonRpcProvider,
     );
     const contract = new ethers.Contract(
-      chain.ralphReservoirAddress as string,
+      chain.ralphReservoirAddress,
       RalphReservoirABI,
       provider,
     );
@@ -121,7 +121,7 @@ export default class Web3Gateway {
         success: true,
         data: {
           amount: claimable as unknown as number, // TODO: check if this is the correct value
-        } as ClaimableSuccessData,
+        },
       };
     } catch (e) {
       console.error(e as Error);

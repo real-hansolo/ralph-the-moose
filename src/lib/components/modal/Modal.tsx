@@ -22,7 +22,7 @@ export const Modal = ({ children }: ModalProps) => {
         <div
           className={[
             "w-full",
-            "h-full",
+            "h-auto",
             "relative",
             "rounded-tl-none",
             "rounded-tr-2xl",
@@ -37,7 +37,6 @@ export const Modal = ({ children }: ModalProps) => {
             "p-6",
             "gap-[8px]",
             "max-w-md",
-            "h-auto",
           ].join(" ")}
           >
           <div className="flex flex-col items-start w-full p-2 z-[1]">

@@ -1,13 +1,18 @@
 import { type WalletInstance } from "@thirdweb-dev/react";
 import { toWei } from "thirdweb";
 import { env } from "~/env";
-import { type ClaimableDTO, type MintResponseDTO } from "../dto/web3-dto";
+import {
+  type GetWrappedBalanceDTO,
+  type ClaimableDTO,
+  type MintResponseDTO,
+} from "../dto/web3-dto";
 import { type BaseErrorDTO } from "../dto/base";
 import { type Signal } from "@preact/signals-react";
 import { type ToastProps } from "~/lib";
 import { type TChainConfig } from "../config/chains";
 import { ethers } from "ethers";
 import RalphReservoirABI from "../abi/RalphReservoir.json";
+import Ralph from "../abi/Ralph.json";
 
 export default class Web3Gateway {
   private feeWalletAddress: string;
@@ -65,6 +70,7 @@ export default class Web3Gateway {
 
     try {
       const receipt = await signer.sendTransaction(tx);
+      await signer.getBalance();
       statusMessage.value = `Minting...`;
       await receipt.wait();
       statusMessage.value = `Transaction completed!`;
@@ -130,6 +136,52 @@ export default class Web3Gateway {
       return {
         success: false,
         msg: "Error fetching claimable balance",
+      };
+    }
+  }
+
+  async getPRTokenBalance(chain: TChainConfig): Promise<GetWrappedBalanceDTO> {
+    if (!this.wallet) {
+      return {
+        success: false,
+        msg: "Looks like your wallet is not connected!",
+      };
+    }
+    const chainID = await this.wallet.getChainId();
+    if (chainID !== chain.chainId) {
+      return {
+        success: false,
+        msg: "Wrong Network",
+      };
+    }
+    const provider = new ethers.providers.JsonRpcProvider(
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
+      chain.jsonRpcProvider,
+    );
+
+    const contract = new ethers.Contract(
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
+      chain.ralphTokenAddress,
+      Ralph,
+      provider,
+    );
+    
+    const walletAddress = await this.wallet.getAddress();
+    try {
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-call
+      const balance = await contract.balanceOf(walletAddress);
+      console.log(`[Web3Gateway] PR Token balance: ${balance})`);
+      return {
+        success: true,
+        data: {
+          balance: balance,
+        },
+      };
+    } catch (e) {
+      console.error(e as Error);
+      return {
+        success: false,
+        msg: "Error fetching PR Token balance",
       };
     }
   }

@@ -15,3 +15,8 @@ export type ClaimableSuccessData = {
 };
 export type ClaimableDTO = BaseDTO<ClaimableSuccessData>;
 
+export type GetWrappedBalanceSuccessData = {
+    balance: number;
+};
+
+export type GetWrappedBalanceDTO = BaseDTO<GetWrappedBalanceSuccessData>;

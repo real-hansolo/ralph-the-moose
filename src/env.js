@@ -21,7 +21,8 @@ export const env = createEnv({
     NEXT_PUBLIC_ENABLE_TESTNETS: z.boolean(),
     NEXT_PUBLIC_INDEXER_URL: z.string(),
     NEXT_PUBLIC_THIRDWEB_CLIENT_ID: z.string(),
-    NEXT_PUBLIC_FEE_WALLET_ADDRESS: z.string()
+    NEXT_PUBLIC_FEE_WALLET_ADDRESS: z.string(),
+    NEXT_PUBLIC_CHAIN_BASE_SEPOLIA_JSON_RPC: z.string(),
   },
 
   /**
@@ -35,6 +36,7 @@ export const env = createEnv({
     NEXT_PUBLIC_THIRDWEB_CLIENT_ID: process.env.NEXT_PUBLIC_THIRDWEB_CLIENT_ID ?? "no-client-id",
     NEXT_PUBLIC_INDEXER_URL: process.env.NEXT_PUBLIC_INDEXER_URL ?? "http://localhost:8080",
     NEXT_PUBLIC_FEE_WALLET_ADDRESS: process.env.NEXT_PUBLIC_FEE_WALLET_ADDRESS ?? "0x",
+    NEXT_PUBLIC_CHAIN_BASE_SEPOLIA_JSON_RPC: process.env.NEXT_PUBLIC_CHAIN_BASE_SEPOLIA_JSON_RPC ?? "http://localhost:8545",
   },
   /**
    * Run `build` or `dev` with `SKIP_ENV_VALIDATION` to skip env validation. This is especially

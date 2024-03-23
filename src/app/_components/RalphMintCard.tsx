@@ -120,14 +120,26 @@ export const RalphMintCard = ({
     indexerGateway: IndexerGateway,
     transactionHash: string,
     numAttempts: number,
+    mintingAmount: number,
+    tokenShortName: string,
   ) => {
     for (let i = 0; i < numAttempts; i++) {
       const inscriptionStatus =
         await indexerGateway.getInscriptionStatus(transactionHash);
-      console.log(`[Inscription Status]: ${i}/${numAttempts}`, inscriptionStatus);
+      console.log(
+        `[Inscription Status]: ${i}/${numAttempts}`,
+        inscriptionStatus,
+      );
       if (inscriptionStatus.success) {
         return inscriptionStatus;
       }
+      statusFrame.value = (
+        <IsMintingStatusFrame
+          message={`Looking for your transaction. Attempt ${i}/${numAttempts}`}
+          isMintingAmount={mintingAmount}
+          tokenShortName={tokenShortName}
+        />
+      );
       // Wait for 0.5 second
       await new Promise((resolve) => setTimeout(resolve, 1000));
     }
@@ -160,7 +172,7 @@ export const RalphMintCard = ({
       statusFrame.value = (
         <MintErrorStatusFrame
           error="Oh Snap!"
-          message="You are on the wrong network."
+          message="You are on the wrong network." // TODO: Please use one of the recommended wallets.
         />
       );
       return;
@@ -187,6 +199,8 @@ export const RalphMintCard = ({
         indexerGateway,
         mintResponse.data.txHash,
         maxAttempts,
+        amount.value, // TODO: should be human readable
+        token,
       );
       if (!inscriptionStatus.success) {
         statusFrame.value = (
@@ -238,7 +252,7 @@ export const RalphMintCard = ({
       })
       .catch((e) => {
         console.log("[Mint Status]: Error minting" + e);
-      })
+      });
   };
 
   const mintCardViewModel: {

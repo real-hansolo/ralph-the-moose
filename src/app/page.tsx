@@ -16,8 +16,6 @@ export default function Home() {
   // const supportedChains  = Object.values(SUPPORTED_CHAINS).map((chain) => chain.thirdWeb);
   return (
     <ThirdwebProvider
-      // activeChain={DEFAULT_CHAIN.thirdWeb} // Fix: Cast DEFAULT_CHAIN to type Chain
-      // supportedChains={supportedChains}
       supportedWallets={SUPPORTED_WALLETS}
     >
       <RalphHome />

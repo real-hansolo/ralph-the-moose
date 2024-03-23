@@ -3,6 +3,7 @@ import type BalanceCardViewModel from "../view-models/BalanceCardViewModel";
 import type IndexerGateway from "../gateways/indexer";
 import { type TChainConfig } from "../config/chains";
 import type Web3Gateway from "../gateways/web3";
+import { toHex } from "thirdweb";
 
 export default class BalanceCardPresenter {
   public inscriptionBalance: Signal<number>;
@@ -38,7 +39,7 @@ export default class BalanceCardPresenter {
         return;
     }
     // TODO: the minted/{address} endpoint should take the chainId as a parameter
-    if(this.walletChainId !== this.activeNetwork.value.chainId) {
+    if(toHex(this.walletChainId) !== toHex(this.activeNetwork.value.chainId)) {
         return;
     }
     const latestBlock = await this.indexer.getLatestBlock();

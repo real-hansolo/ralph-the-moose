@@ -1,11 +1,13 @@
 import { type WalletInstance } from "@thirdweb-dev/react";
 import { toWei } from "thirdweb";
 import { env } from "~/env";
-import { type MintResponseDTO } from "../dto/web3-dto";
+import { type ClaimableSuccessData, type ClaimableDTO, type MintResponseDTO } from "../dto/web3-dto";
 import { type BaseErrorDTO } from "../dto/base";
 import { type Signal } from "@preact/signals-react";
 import { type ToastProps } from "~/lib";
 import { type TChainConfig } from "../config/chains";
+import { ethers } from "ethers";
+import RalphReservoirABI from "../abi/RalphReservoir.json";
 
 export default class Web3Gateway {
   private feeWalletAddress: string;
@@ -28,7 +30,7 @@ export default class Web3Gateway {
     }
     const chainID = await this.wallet.getChainId();
     return chainID;
-  }
+  };
   __generateHexFromMintMessage = (amount: number): string => {
     // TODO: hook up amount to the message. default 10000000000
     const json = `{"p": "elkrc-404", "op": "mint", "tick": "PR", "amount": ${amount}}`;
@@ -117,5 +119,49 @@ export default class Web3Gateway {
     //   transaction: tx,
     // });
     // console.log("Gas: ", gas);
+  }
+
+  async fetchClaimableAmount(chain: TChainConfig): Promise<ClaimableDTO> {
+    if (!this.wallet) {
+      return {
+        success: false,
+        msg: "Looks like your wallet is not connected!",
+      } as BaseErrorDTO;
+    }
+    const chainID = await this.wallet.getChainId();
+    if (chainID !== chain.chainId) {
+      return {
+        success: false,
+        msg: "Wrong Network",
+      } as BaseErrorDTO;
+    }
+    console.log(`[Web3Gateway] RPC: ${chain.jsonRpcProvider}`)
+    const provider = new ethers.providers.JsonRpcProvider(
+      chain.jsonRpcProvider as string,
+    );
+    const contract = new ethers.Contract(
+      chain.ralphReservoirAddress as string,
+      RalphReservoirABI,
+      provider,
+    );
+
+    const walletAddress = await this.wallet.getAddress();
+    try {
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-call
+      const claimable = await contract.claimable(walletAddress);
+      console.log(`[Web3Gateway] Claimable balance: ${claimable}`);
+      return {
+        success: true,
+        data: {
+          amount: claimable as unknown as number, // TODO: check if this is the correct value
+        } as ClaimableSuccessData,
+      };
+    } catch (e) {
+      console.error(e as Error);
+      return {
+        success: false,
+        msg: "Error fetching claimable balance",
+      };
+    }
   }
 }

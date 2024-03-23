@@ -6,24 +6,30 @@ export type TChainConfig = {
   chainId: number;
   name: string;
   rpcUrl: string;
+  jsonRpcProvider: string;
   explorerUrl: string;
   explorerName: string;
   gasLimit: number;
   icon: React.ReactNode;
   mintingFeeCurrency: string;
   mintingFee: number;
+  ralphReservoirAddress: string;
+  ralphTokenAddress?: string;
 };
 
 export const BASE_MAINNET: TChainConfig = {
   chainId: Base.chainId,
   name: "Base",
   rpcUrl: Base.rpc[1],
+  jsonRpcProvider: "", // TODO: Add JSON RPC URL for mainnet
   explorerUrl: Base.explorers[0].url,
   explorerName: Base.explorers[0].name,
   gasLimit: 23000,
   icon: <IconNetworkBase />,
   mintingFeeCurrency: "ETH",
   mintingFee: 0.00123,
+  ralphReservoirAddress: "", // TODO: Add Ralph reservoir address for mainnet
+  ralphTokenAddress: "" // TODO: Add Ralph token address for mainnet
 };
 
 
@@ -31,12 +37,15 @@ export const BASE_SEPOLIA_TESTNET: TChainConfig = {
   chainId: BaseSepoliaTestnet.chainId,
   name: "Base Sepolia",
   rpcUrl: "https://sepolia.basescan.org",
+  jsonRpcProvider: env.NEXT_PUBLIC_CHAIN_BASE_SEPOLIA_JSON_RPC,
   explorerUrl: BaseSepoliaTestnet.explorers[0].url,
   explorerName: BaseSepoliaTestnet.explorers[0].name,
   gasLimit: 23000,
   icon: <IconNetworkBase />,
   mintingFeeCurrency: "ETH",
   mintingFee: 0.00123,
+  ralphReservoirAddress: "0x16066289b4A453C34e081842308B9E7EF2D6F9e5",
+  ralphTokenAddress: "0x5Ccfdb1e9EdE08b4026824e8cAE542eC5E925650",
 };
 
 export const getSupportedChains = () => {

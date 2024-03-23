@@ -170,7 +170,7 @@ export const RalphMintCard = ({
     }
 
     const mintResponse: MintResponseDTO = await web3Gateway.sendMintTransaction(
-      amount.value,
+      amount.value * 1000000000, // TODO: cleanup
       chain.value,
       SStatusMessage,
     );
@@ -216,7 +216,7 @@ export const RalphMintCard = ({
           statusFrame.value = (
             <MintCompletedStatusFrame
               timestamp={mintResponse.data.timestamp}
-              amountMinted={mintResponse.data.amountMinted}
+              amountMinted={mintResponse.data.amountMinted / 1000000000} // TODO: cleanup
               tokenShortName={mintResponse.data.tokenShortName}
               explorerLink={mintResponse.data.explorerLink}
             />

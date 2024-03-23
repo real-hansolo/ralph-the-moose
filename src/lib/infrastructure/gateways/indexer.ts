@@ -3,7 +3,8 @@ import {
   type GetAllMintedDTO,
   type GetAllocationForAddressDTO,
   type GetInscriptionStatusDTO,
-  GetLatestBlockDTO,
+  type GetLatestBlockDTO,
+  type GetBalanceForAccountDTO,
 } from "../dto/indexer-dto";
 
 export default class IndexerGateway {
@@ -12,8 +13,6 @@ export default class IndexerGateway {
   }
 
   async _call<T>(endpoint: string, method?: string, body?: object): Promise<T> {
-    // console.log("Making request to indexer")
-    // console.log(`${this.indexer_url}/${endpoint}`);
     const response = await fetch(`${this.indexer_url}/${endpoint}`, {
       method: method ?? "GET",
       headers: {
@@ -25,7 +24,6 @@ export default class IndexerGateway {
       const data = await response.json();
       return data as T;
     } else {
-      console.log(response.status);
       return {
         status: "error",
         msg: "Error fetching data from the indexer.",
@@ -64,6 +62,20 @@ export default class IndexerGateway {
     const response = await this._call<GetLatestBlockDTO>("latest_block");
     return response;
   }
+
+  async getBalanceForAccount(address: string, latestBlock?: number): Promise<GetBalanceForAccountDTO> {
+    if(latestBlock) {
+      const response = await this._call<GetBalanceForAccountDTO>(
+        `balances/${address}?block=${latestBlock}`,
+        );
+      return response;
+    }
+    const response = await this._call<GetBalanceForAccountDTO>(
+      `balances/${address}`,
+      );
+    return response;
+  }
 }
+
 
 

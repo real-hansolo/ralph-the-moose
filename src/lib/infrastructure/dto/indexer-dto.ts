@@ -44,3 +44,9 @@ export type GetLatestBlockSuccessDTO = {
 }
 
 export type GetLatestBlockDTO = BaseDTO<GetLatestBlockSuccessDTO>;
+
+export type GetBalanceForAccountSuccessDTO = {
+    balance: number
+}
+
+export type GetBalanceForAccountDTO = BaseDTO<GetBalanceForAccountSuccessDTO>;

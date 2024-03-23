@@ -75,7 +75,8 @@ export default class MintCardPresenter {
         this.allocation.value = this.DEFAULT_ALLOCATION.value;
       } else {
         // TODO check balance, if balance is less than allocation, set allocation to (allocation - balance)
-        this.allocation.value = allocationForAcountDTO.data.allocation_amount;
+        this.allocation.value = allocationForAcountDTO.data.allocation_amount / 1000000000;
+        // TODO: check if 
         // TODO: else set allocation to DEFAULT_ALLOCATION
       }
     }

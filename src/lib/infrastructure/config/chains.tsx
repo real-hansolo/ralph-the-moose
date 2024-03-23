@@ -1,6 +1,7 @@
 import { env } from "~/env";
 import { Base, BaseSepoliaTestnet } from "@thirdweb-dev/chains";
 import { IconNetworkBase } from "~/lib/components";
+import { type Chain } from "thirdweb";
 
 export type TChainConfig = {
   chainId: number;
@@ -15,6 +16,7 @@ export type TChainConfig = {
   mintingFee: number;
   ralphReservoirAddress: string;
   ralphTokenAddress: string;
+  thirdWeb: Chain;
 };
 
 export const BASE_MAINNET: TChainConfig = {
@@ -29,14 +31,19 @@ export const BASE_MAINNET: TChainConfig = {
   mintingFeeCurrency: "ETH",
   mintingFee: 0.00123,
   ralphReservoirAddress: "", // TODO: Add Ralph reservoir address for mainnet
-  ralphTokenAddress: "" // TODO: Add Ralph token address for mainnet
+  ralphTokenAddress: "", // TODO: Add Ralph token address for mainnet
+  thirdWeb: {
+    ...Base,
+    id: Base.chainId,
+    rpc: Base.rpc[1],
+    testnet: undefined,
+  },
 };
-
 
 export const BASE_SEPOLIA_TESTNET: TChainConfig = {
   chainId: BaseSepoliaTestnet.chainId,
   name: "Base Sepolia",
-  rpcUrl: "https://sepolia.basescan.org",
+  rpcUrl: "https://sepolia.base.org",
   jsonRpcProvider: env.NEXT_PUBLIC_CHAIN_BASE_SEPOLIA_JSON_RPC,
   explorerUrl: BaseSepoliaTestnet.explorers[0].url,
   explorerName: BaseSepoliaTestnet.explorers[0].name,
@@ -46,18 +53,23 @@ export const BASE_SEPOLIA_TESTNET: TChainConfig = {
   mintingFee: 0.00123,
   ralphReservoirAddress: "0x16066289b4A453C34e081842308B9E7EF2D6F9e5",
   ralphTokenAddress: "0x5Ccfdb1e9EdE08b4026824e8cAE542eC5E925650",
+  thirdWeb: {
+    ...BaseSepoliaTestnet,
+    id: BaseSepoliaTestnet.chainId,
+    rpc: BaseSepoliaTestnet.rpc[1],
+    testnet: true,
+  },
 };
 
 export const getSupportedChains = () => {
   const supportedChains: TChainConfig[] = [BASE_MAINNET];
-  if(env.NEXT_PUBLIC_ENABLE_TESTNETS) {
+  if (env.NEXT_PUBLIC_ENABLE_TESTNETS) {
     supportedChains.push(BASE_SEPOLIA_TESTNET);
   }
   return supportedChains;
-}
+};
 
 export const SUPPORTED_CHAINS: TChainConfig[] = getSupportedChains();
-
 
 /**
  * Retrieves the default chain configuration based on the value of the `NEXT_PUBLIC_ENABLE_TESTNETS` environment variable.

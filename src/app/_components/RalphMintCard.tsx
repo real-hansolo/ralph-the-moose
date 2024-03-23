@@ -9,7 +9,7 @@ import {
   type ToastProps,
 } from "~/lib";
 import type MintCardViewModel from "~/lib/infrastructure/view-models/MintCardViewModel";
-import { useAddress, useWallet } from "@thirdweb-dev/react";
+import { useAddress, useChainId, useWallet } from "@thirdweb-dev/react";
 import Web3Gateway from "~/lib/infrastructure/gateways/web3";
 import { type MintResponseDTO } from "~/lib/infrastructure/dto/web3-dto";
 import MintCardPresenter from "~/lib/infrastructure/presenters/MintCardPresenter";
@@ -29,6 +29,7 @@ export const RalphMintCard = ({
 }) => {
   const wallet = useWallet();
   const walletAddress = useAddress();
+  const walletChainID = useChainId();
   const indexerHost = env.NEXT_PUBLIC_INDEXER_URL;
   const indexerGateway = new IndexerGateway(indexerHost);
   const web3Gateway = new Web3Gateway(wallet, toasts);
@@ -167,12 +168,21 @@ export const RalphMintCard = ({
 
     // Network Validation!
     const chain = activeNetwork;
-    const walletChainID = await wallet.getChainId();
+    if (!walletChainID) {
+      statusFrame.value = (
+        <MintErrorStatusFrame
+          error="Ah Dayum!!"
+          message="Couldn't detect wallet's network!"
+        />
+      );
+      SisMinting.value = false;
+      return;
+    }
     if (toHex(walletChainID) !== toHex(chain.value.chainId)) {
       statusFrame.value = (
         <MintErrorStatusFrame
-          error="Oh Snap!"
-          message="You are on the wrong network pal." // TODO: Please use one of the recommended wallets.
+          error={`Oh Snap!`}
+          message={`You are on the wrong network pal. wallet: ${walletChainID} !== network: ${chain.value.chainId}`} // TODO: Please use one of the recommended wallets.
         />
       );
       return;

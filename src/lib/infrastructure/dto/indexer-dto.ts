@@ -50,3 +50,9 @@ export type GetBalanceForAccountSuccessDTO = {
 }
 
 export type GetBalanceForAccountDTO = BaseDTO<GetBalanceForAccountSuccessDTO>;
+
+export type GetTotalMintedForAccountSuccessDTO = {
+    minted: number
+}
+
+export type GetTotalMintedForAccountDTO = BaseDTO<GetTotalMintedForAccountSuccessDTO>;

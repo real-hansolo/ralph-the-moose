@@ -52,7 +52,8 @@ export default class MintCardPresenter {
       } as MintCardViewModel;
     } else {
       this.mintLimit.value = allocationLimits.data.total_mintable / 1000000000; // TODO: check if this is the correct value
-      this.DEFAULT_ALLOCATION.value = allocationLimits.data.max_per_mint / 1000000000;
+      this.DEFAULT_ALLOCATION.value =
+        allocationLimits.data.max_per_mint / 1000000000;
     }
   }
 
@@ -75,9 +76,24 @@ export default class MintCardPresenter {
         this.allocation.value = this.DEFAULT_ALLOCATION.value;
       } else {
         // TODO check balance, if balance is less than allocation, set allocation to (allocation - balance)
-        this.allocation.value = allocationForAcountDTO.data.allocation_amount / 1000000000;
-        // TODO: check if 
-        // TODO: else set allocation to DEFAULT_ALLOCATION
+        const totalMintedDTO = await this.indexer.getTotalMintedForAccount(
+          this.walletAddress,
+        );
+        if (totalMintedDTO.success) {
+          if (
+            totalMintedDTO.data.minted >=
+            allocationForAcountDTO.data.allocation_amount
+          ) {
+            this.allocation.value = this.DEFAULT_ALLOCATION.value;
+          } else {
+            this.allocation.value =
+              allocationForAcountDTO.data.allocation_amount / 1000000000;
+          }
+        } else {
+          this.allocation.value = this.DEFAULT_ALLOCATION.value;
+        }
+        this.allocation.value =
+          this.DEFAULT_ALLOCATION.value / 1000000000;
       }
     }
   }
@@ -89,7 +105,7 @@ export default class MintCardPresenter {
     await this.__presentMintLimit();
     await this.__presentMintPercentage();
     await this.__presentAllocationForAddress();
-    
+
     return {
       status: "success",
       data: {

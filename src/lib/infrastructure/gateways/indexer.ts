@@ -5,6 +5,7 @@ import {
   type GetInscriptionStatusDTO,
   type GetLatestBlockDTO,
   type GetBalanceForAccountDTO,
+  GetTotalMintedForAccountDTO,
 } from "../dto/indexer-dto";
 
 export default class IndexerGateway {
@@ -51,6 +52,13 @@ export default class IndexerGateway {
     return response;
   }
 
+  async getTotalMintedForAccount(address: string): Promise<GetTotalMintedForAccountDTO> {
+    const response = await this._call<GetTotalMintedForAccountDTO>(
+      `minted/${address}`,
+    );
+    return response;
+  }
+  
   async getInscriptionStatus(txHash: string): Promise<GetInscriptionStatusDTO> {
     const response = await this._call<GetInscriptionStatusDTO>(
       `inscriptions/${txHash}`,

@@ -85,12 +85,12 @@ export default class MintCardPresenter {
     }
     // TODO: check if this is the correct value
     if (
-      totalMintedDTO.data.minted <= allocationForAcountDTO.data.allocation_amount
+      totalMintedDTO.data.minted >= allocationForAcountDTO.data.allocation_amount
     ) {
-      this.allocation.value =
-        allocationForAcountDTO.data.allocation_amount / 1000000000; // TODO: process 0's
+      this.allocation.value = this.DEFAULT_ALLOCATION.value;
+      return;
     }
-
+    
     this.allocation.value =
       allocationForAcountDTO.data.allocation_amount / 1000000000;
     return;

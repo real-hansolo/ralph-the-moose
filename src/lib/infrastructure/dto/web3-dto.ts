@@ -14,3 +14,4 @@ export type ClaimableSuccessData = {
     amount: number;
 };
 export type ClaimableDTO = BaseDTO<ClaimableSuccessData>;
+

@@ -22,18 +22,22 @@ export interface WrapCardProps {
   fee: number; // The fee for wrapping
   tokenShortName: string; // The short name of the token
   icon: React.ReactNode; // The icon for the token
+  claimableAmount: number; // The amount that can be claimed
   onClose?: () => void; // Callback function when the modal is closed
   onWrap: () => void; // Callback function when wrapping is triggered
+  onClaim: () => void; // Callback function when claiming is triggered
 }
 
 export const WrapCard = ({
   amountToWrap,
   inscriptionBalance,
+  claimableAmount,
   fee,
   tokenShortName,
   icon,
   onClose,
   onWrap,
+  onClaim,
 }: WrapCardProps) => {
   useSignals();
   const wrappedTokenName = `W${tokenShortName.toUpperCase()}`;
@@ -53,6 +57,7 @@ export const WrapCard = ({
           amount={amountToWrap}
           tokenShortName={tokenShortName}
           icon={icon}
+          errorMessage={ amountToWrap.value > inscriptionBalance ? "Tryn'a reap before you sow?" : ""}
         />
         <LightFrame className="w-full font-varela text-text-secondary">
           <div className="self-stretch flex flex-row items-baseline justify-between">
@@ -77,6 +82,11 @@ export const WrapCard = ({
             label={`Wrap ${amountToWrap.value} ${tokenShortName}`}
             variant="primary"
             onClick={onWrap}
+          />
+          <Button
+            label={`Claim ${claimableAmount} ${wrappedTokenName}`}
+            variant="secondary"
+            onClick={onClaim}
           />
         </LightFrame>
       </div>

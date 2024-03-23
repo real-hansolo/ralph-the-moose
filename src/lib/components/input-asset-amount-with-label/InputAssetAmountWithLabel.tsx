@@ -42,7 +42,7 @@ export const InputAssetAmountWithLabel: React.FC<
   InputAssetAmountWithLabelProps
 > = ({ label, maxAmount, errorMessage, ...props }) => {
   const labelFinal = label ? label : "Amount to bridge";
-  const maxAmountFinal = maxAmount ? maxAmount : 0;
+  const maxAmountFinal = maxAmount ? parseFloat(maxAmount.toFixed(2)) : 0;
   const maxAmountString = `${maxAmountFinal} ${props.tokenShortName}`;
   return (
     <div className="w-full relative flex flex-col items-start justify-start text-left text-base text-text-secondary font-varela">

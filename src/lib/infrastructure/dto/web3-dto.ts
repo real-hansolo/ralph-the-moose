@@ -20,3 +20,10 @@ export type GetWrappedBalanceSuccessData = {
 };
 
 export type GetWrappedBalanceDTO = BaseDTO<GetWrappedBalanceSuccessData>;
+
+
+export type ClaimSuccessData = {
+    txHash: string;
+};
+
+export type ClaimDTO = BaseDTO<ClaimSuccessData>;

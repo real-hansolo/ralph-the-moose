@@ -22,6 +22,10 @@ export interface BalanceCardProps {
    */
   wrappedBalance: number;
   /**
+   * The claimable amount.
+   */
+  claimableAmount: number;
+  /**
    * The short name of the token.
    */
   tokenShortName: string;
@@ -41,6 +45,11 @@ export interface BalanceCardProps {
    * Callback function when unwrapping is triggered. It should open the unwrapping modal.
    */
   onUnwrap: () => void;
+
+  /**
+   * Callback function when claiming is triggered. It should open the claiming modal.
+   */
+  onClaim: () => void;
 }
 
 /**
@@ -86,28 +95,6 @@ export const BalanceCard = (props: BalanceCardProps) => {
           {...props}
         ></UnwrapCard>
       )}
-
-      {/* {activeVariant.value === BalanceCardVariants.VARIANT_PRIMARY && (
-        <BalanceCardPrimaryVariant
-          showWrapVariant={showWrapVariant}
-          showUnwrapVariant={showUnwrapVariant}
-          {...props}
-        ></BalanceCardPrimaryVariant>
-      )}
-      {activeVariant.value === BalanceCardVariants.VARIANT_WRAP && (
-        <WrapCard
-          amountToWrap={amountToWrap}
-          onClose={returnToPrimaryVariant}
-          {...props}
-        ></WrapCard>
-      )}
-      {activeVariant.value === BalanceCardVariants.VARIANT_UNWRAP && (
-        <UnwrapCard
-          amountToUnwrap={amountToUnwrap}
-          onClose={returnToPrimaryVariant}
-          {...props}
-        ></UnwrapCard>
-      )} */}
     </div>
   );
 };

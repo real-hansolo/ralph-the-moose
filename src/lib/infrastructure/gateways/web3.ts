@@ -105,9 +105,11 @@ export default class Web3Gateway {
       } as BaseErrorDTO;
     }
     const provider = new ethers.providers.JsonRpcProvider(
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
       chain.jsonRpcProvider,
     );
     const contract = new ethers.Contract(
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
       chain.ralphReservoirAddress,
       RalphReservoirABI,
       provider,

@@ -89,8 +89,13 @@ export default class MintCardPresenter {
     ) {
       this.allocation.value = this.DEFAULT_ALLOCATION.value;
       return;
+    } else {
+      this.allocation.value =
+        (allocationForAcountDTO.data.allocation_amount -
+          totalMintedDTO.data.minted) /
+        1000000000;
     }
-    
+
     this.allocation.value =
       allocationForAcountDTO.data.allocation_amount / 1000000000;
     return;

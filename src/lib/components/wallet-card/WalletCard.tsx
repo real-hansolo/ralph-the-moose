@@ -1,6 +1,8 @@
 import Image from "next/image";
-import { Label, Card } from "..";
+import { Label, Card, IconWalletCoinbase, IconWalletConnect, IconWalletMetamask, IconWalletTrust } from "..";
 import ralphConnectWallet from "@/assets/ralph-connect-wallet.svg";
+import React from "react";
+
 /**
  * Represents the props for the WalletCard component.
  */
@@ -72,6 +74,8 @@ WalletCard.Disconnected = ({
   );
 };
 
+
+
 WalletCard.Connected = ({
   address,
   walletId,
@@ -81,14 +85,33 @@ WalletCard.Connected = ({
   walletId: string;
   disconnectButton: React.ReactNode;
 }) => {
+  // let walletIcon
+  // if ( walletId === "metamask" ) {
+  //   walletIcon = IconNetworkBase;
+  // }
+  function getWalletDisplayName(walletId: string) {
+    if (walletId === "metamask") return <IconWalletMetamask size={12} />;
+    if (walletId === "walletConnect") return <IconWalletConnect  size={12} />;
+    if (walletId === "coinbase") return <IconWalletCoinbase  size={12} />;
+    if (walletId === "trust") return <IconWalletTrust  size={12} />;
+    return <React.Fragment />;
+  }
   return (
     <div className="flex flex-row items-center justify-between gap-[16px] self-stretch">
+      {getWalletDisplayName(walletId)}
+
+      {/* { walletId === "metamask"? <div>Metamask</div> : <div>Other</div> }
+      { walletId === "walletConnect"? <div>Metamask</div> : <div>Other</div> }
+      { walletId === "coinbase"? <div>Metamask</div> : <div>Other</div> }
+      { walletId === "trust"? <div>Metamask</div> : <div>Other</div> } */}
+
       {/** Wallet Addres div, pinned to the left of the parent */}
       <div className="flex flex-1 flex-col items-start justify-start gap-[8px]">
-        <div className="relative self-stretch font-varela text-sm leading-[14px] text-text-secondary">
+        <div className="relative self-stretch font-varela text-sm leading-[14px] text-text-secondary capitalize">
           {walletId}
         </div>
-        <Label variant="small" label={address} />
+        
+        <Label variant="small" label={address}  />
       </div>
       {/** Disconnect div, pinned to the right of parent */}
       <div className="">{disconnectButton}</div>

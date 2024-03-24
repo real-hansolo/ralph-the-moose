@@ -15,4 +15,8 @@ export { IconSuccess } from "./IconSuccess";
 export { IconTelegram } from "./IconTelegram";
 export { IconTooltip } from "./IconTooltip";
 export { IconTwitter } from "./IconTwitter";
+export { IconWalletCoinbase } from "./IconWalletCoinbase";
+export { IconWalletConnect } from "./IconWalletConnect";
+export { IconWalletMetamask } from "./IconWalletMetamask";
+export { IconWalletTrust } from "./IconWalletTrust";
 export { IconWarning } from "./IconWarning";

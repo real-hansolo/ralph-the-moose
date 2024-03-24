@@ -13,6 +13,10 @@ export interface LabelProps {
    * The text of the label.
    */
   label: string;
+  /**
+   * To add custom styles to Labels (e.g. capitalize walletId)
+   */
+  className?: string;
 }
 
 /**
@@ -20,7 +24,7 @@ export interface LabelProps {
  * This is a label component that can be used to display text with different styles based on the variant.
  * @param {LabelProps} props - The properties of the label.
  */
-export const Label = ({ variant, label }: LabelProps) => {
+export const Label = ({ variant, label, className }: LabelProps) => {
   const classes = twMerge([
     "relative",
     "text-sm",

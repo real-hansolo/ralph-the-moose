@@ -26,7 +26,7 @@ export const BASE_MAINNET: TChainConfig = {
   jsonRpcProvider: "", // TODO: Add JSON RPC URL for mainnet
   explorerUrl: Base.explorers[0].url,
   explorerName: Base.explorers[0].name,
-  gasLimit: 23000,
+  gasLimit: 30000,
   icon: <IconNetworkBase />,
   mintingFeeCurrency: "ETH",
   mintingFee: 0.00123,
@@ -43,11 +43,11 @@ export const BASE_MAINNET: TChainConfig = {
 export const BASE_SEPOLIA_TESTNET: TChainConfig = {
   chainId: BaseSepoliaTestnet.chainId,
   name: "Base Sepolia",
-  rpcUrl: "https://sepolia.base.org",
+  rpcUrl: env.NEXT_PUBLIC_CHAIN_BASE_SEPOLIA_JSON_RPC,
   jsonRpcProvider: env.NEXT_PUBLIC_CHAIN_BASE_SEPOLIA_JSON_RPC,
   explorerUrl: BaseSepoliaTestnet.explorers[0].url,
   explorerName: BaseSepoliaTestnet.explorers[0].name,
-  gasLimit: 23000,
+  gasLimit: 30000,
   icon: <IconNetworkBase />,
   mintingFeeCurrency: "ETH",
   mintingFee: 0.00123,

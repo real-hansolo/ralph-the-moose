@@ -9,7 +9,7 @@ export default class BalanceCardPresenter {
   public inscriptionBalance: Signal<number>;
   public wrappedBalance: Signal<number>;
   public fee: Signal<number>;
-  public claimableWrappedBalance: Signal<number>;
+  public claimableInscriptions: Signal<number>;
   
   
   private indexer: IndexerGateway;
@@ -24,7 +24,7 @@ export default class BalanceCardPresenter {
     this.inscriptionBalance = signal(0);
     this.wrappedBalance = signal(0);
     this.fee = signal(0);
-    this.claimableWrappedBalance = signal(0);
+    this.claimableInscriptions = signal(0);
 
     this.indexer = indexer;
     this.web3Gateway = web3Gateway;
@@ -65,8 +65,8 @@ export default class BalanceCardPresenter {
     }
     this.wrappedBalance.value = wrappedBalance.data.balance / 1000000000; // TODO: 0's
   }
-  async __presentClaimableWrappedBalance() {
-    this.claimableWrappedBalance.value = 0;
+  async __presentClaimableInscriptions() {
+    this.claimableInscriptions.value = 0;
     if(!this.walletChainId || !this.walletAddress || !this.activeNetwork.value) {
         return;
     }
@@ -74,12 +74,12 @@ export default class BalanceCardPresenter {
     if(!claimableBalance.success) {
       return;
     }
-    this.claimableWrappedBalance.value = claimableBalance.data.amount / 1000000000;
+    this.claimableInscriptions.value = claimableBalance.data.amount / 1000000000;
   }
 
   async present(): Promise<BalanceCardViewModel> {
     await this.__presentInscriptionBalance();
-    await this.__presentClaimableWrappedBalance();
+    await this.__presentClaimableInscriptions();
     await this.__presentWrappedBalance();
     return {
       status: "success",
@@ -87,7 +87,7 @@ export default class BalanceCardPresenter {
         inscriptionBalance: this.inscriptionBalance,
         wrappedBalance: this.wrappedBalance,
         fee: this.fee,
-        claimableWrappedBalance: this.claimableWrappedBalance,
+        claimableInscriptions: this.claimableInscriptions,
       },
     };
   }

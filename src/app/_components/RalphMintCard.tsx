@@ -136,7 +136,7 @@ export const RalphMintCard = ({
       }
       statusFrame.value = (
         <IsMintingStatusFrame
-          message={`Looking for your transaction. Attempt ${i}/${numAttempts}`}
+          message={`Looking for your transaction. Attempt ${i}/${numAttempts}.`}
           isMintingAmount={mintingAmount}
           tokenShortName={tokenShortName}
         />

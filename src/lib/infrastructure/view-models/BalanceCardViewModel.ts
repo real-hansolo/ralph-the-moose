@@ -5,7 +5,7 @@ export interface BalanceCardData {
     inscriptionBalance: Signal<number>;
     wrappedBalance: Signal<number>;
     fee: Signal<number>;
-    claimableWrappedBalance: Signal<number>;
+    claimableInscriptions: Signal<number>;
 }
 
 type BalanceCardViewModel = BaseViewModel<BalanceCardData>;

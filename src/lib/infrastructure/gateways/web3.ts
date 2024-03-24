@@ -5,6 +5,7 @@ import {
   type GetWrappedBalanceDTO,
   type ClaimableDTO,
   type MintResponseDTO,
+  type WrapDTO,
 } from "../dto/web3-dto";
 import { type BaseErrorDTO } from "../dto/base";
 import { type Signal } from "@preact/signals-react";
@@ -39,6 +40,12 @@ export default class Web3Gateway {
   __generateHexFromMintMessage = (amount: number): string => {
     // TODO: hook up amount to the message. default 10000000000
     const json = `{"p": "elkrc-404", "op": "mint", "tick": "PR", "amount": ${amount}}`;
+    const hex = Buffer.from(json, "utf8").toString("hex");
+    return hex;
+  };
+
+  __generateHexFromWrapMessage = (bigAmount: number): string => {
+    const json = `{"p": "elkrc-404", "op": "transfer", "tick": "PR", "amount": ${bigAmount}}`;
     const hex = Buffer.from(json, "utf8").toString("hex");
     return hex;
   };
@@ -125,6 +132,7 @@ export default class Web3Gateway {
     try {
       // eslint-disable-next-line @typescript-eslint/no-unsafe-call
       const claimable = await contract.claimable(walletAddress);
+      console.log(claimable);
       return {
         success: true,
         data: {
@@ -140,6 +148,58 @@ export default class Web3Gateway {
     }
   }
 
+  async claimWrappedTokens(amount: number, chain: TChainConfig): Promise<> {
+    if (!this.wallet) {
+      return {
+        success: false,
+        msg: "Looks like your wallet is not connected!",
+      };
+    }
+    const chainID = await this.wallet.getChainId();
+    if (chainID !== chain.chainId) {
+      return {
+        success: false,
+        msg: "Wrong Network",
+      };
+    }
+    const provider = new ethers.providers.JsonRpcProvider(
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
+      chain.jsonRpcProvider,
+    );
+    const contract = new ethers.Contract(
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
+      chain.ralphReservoirAddress,
+      RalphReservoirABI,
+      provider,
+    );
+    const walletAddress = await this.wallet.getAddress();
+    const signer = await this.wallet.getSigner();
+    try {
+      const tx = await contract.claim(walletAddress, amount);
+      const receipt = await signer.sendTransaction(tx);
+      await signer.getBalance();
+      await receipt.wait();
+      const timestamp =
+        receipt.timestamp?.toLocaleString() ?? new Date().toLocaleDateString(); // TODO: check if this is okay or we should stick with the receipt timestamp
+      const explorerLink = `${chain.explorerUrl}/tx/${receipt.hash}`;
+      return {
+        success: true,
+        data: {
+          amountMinted: amount,
+          timestamp: timestamp,
+          explorerLink: explorerLink,
+          tokenShortName: "PR",
+          txHash: receipt.hash,
+        },
+      };
+    } catch (e) {
+      console.error(e as Error);
+      return {
+        success: false,
+        msg: "Error claiming wrapped tokens",
+      };
+    }
+  }
   async getPRTokenBalance(chain: TChainConfig): Promise<GetWrappedBalanceDTO> {
     if (!this.wallet) {
       return {
@@ -170,7 +230,6 @@ export default class Web3Gateway {
     try {
       // eslint-disable-next-line @typescript-eslint/no-unsafe-call
       const balance = await contract.balanceOf(walletAddress);
-      console.log(`[Web3Gateway] PR Token balance: ${balance})`);
       return {
         success: true,
         data: {
@@ -182,6 +241,67 @@ export default class Web3Gateway {
       return {
         success: false,
         msg: "Error fetching PR Token balance",
+      };
+    }
+  }
+
+  async sendWrapTransaction(
+    amount: number,
+    chain: TChainConfig,
+    statusMessage: Signal<string>,
+  ): Promise<WrapDTO> {
+    if (!this.wallet) {
+      const error = {
+        success: false,
+        msg: "Looks like your wallet is not connected!",
+      };
+      return error as BaseErrorDTO;
+    }
+
+    const message = this.__generateHexFromWrapMessage(amount);
+    const signer = await this.wallet.getSigner();
+    const tx = {
+      to: `${chain.ralphReservoirAddress}`,
+      value: toWei("0.00123"),
+      data: `0x${message}`,
+      chainId: chain.chainId,
+      gasLimit: chain.gasLimit,
+    };
+    statusMessage.value = `Wrapping ${amount} on ${chain.name}: ${chain.ralphReservoirAddress}`;
+    const estimatedGas = await signer.estimateGas(tx);
+    statusMessage.value = `Waiting for confirmation! Estimated Gas: ${estimatedGas.toString()}. Gas Limit: ${chain.gasLimit}`; // TODO: what is the correct format ?
+
+    try {
+      const walletNetwork = await this.wallet.getChainId();
+      if (walletNetwork !== chain.chainId) {
+        statusMessage.value = `Please connect to ${chain.name} network`;
+        return {
+          success: false,
+          msg: `Please connect to ${chain.name} network`,
+        };
+      }
+      statusMessage.value = `Wrapping in progress..`;
+      const receipt = await signer.sendTransaction(tx);
+      await receipt.wait();
+      statusMessage.value = `Wrapping ended!`;
+      const timestamp =
+        receipt.timestamp?.toLocaleString() ?? new Date().toLocaleDateString(); // TODO: check if this is okay or we should stick with the receipt timestamp
+      const explorerLink = `${chain.explorerUrl}/tx/${receipt.hash}`;
+      return {
+        success: true,
+        data: {
+          wrappedAmount: amount,
+          timestamp: timestamp,
+          explorerLink: explorerLink,
+          tokenShortName: "PR",
+          txHash: receipt.hash,
+        },
+      };
+    } catch (e) {
+      console.error(e as Error);
+      return {
+        success: false,
+        msg: "Transaction failed. Try again or get in touch?",
       };
     }
   }

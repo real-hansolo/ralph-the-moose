@@ -15,6 +15,7 @@ export default class MintCardPresenter {
   private DEFAULT_ALLOCATION: Signal<number>;
   private indexer: IndexerGateway;
   private walletAddress: string | undefined;
+  
   constructor(indexer: IndexerGateway, walletAddress: string | undefined) {
     this.mintLimit = signal(0);
     this.mintedPercentage = signal(0);

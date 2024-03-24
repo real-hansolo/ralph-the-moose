@@ -9,34 +9,54 @@ import {
   type ToastProps,
 } from "~/lib";
 import type MintCardViewModel from "~/lib/infrastructure/view-models/MintCardViewModel";
-import { useAddress, useChainId, useWallet } from "@thirdweb-dev/react";
 import Web3Gateway from "~/lib/infrastructure/gateways/web3";
-import { type MintResponseDTO } from "~/lib/infrastructure/dto/web3-dto";
 import MintCardPresenter from "~/lib/infrastructure/presenters/MintCardPresenter";
 import { useQuery } from "@tanstack/react-query";
 import { env } from "~/env";
 import IndexerGateway from "~/lib/infrastructure/gateways/indexer";
 import { type TChainConfig } from "~/lib/infrastructure/config/chains";
 import { MintWarningStatusFrame } from "~/lib/components/mint-card/MintWarningStatusFrame";
-import { toHex } from "thirdweb";
+import { type Chain } from "thirdweb";
 import { formatNumber } from "~/lib/utils/tokenUtils";
+import { type Account, type Wallet } from "thirdweb/wallets";
+import { type MintResponseModel, mint } from "./controllers/MintController";
 
 export const RalphMintCard = ({
   toasts,
   activeNetwork,
+  connectedWallet,
+  connectedAccount,
+  connectedWalletNetwork: connectedWalletNetwork,
 }: {
   activeNetwork: Signal<TChainConfig>;
   toasts: Signal<ToastProps[]>;
+  /**
+   * The connected wallet
+   */
+  connectedWallet?: Wallet;
+  /**
+   * The connected account
+   */
+  connectedAccount?: Account;
+  /**
+   * Connected Wallet's Network
+   */
+  connectedWalletNetwork: Chain | undefined;
 }) => {
-  const wallet = useWallet();
-  const walletAddress = useAddress();
-  const walletChainID = useChainId();
+  // Signals
+  const SdisableMinting = useSignal<boolean>(true);
+  const SisMinting = useSignal<boolean>(false);
+  const SStatusMessage = useSignal<string>("");
+  if (!connectedWallet || !connectedAccount || !connectedWalletNetwork) {
+    SdisableMinting.value = true;
+  }
+
   const indexerHost = env.NEXT_PUBLIC_INDEXER_URL;
   const indexerGateway = new IndexerGateway(indexerHost);
-  const web3Gateway = new Web3Gateway(wallet, toasts);
+  const web3Gateway = new Web3Gateway();
   const mintCardPresenter = new MintCardPresenter(
     indexerGateway,
-    walletAddress,
+    connectedAccount?.address,
   );
   const { data, isLoading, isError } = useQuery<MintCardViewModel>({
     queryKey: ["MintCard"],
@@ -47,18 +67,13 @@ export const RalphMintCard = ({
     refetchInterval: 1000,
   });
 
-  // Signals
-  const SdisableMinting = useSignal<boolean>(true);
-  const SisMinting = useSignal<boolean>(false);
-  const SStatusMessage = useSignal<string>("");
-
   // Status Frame Content Signals
   const statusFrame = useSignal<React.ReactNode>(<></>);
   const mintEnabledStatusFrame = useSignal<React.ReactNode>(<></>);
 
   // Effect to enable or disable minting
   effect(() => {
-    if (!wallet) {
+    if (!connectedWallet || !connectedAccount || !connectedWalletNetwork) {
       SdisableMinting.value = true;
       return;
     }
@@ -114,153 +129,90 @@ export const RalphMintCard = ({
     );
   });
 
-  /**
-   * Minting Controller
-   */
-
-  const pollIndexer = async (
-    indexerGateway: IndexerGateway,
-    transactionHash: string,
-    numAttempts: number,
-    mintingAmount: number,
-    tokenShortName: string,
-  ) => {
-    for (let i = 0; i < numAttempts; i++) {
-      const inscriptionStatus =
-        await indexerGateway.getInscriptionStatus(transactionHash);
-      console.log(
-        `[Inscription Status]: ${i}/${numAttempts}`,
-        inscriptionStatus,
-      );
-      if (inscriptionStatus.success) {
-        return inscriptionStatus;
-      }
-      const formattedIsMintingAmount = formatNumber(mintingAmount);
-      statusFrame.value = (
-        <InProgressStatusFrame
-          message={`Looking for your transaction. Attempt ${i}/${numAttempts}.`}
-          title={`${formattedIsMintingAmount} ${tokenShortName} are being minted!`}
-        />
-      );
-      // Wait for 0.5 second
-      await new Promise((resolve) => setTimeout(resolve, 1000));
-    }
-    throw new Error(
-      `Transaction not detected by indexer after ${numAttempts} attempts.`,
-    );
-  };
-
-  const mint = async () => {
-    if (!data || data.status !== "success" || !wallet) {
+  const onMint = () => {
+    if (!data || data.status !== "success") {
+      SdisableMinting.value = true;
       return;
     }
-    const amount = data.data.allocation;
-    const formattedIsMintingAmount = formatNumber(amount.value);
+    const amount = data.data.allocation.value;
+    if (!amount) {
+      SdisableMinting.value = true;
+
+      return;
+    }
+    if (!connectedWalletNetwork || !connectedAccount || !connectedWallet) {
+      SdisableMinting.value = true;
+      statusFrame.value = (
+        <MintErrorStatusFrame
+          error={`Oh Snap!`}
+          message={`Couldn't detect a connected wallet`} // TODO: Please use one of the recommended wallets.
+        />
+      );
+      return;
+    }
+    if (connectedWalletNetwork?.id !== activeNetwork.value.chainId) {
+      SdisableMinting.value = true;
+      statusFrame.value = (
+        <MintErrorStatusFrame
+          error={`Oh Snap!`}
+          message={`You are on the wrong network pal. wallet: ${connectedWalletNetwork?.id} !== network: ${activeNetwork.value.chainId}`} // TODO: Please use one of the recommended wallets.
+        />
+      );
+      return;
+    }
+    SdisableMinting.value = true;
+    SisMinting.value = true;
+
+    const formattedIsMintingAmount = formatNumber(amount);
     const token = "PR"; // TODO: This is a hardcoded value. This should be dynamic
+
     statusFrame.value = (
       <InProgressStatusFrame
         message={SStatusMessage.value}
         title={`${formattedIsMintingAmount} ${token} are being minted!`}
       />
     );
-    // mintEnabledStatusFrame.value = <></>;
-    SisMinting.value = true;
-
-    // Network Validation!
-    const chain = activeNetwork;
-    if (!walletChainID) {
-      statusFrame.value = (
-        <MintErrorStatusFrame
-          error="Ah Dayum!!"
-          message="Couldn't detect wallet's network!"
-        />
-      );
-      SisMinting.value = false;
-      return;
-    }
-    if (toHex(walletChainID) !== toHex(chain.value.chainId)) {
-      statusFrame.value = (
-        <MintErrorStatusFrame
-          error={`Oh Snap!`}
-          message={`You are on the wrong network pal. wallet: ${walletChainID} !== network: ${chain.value.chainId}`} // TODO: Please use one of the recommended wallets.
-        />
-      );
-      return;
-    }
-
-    const mintResponse: MintResponseDTO = await web3Gateway.sendMintTransaction(
-      amount.value * 1000000000, // TODO: cleanup
-      chain.value,
+    mint(
+      amount,
       SStatusMessage,
-    );
-
-    if (!mintResponse.success) {
-      statusFrame.value = (
-        <MintErrorStatusFrame error="Oh Snap!" message={mintResponse.msg} />
-      );
-      SisMinting.value = false;
-      return;
-    }
-
-    // Poll the indexer for transaction hash
-    const maxAttempts = 60;
-    try {
-      const inscriptionStatus = await pollIndexer(
-        indexerGateway,
-        mintResponse.data.txHash,
-        maxAttempts,
-        amount.value, // TODO: should be human readable
-        token,
-      );
-      if (!inscriptionStatus.success) {
-        statusFrame.value = (
-          <MintWarningStatusFrame
-            error="Come back later!"
-            message={`Ralph is still looking for your transaction.`}
-            explorerLink={mintResponse.data.explorerLink}
-          />
-        );
-        return;
-      } else {
-        if (inscriptionStatus.data.valid === 0) {
-          statusFrame.value = (
-            <MintErrorStatusFrame
-              error="Oh Snap!"
-              message="That looks like an invalid transaction!"
-              explorerLink={mintResponse.data.explorerLink}
-            />
-          );
-          SisMinting.value = false;
-          return;
-        } else if (inscriptionStatus.data.valid === 1) {
+      activeNetwork.value,
+      web3Gateway,
+      indexerGateway,
+      connectedWallet,
+      connectedAccount,
+      token,
+      statusFrame,
+    )
+      .then(async (response: MintResponseModel) => {
+        console.log(`[Mint Status]: ${JSON.stringify(response)}`);
+        if (response.status === "success") {
           statusFrame.value = (
             <MintCompletedStatusFrame
-              timestamp={mintResponse.data.timestamp}
-              amountMinted={mintResponse.data.amountMinted / 1000000000} // TODO: cleanup
-              tokenShortName={mintResponse.data.tokenShortName}
-              explorerLink={mintResponse.data.explorerLink}
+              tokenShortName={token}
+              amountMinted={response.amountMinted ?? data.data.allocation.value}
+              explorerLink={`${response.explorerLink}`}
+              timestamp={`${response.timestamp}`}
             />
           );
+        } else if (response.status === "warning") {
+          statusFrame.value = (
+            <MintWarningStatusFrame message={response.message} error={""} />
+          );
         }
-      }
-    } catch (e) {
-      statusFrame.value = (
-        <MintErrorStatusFrame
-          error="Come back later!"
-          message={`Ralph is still hunting for your transaction!`}
-        />
-      );
-    }
-    SisMinting.value = false;
-  };
-
-  const onMint = () => {
-    mint()
-      .then(() => {
-        console.log("[Mint Status]: Minting Ended!");
       })
-      .catch((e) => {
-        console.log("[Mint Status]: Error minting" + e);
+      .catch((error: MintResponseModel) => {
+        console.log(
+          `[Mint Status]: Error minting ${formattedIsMintingAmount} ${token}. ${JSON.stringify(error)}`,
+        );
+        statusFrame.value = (
+          <MintErrorStatusFrame
+            error={`Oh Snap!`}
+            message={`Couldn't mint ${formattedIsMintingAmount} ${token}`} // TODO: Please use one of the recommended wallets.
+          />
+        );
+      })
+      .finally(() => {
+        SisMinting.value = false;
       });
   };
 

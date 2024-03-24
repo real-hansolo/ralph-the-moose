@@ -28,6 +28,7 @@ export interface WrapCardProps {
   onWrap: () => void; // Callback function when wrapping is triggered
   onClaim: () => void; // Callback function when claiming is triggered
   SWrapStatusMessage: Signal<string>; // The status message populated during the wrapping process
+  SClaimStatusMessage: Signal<string>; // The status message populated during the claiming process
   SWrapCardView: Signal<"wrapping" | "claiming" | "default">; // The view of the wrap card
 }
 
@@ -43,6 +44,7 @@ export const WrapCard = ({
   onClaim,
   SWrapCardView,
   SWrapStatusMessage,
+  SClaimStatusMessage,
 }: WrapCardProps) => {
   useSignals();
   const wrappedTokenName = `W${tokenShortName.toUpperCase()}`;
@@ -135,13 +137,18 @@ export const WrapCard = ({
       <div className="relative flex w-full flex-row justify-between">
         <Heading title="Claiming" variant={HeadingVariant.H4} />
         <div className="ml-auto">
-          <IconButtonClose size={4} onClick={onClose ? onClose : () => {}} />
+          <IconButtonClose size={4} onClick={onClose ? onClose : () => {
+            SWrapCardView.value = "default";
+          }} />
         </div>
       </div>
       <div className="flex w-full flex-col items-center justify-center gap-4">
         <LightFrame className="w-full items-center gap-4">
           <div className="font-heading-h5 relative inline-block w-full overflow-auto whitespace-normal text-center font-gluten text-lg font-bold leading-[18px] tracking-[-0.04em] text-text-primary">
-            {SWrapStatusMessage.value}
+            <InProgressStatusFrame
+              title={`Claiming ${claimableAmount} W${tokenShortName}`}
+              message={SClaimStatusMessage.value}
+            />
           </div>
         </LightFrame>
       </div>

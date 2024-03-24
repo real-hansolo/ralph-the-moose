@@ -16,9 +16,9 @@ export interface WalletCardProps {
    */
   address: string;
   /**
-   * The walletId of the wallet.
+   * The name of the wallet.
    */
-  walletId: string;
+  walletName: string;
   /**
    * The React node for the connect button.
    */
@@ -38,14 +38,14 @@ export const WalletCard = ({
   address,
   connectButton,
   disconnectButton,
-  walletId,
+  walletName: walletName,
 }: WalletCardProps) => {
   return (
     <Card>
       {status === "connected" ? (
         <WalletCard.Connected
           address={address}
-          walletId={walletId}
+          walletName={walletName}
           disconnectButton={disconnectButton}
         />
       ) : (
@@ -74,11 +74,11 @@ WalletCard.Disconnected = ({
 
 WalletCard.Connected = ({
   address,
-  walletId,
+  walletName,
   disconnectButton,
 }: {
   address: string;
-  walletId: string;
+  walletName: string;
   disconnectButton: React.ReactNode;
 }) => {
   return (
@@ -86,7 +86,7 @@ WalletCard.Connected = ({
       {/** Wallet Addres div, pinned to the left of the parent */}
       <div className="flex flex-1 flex-col items-start justify-start gap-[8px]">
         <div className="relative self-stretch font-varela text-sm leading-[14px] text-text-secondary">
-          {walletId}
+          {walletName}
         </div>
         <Label variant="small" label={address} />
       </div>

@@ -1,41 +1,41 @@
-import { type WalletInstance } from "@thirdweb-dev/react";
-import { toWei } from "thirdweb";
+import {
+  type ThirdwebClient,
+  createThirdwebClient,
+  estimateGas,
+  prepareTransaction,
+  sendTransaction,
+  toWei,
+} from "thirdweb";
 import { env } from "~/env";
 import {
   type GetWrappedBalanceDTO,
   type ClaimableDTO,
   type MintResponseDTO,
   type WrapDTO,
+  type ClaimDTO,
 } from "../dto/web3-dto";
+import { ethers5Adapter } from "thirdweb/adapters/ethers5";
 import { type BaseErrorDTO } from "../dto/base";
 import { type Signal } from "@preact/signals-react";
-import { type ToastProps } from "~/lib";
 import { type TChainConfig } from "../config/chains";
 import { ethers } from "ethers";
 import RalphReservoirABI from "../abi/RalphReservoir.json";
 import Ralph from "../abi/Ralph.json";
+import { type Account, type Wallet } from "thirdweb/wallets";
 
 export default class Web3Gateway {
   private feeWalletAddress: string;
-  private wallet: WalletInstance | undefined;
-  private thirdwebClientID: string;
-  private toasts: Signal<ToastProps[]>;
-  constructor(
-    wallet: WalletInstance | undefined,
-    toasts: Signal<ToastProps[]>,
-  ) {
+  private thirdWebClient: ThirdwebClient;
+  constructor() {
     this.feeWalletAddress = env.NEXT_PUBLIC_FEE_WALLET_ADDRESS;
-    this.wallet = wallet;
-    this.thirdwebClientID = env.NEXT_PUBLIC_THIRDWEB_CLIENT_ID;
-    this.toasts = toasts;
+    this.thirdWebClient = createThirdwebClient({
+      clientId: env.NEXT_PUBLIC_THIRDWEB_CLIENT_ID,
+    });
   }
 
-  __getWalletChainID = async () => {
-    if (!this.wallet) {
-      return;
-    }
-    const chainID = await this.wallet.getChainId();
-    return chainID;
+  __getWalletChainID = async (wallet: Wallet) => {
+    const chain = wallet.getChain();
+    return chain?.id;
   };
   __generateHexFromMintMessage = (amount: number): string => {
     // TODO: hook up amount to the message. default 10000000000
@@ -44,7 +44,10 @@ export default class Web3Gateway {
     return hex;
   };
 
-  __generateHexFromWrapMessage = (bigAmount: number, ralphReservoirAddress: string): string => {
+  __generateHexFromWrapMessage = (
+    bigAmount: number,
+    ralphReservoirAddress: string,
+  ): string => {
     const json = `{"p": "elkrc-404", "op": "transfer", "tick": "PR", "to": "${ralphReservoirAddress}", "amount": ${bigAmount}}`;
     const hex = Buffer.from(json, "utf8").toString("hex");
     return hex;
@@ -53,37 +56,35 @@ export default class Web3Gateway {
   async sendMintTransaction(
     amount: number,
     chain: TChainConfig,
+    wallet: Wallet,
+    account: Account,
     statusMessage: Signal<string>,
   ): Promise<MintResponseDTO> {
-    if (!this.wallet) {
-      const error = {
-        success: false,
-        msg: "Looks like your wallet is not connected!",
-      };
-      return error as BaseErrorDTO;
-    }
     const message = this.__generateHexFromMintMessage(amount);
-    const signer = await this.wallet.getSigner();
-    const tx = {
+    const thirdWebClient = this.thirdWebClient;
+    const thirdWebTx = prepareTransaction({
       to: `0x${this.feeWalletAddress}`,
       value: toWei("0.00123"),
       data: `0x${message}`,
-      chainId: chain.chainId,
-      gasLimit: chain.gasLimit, // TODO: Set gas limit from chain config
-    };
+      chain: chain.thirdWeb,
+      client: thirdWebClient,
+    });
 
-    const estimatedGas = await signer.estimateGas(tx);
-    statusMessage.value = `Waiting for confirmation! Estimated Gas: ${estimatedGas.toString()}. Gas Limit: ${chain.gasLimit}`; // TODO: what is the correct format ?
-
+    if (account.estimateGas) {
+      const estimatedGas = await account.estimateGas(thirdWebTx);
+      statusMessage.value = `Waiting for confirmation! Estimated Gas: ${estimatedGas.toString()}. Gas Limit: ${chain.gasLimit}`; // TODO: what is the correct format ?
+    }
+    const gas = await estimateGas({
+      transaction: thirdWebTx,
+    });
+    statusMessage.value = `Estimated Gas: ${gas.toString()}. Gas Limit: ${chain.gasLimit}`; // TODO: what is the correct format ?
     try {
-      const receipt = await signer.sendTransaction(tx);
-      await signer.getBalance();
-      statusMessage.value = `Minting...`;
-      await receipt.wait();
-      statusMessage.value = `Transaction completed!`;
-      const timestamp =
-        receipt.timestamp?.toLocaleString() ?? new Date().toLocaleDateString(); // TODO: check if this is okay or we should stick with the receipt timestamp
-      const explorerLink = `${chain.explorerUrl}/tx/${receipt.hash}`;
+      const { transactionHash } = await sendTransaction({
+        account: account,
+        transaction: thirdWebTx,
+      });
+      const explorerLink = `${chain.explorerUrl}/tx/${transactionHash}`;
+      const timestamp = new Date().toLocaleDateString();
       return {
         success: true,
         data: {
@@ -91,7 +92,7 @@ export default class Web3Gateway {
           timestamp: timestamp,
           explorerLink: explorerLink,
           tokenShortName: "PR",
-          txHash: receipt.hash,
+          txHash: transactionHash,
         },
       };
     } catch (e) {
@@ -103,20 +104,10 @@ export default class Web3Gateway {
     }
   }
 
-  async fetchClaimableAmount(chain: TChainConfig): Promise<ClaimableDTO> {
-    if (!this.wallet) {
-      return {
-        success: false,
-        msg: "Looks like your wallet is not connected!",
-      } as BaseErrorDTO;
-    }
-    const chainID = await this.wallet.getChainId();
-    if (chainID !== chain.chainId) {
-      return {
-        success: false,
-        msg: "Wrong Network",
-      } as BaseErrorDTO;
-    }
+  async fetchClaimableAmount(
+    chain: TChainConfig,
+    walletAddress: string,
+  ): Promise<ClaimableDTO> {
     const provider = new ethers.providers.JsonRpcProvider(
       // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
       chain.jsonRpcProvider,
@@ -128,7 +119,6 @@ export default class Web3Gateway {
       provider,
     );
 
-    const walletAddress = await this.wallet.getAddress();
     try {
       // eslint-disable-next-line @typescript-eslint/no-unsafe-call
       const claimable = await contract.claimable(walletAddress);
@@ -148,51 +138,54 @@ export default class Web3Gateway {
     }
   }
 
-  async claimWrappedTokens(amount: number, chain: TChainConfig): Promise<any> {
-    if (!this.wallet) {
-      return {
-        success: false,
-        msg: "Looks like your wallet is not connected!",
-      };
-    }
-    const chainID = await this.wallet.getChainId();
-    if (chainID !== chain.chainId) {
-      return {
-        success: false,
-        msg: "Wrong Network",
-      };
-    }
+  async claimWrappedTokens(
+    amount: number,
+    chain: TChainConfig,
+  ): Promise<ClaimDTO> {
     const provider = new ethers.providers.JsonRpcProvider(
       // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
       chain.jsonRpcProvider,
     );
-    const contract = new ethers.Contract(
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-      chain.ralphReservoirAddress,
-      RalphReservoirABI,
-      provider,
-    );
-    const walletAddress = await this.wallet.getAddress();
-    const signer = await this.wallet.getSigner();
+
+    // const client = createThirdwebClient({clientId: env.NEXT_PUBLIC_THIRDWEB_CLIENT_ID})
+    // const account = await this.wallet.connect();
+    // const signer = await ethers5Adapter.signer.toEthers(client, account );
+    // const contract = new ethers.Contract(
+    //   // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
+    //   chain.ralphReservoirAddress,
+    //   RalphReservoirABI,
+    //   signer,
+    // );
+    // // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
+
     try {
-      const tx = await contract.claim(walletAddress, amount);
-      const receipt = await signer.sendTransaction(tx);
-      await signer.getBalance();
-      await receipt.wait();
-      const timestamp =
-        receipt.timestamp?.toLocaleString() ?? new Date().toLocaleDateString(); // TODO: check if this is okay or we should stick with the receipt timestamp
-      const explorerLink = `${chain.explorerUrl}/tx/${receipt.hash}`;
+      //   // const receipt = await signer.signTransaction({
+      //   //   to: walletAddress,
+      //   //   from: chain.ralphReservoirAddress,
+      //   //   value: 99999999,
+      //   // });
+      //   // console.log(receipt);
+
+      //   const tx = await contract.claim(amount);
+      //   await tx.wait();
+
+      // await signer.getBalance();
+      // await receipt
+      // const timestamp =
+      //   receipt.timestamp?.toLocaleString() ?? new Date().toLocaleDateString(); // TODO: check if this is okay or we should stick with the receipt timestamp
+      // const explorerLink = `${chain.explorerUrl}/tx/${receipt.hash}`;
       return {
-        success: true,
-        data: {
-          amountMinted: amount,
-          timestamp: timestamp,
-          explorerLink: explorerLink,
-          tokenShortName: "PR",
-          txHash: receipt.hash,
-        },
+        success: false,
+        msg: "Claiming wrapped tokens is not yet supported",
+        // data: {
+        //   amountMinted: amount,
+        //   timestamp: timestamp,
+        //   explorerLink: explorerLink,
+        //   tokenShortName: "PR",
+        //   txHash: receipt.hash,
+        // },
       };
-    } catch (e) {
+    } catch (e: unknown) {
       console.error(e as Error);
       return {
         success: false,
@@ -200,20 +193,10 @@ export default class Web3Gateway {
       };
     }
   }
-  async getPRTokenBalance(chain: TChainConfig): Promise<GetWrappedBalanceDTO> {
-    if (!this.wallet) {
-      return {
-        success: false,
-        msg: "Looks like your wallet is not connected!",
-      };
-    }
-    const chainID = await this.wallet.getChainId();
-    if (chainID !== chain.chainId) {
-      return {
-        success: false,
-        msg: "Wrong Network",
-      };
-    }
+  async getPRTokenBalance(
+    chain: TChainConfig,
+    walletAddress: string,
+  ): Promise<GetWrappedBalanceDTO> {
     const provider = new ethers.providers.JsonRpcProvider(
       // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
       chain.jsonRpcProvider,
@@ -226,7 +209,6 @@ export default class Web3Gateway {
       provider,
     );
 
-    const walletAddress = await this.wallet.getAddress();
     try {
       // eslint-disable-next-line @typescript-eslint/no-unsafe-call
       const balance = await contract.balanceOf(walletAddress);
@@ -248,25 +230,15 @@ export default class Web3Gateway {
   async sendWrapTransaction(
     amount: number,
     chain: TChainConfig,
+    wallet: Wallet,
+    account: Account,
     statusMessage: Signal<string>,
   ): Promise<WrapDTO> {
-    if (!this.wallet) {
-      const error = {
-        success: false,
-        msg: "Looks like your wallet is not connected!",
-      };
-      return error as BaseErrorDTO;
-    }
-    const walletNetwork = await this.wallet.getChainId();
-    if (walletNetwork !== chain.chainId) {
-      statusMessage.value = `Please connect to ${chain.name} network`;
-      return {
-        success: false,
-        msg: `Please connect to ${chain.name} network`,
-      };
-    }
-    const message = this.__generateHexFromWrapMessage(amount, chain.ralphReservoirAddress);
-    const signer = await this.wallet.getSigner();
+    const message = this.__generateHexFromWrapMessage(
+      amount,
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
+      chain.ralphReservoirAddress,
+    );
     const tx = {
       to: `${chain.ralphReservoirAddress}`,
       value: toWei("0.00123"),
@@ -274,16 +246,25 @@ export default class Web3Gateway {
       chainId: chain.chainId,
       gasLimit: chain.gasLimit,
     };
-    const estimatedGas = await signer.estimateGas(tx);
+    const thirdWebTx = prepareTransaction({
+      to: `${chain.ralphReservoirAddress}`,
+      chain: chain.thirdWeb,
+      client: this.thirdWebClient,
+      value: toWei("0.00123"),
+      data: `0x${message}`,
+    });
+
+    const estimatedGas = await estimateGas({ transaction: thirdWebTx });
     statusMessage.value = `Estd Gas: ${estimatedGas.toString()}. Limit: ${chain.gasLimit}`; // TODO: what is the correct format ?
 
     try {
-      const receipt = await signer.sendTransaction(tx);
-      await receipt.wait();
+      const { transactionHash } = await sendTransaction({
+        transaction: thirdWebTx,
+        account: account,
+      });
       statusMessage.value = `Wrapping ended!`;
-      const timestamp =
-        receipt.timestamp?.toLocaleString() ?? new Date().toLocaleDateString(); // TODO: check if this is okay or we should stick with the receipt timestamp
-      const explorerLink = `${chain.explorerUrl}/tx/${receipt.hash}`;
+      const timestamp = new Date().toLocaleDateString(); // TODO: check if this is okay or we should stick with the receipt timestamp
+      const explorerLink = `${chain.explorerUrl}/tx/${transactionHash}`;
       return {
         success: true,
         data: {
@@ -291,7 +272,7 @@ export default class Web3Gateway {
           timestamp: timestamp,
           explorerLink: explorerLink,
           tokenShortName: "PR",
-          txHash: receipt.hash,
+          txHash: transactionHash,
         },
       };
     } catch (e) {

@@ -66,7 +66,7 @@ export const RalphBalaceCard = ({
         } as BaseErrorViewModel;
       }
       const viewModel = await balanceCardPresenter.present();
-      console.log(`[Balance View Model]: ${JSON.stringify(viewModel)}`);
+      // console.log(`[Balance View Model]: ${JSON.stringify(viewModel)}`);
       return viewModel;
     },
     refetchInterval: 1000,
@@ -81,23 +81,22 @@ export const RalphBalaceCard = ({
   );
 
   const onClaim = () => {
-    // check wallet
-    // if (!wallet || !walletAddress || !walletChainID) {
-    //   toasts.value.push({
-    //     message: "Please connect your wallet",
-    //     title: "Wall-E.T.",
-    //     status: "error",
-    //   });
-    //   return;
-    // }
-    // if(toHex(activeNetwork.value.chainId) !== toHex(walletChainID)) {
-    //   toasts.value = [{
-    //     message: "Please connect to the correct network",
-    //     title: "Network Error",
-    //     status: "error",
-    //   }];
-    //   return;
-    // }
+    if (!connectedAccount || !connectedWallet || !connectedWalletNetwork) {
+      toasts.value.push({
+        message: "Please connect your wallet",
+        title: "Wall-E.T.",
+        status: "error",
+      });
+      return;
+    }
+    if(toHex(activeNetwork.value.chainId) !== toHex(connectedWalletNetwork.id)) {
+      toasts.value = [{
+        message: "Please connect to the correct network",
+        title: "Network Error",
+        status: "error",
+      }];
+      return;
+    }
     if(!data || isLoading || isError || !data.status || data.status !== "success") {
       toasts.value.push({
         message: "Tryin' to claim, but something went wrong!",
@@ -121,6 +120,8 @@ export const RalphBalaceCard = ({
     claim(
       web3Gateway,
       data.data.claimableInscriptions.value,
+      connectedWallet,
+      connectedAccount,
       activeNetwork.value,
       SClaimStatusMessage,
     )

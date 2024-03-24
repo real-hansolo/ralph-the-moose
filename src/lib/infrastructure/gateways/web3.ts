@@ -5,6 +5,8 @@ import {
   prepareTransaction,
   sendTransaction,
   toWei,
+  prepareContractCall,
+  getContract,
 } from "thirdweb";
 import { env } from "~/env";
 import {
@@ -15,7 +17,6 @@ import {
   type ClaimDTO,
 } from "../dto/web3-dto";
 import { ethers5Adapter } from "thirdweb/adapters/ethers5";
-import { type BaseErrorDTO } from "../dto/base";
 import { type Signal } from "@preact/signals-react";
 import { type TChainConfig } from "../config/chains";
 import { ethers } from "ethers";
@@ -122,7 +123,6 @@ export default class Web3Gateway {
     try {
       // eslint-disable-next-line @typescript-eslint/no-unsafe-call
       const claimable = await contract.claimable(walletAddress);
-      console.log(claimable);
       return {
         success: true,
         data: {
@@ -140,56 +140,48 @@ export default class Web3Gateway {
 
   async claimWrappedTokens(
     amount: number,
+    wallet: Wallet,
+    account: Account,
     chain: TChainConfig,
   ): Promise<ClaimDTO> {
-    const provider = new ethers.providers.JsonRpcProvider(
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-      chain.jsonRpcProvider,
-    );
-
-    // const client = createThirdwebClient({clientId: env.NEXT_PUBLIC_THIRDWEB_CLIENT_ID})
-    // const account = await this.wallet.connect();
-    // const signer = await ethers5Adapter.signer.toEthers(client, account );
-    // const contract = new ethers.Contract(
-    //   // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-    //   chain.ralphReservoirAddress,
-    //   RalphReservoirABI,
-    //   signer,
-    // );
-    // // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-
     try {
-      //   // const receipt = await signer.signTransaction({
-      //   //   to: walletAddress,
-      //   //   from: chain.ralphReservoirAddress,
-      //   //   value: 99999999,
-      //   // });
-      //   // console.log(receipt);
+      const transaction = prepareContractCall({
+        contract: getContract({
+          client: this.thirdWebClient,
+          address: chain.ralphReservoirAddress,
+          chain: chain.thirdWeb,
+        }),
+        method: {
+          inputs: [
+            {
+              internalType: "uint256",
+              name: "amount",
+              type: "uint256",
+            },
+          ],
+          name: "claim",
+          outputs: [],
+          stateMutability: "nonpayable",
+          type: "function",
+        },
+        params: [BigInt(amount)],
+      });
 
-      //   const tx = await contract.claim(amount);
-      //   await tx.wait();
-
-      // await signer.getBalance();
-      // await receipt
-      // const timestamp =
-      //   receipt.timestamp?.toLocaleString() ?? new Date().toLocaleDateString(); // TODO: check if this is okay or we should stick with the receipt timestamp
-      // const explorerLink = `${chain.explorerUrl}/tx/${receipt.hash}`;
+      const receipt = await sendTransaction({
+        transaction: transaction,
+        account: account,
+      });
+      console.log(`[Receipt]: ${JSON.stringify(receipt)}`);
+      
       return {
-        success: false,
-        msg: "Claiming wrapped tokens is not yet supported",
-        // data: {
-        //   amountMinted: amount,
-        //   timestamp: timestamp,
-        //   explorerLink: explorerLink,
-        //   tokenShortName: "PR",
-        //   txHash: receipt.hash,
-        // },
+        success: true,
+        data: {},
       };
     } catch (e: unknown) {
       console.error(e as Error);
       return {
         success: false,
-        msg: "Error claiming wrapped tokens",
+        msg: `Error claiming wrapped tokens: ${JSON.stringify(e)}`,
       };
     }
   }

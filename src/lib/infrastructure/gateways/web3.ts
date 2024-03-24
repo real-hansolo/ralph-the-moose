@@ -44,8 +44,8 @@ export default class Web3Gateway {
     return hex;
   };
 
-  __generateHexFromWrapMessage = (bigAmount: number): string => {
-    const json = `{"p": "elkrc-404", "op": "transfer", "tick": "PR", "amount": ${bigAmount}}`;
+  __generateHexFromWrapMessage = (bigAmount: number, ralphReservoirAddress: string): string => {
+    const json = `{"p": "elkrc-404", "op": "transfer", "tick": "PR", "to": "${ralphReservoirAddress}", "amount": ${bigAmount}}`;
     const hex = Buffer.from(json, "utf8").toString("hex");
     return hex;
   };
@@ -148,7 +148,7 @@ export default class Web3Gateway {
     }
   }
 
-  async claimWrappedTokens(amount: number, chain: TChainConfig): Promise<> {
+  async claimWrappedTokens(amount: number, chain: TChainConfig): Promise<any> {
     if (!this.wallet) {
       return {
         success: false,
@@ -265,7 +265,7 @@ export default class Web3Gateway {
         msg: `Please connect to ${chain.name} network`,
       };
     }
-    const message = this.__generateHexFromWrapMessage(amount);
+    const message = this.__generateHexFromWrapMessage(amount, chain.ralphReservoirAddress);
     const signer = await this.wallet.getSigner();
     const tx = {
       to: `${chain.ralphReservoirAddress}`,

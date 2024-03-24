@@ -1,7 +1,7 @@
 import { type Signal, useSignal, effect } from "@preact/signals-react";
 import { useMemo } from "react";
 import {
-  IsMintingStatusFrame,
+  InProgressStatusFrame,
   MintCard,
   MintCompletedStatusFrame,
   MintEnabledStatusFrame,
@@ -19,6 +19,7 @@ import IndexerGateway from "~/lib/infrastructure/gateways/indexer";
 import { type TChainConfig } from "~/lib/infrastructure/config/chains";
 import { MintWarningStatusFrame } from "~/lib/components/mint-card/MintWarningStatusFrame";
 import { toHex } from "thirdweb";
+import { formatNumber } from "~/lib/utils/tokenUtils";
 
 export const RalphMintCard = ({
   toasts,
@@ -134,11 +135,11 @@ export const RalphMintCard = ({
       if (inscriptionStatus.success) {
         return inscriptionStatus;
       }
+      const formattedIsMintingAmount = formatNumber(mintingAmount);
       statusFrame.value = (
-        <IsMintingStatusFrame
+        <InProgressStatusFrame
           message={`Looking for your transaction. Attempt ${i}/${numAttempts}.`}
-          isMintingAmount={mintingAmount}
-          tokenShortName={tokenShortName}
+          title={`${formattedIsMintingAmount} ${tokenShortName} are being minted!`}
         />
       );
       // Wait for 0.5 second
@@ -154,13 +155,12 @@ export const RalphMintCard = ({
       return;
     }
     const amount = data.data.allocation;
-
+    const formattedIsMintingAmount = formatNumber(amount.value);
     const token = "PR"; // TODO: This is a hardcoded value. This should be dynamic
     statusFrame.value = (
-      <IsMintingStatusFrame
-        isMintingAmount={amount.value}
-        tokenShortName={token}
+      <InProgressStatusFrame
         message={SStatusMessage.value}
+        title={`${formattedIsMintingAmount} ${token} are being minted!`}
       />
     );
     // mintEnabledStatusFrame.value = <></>;

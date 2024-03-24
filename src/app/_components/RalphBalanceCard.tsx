@@ -11,6 +11,7 @@ import Web3Gateway from "~/lib/infrastructure/gateways/web3";
 import BalanceCardPresenter from "~/lib/infrastructure/presenters/BalanceCardPresenter";
 import type BalanceCardViewModel from "~/lib/infrastructure/view-models/BalanceCardViewModel";
 import { wrap } from "./controllers/WrapController";
+import { toHex } from "thirdweb";
 
 export const RalphBalaceCard = ({
   toasts,
@@ -52,6 +53,23 @@ export const RalphBalaceCard = ({
 
   const onWrap = () => {
     SWrapCardView.value = "wrapping";
+    // check wallet
+    if (!wallet || !walletAddress || !walletChainID) {
+      toasts.value.push({
+        message: "Please connect your wallet",
+        title: "Wall-E.T.",
+        status: "error",
+      });
+      return;
+    }
+    if(toHex(activeNetwork.value.chainId) !== toHex(walletChainID)) {
+      toasts.value = [{
+        message: "Please connect to the correct network",
+        title: "Network Error",
+        status: "error",
+      }];
+      return;
+    }
     wrap(
       web3Gateway,
       amountToWrap.value,
@@ -60,11 +78,27 @@ export const RalphBalaceCard = ({
     )
       .then((result) => {
         if (result) {
-          console.log("[WRAP] Wrap successful");
+          SWrapStatusMessage.value = "Looking good! Come back later to claim your PRs!";
+          // wait 2 seconds
+          setTimeout(() => {
+          }, 2000);
+          toasts.value.push({
+            message: `You wrapd' ${amountToWrap.value} PR, like its hot!`,
+            title: "It's a wrap!",
+            status: "success",
+          });
         }
       })
       .catch((error) => {
         console.error("[WRAP] Wrap failed", error);
+        SWrapStatusMessage.value = "Shit happens! Try again later";
+        setTimeout(() => {
+        }, 2000);
+        toasts.value.push({
+          message: `You wrapd' ${amountToWrap.value} PR, like its hot!`,
+          title: "It's a wrap!",
+          status: "error",
+        });
       })
       .finally(() => {
         SWrapCardView.value = "default";

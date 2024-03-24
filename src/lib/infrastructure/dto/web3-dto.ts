@@ -27,3 +27,27 @@ export type ClaimSuccessData = {
 };
 
 export type ClaimDTO = BaseDTO<ClaimSuccessData>;
+
+
+export type WrapSuccessDTO = {
+    txHash: string;
+    timestamp: string;
+    explorerLink: string;
+    wrappedAmount: number;
+    tokenShortName: string;
+};
+
+export type WrapDTO = BaseDTO<WrapSuccessDTO>;
+
+export type UnwrapSuccessDTO = {
+    txHash: string;
+    timestamp: string;
+    explorerLink: string;
+    unwrappedAmount: number;
+    tokenShortName: string;
+};
+
+export type UnwrapDTO = BaseDTO<UnwrapSuccessDTO>;
+
+
+

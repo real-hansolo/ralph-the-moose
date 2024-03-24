@@ -1,4 +1,4 @@
-import { useSignal } from "@preact/signals-react";
+import { type Signal, useSignal } from "@preact/signals-react";
 import { useSignals } from "@preact/signals-react/runtime";
 import { BalanceCardPrimaryVariant } from "./BalanceCardPrimary";
 import { WrapCard } from "./WrapCard";
@@ -50,6 +50,22 @@ export interface BalanceCardProps {
    * Callback function when claiming is triggered. It should open the claiming modal.
    */
   onClaim: () => void;
+  /**
+   * The amount to wrap, populated by the wrap modal.
+   */
+  amountToWrap: Signal<number>;
+  /**
+   * The amount to unwrap, populated by the unwrap modal.
+   */
+  amountToUnwrap: Signal<number>;
+  /**
+   * SWrapStatusMessage: The status message populated during the wrapping process.
+   */
+  SWrapStatusMessage: Signal<string>;
+  /**
+   * SWrapCardView: The view of the wrap card.
+   */
+  SWrapCardView: Signal<"wrapping" | "claiming" | "default">;
 }
 
 /**
@@ -60,8 +76,6 @@ export const BalanceCard = (props: BalanceCardProps) => {
   const activeVariant = useSignal<BalanceCardVariants>(
     BalanceCardVariants.VARIANT_PRIMARY,
   );
-  const amountToWrap = useSignal<number>(0);
-  const amountToUnwrap = useSignal<number>(0);
   const returnToPrimaryVariant = () => {
     activeVariant.value = BalanceCardVariants.VARIANT_PRIMARY;
   };
@@ -82,7 +96,6 @@ export const BalanceCard = (props: BalanceCardProps) => {
 
       {activeVariant.value === BalanceCardVariants.VARIANT_WRAP && (
         <WrapCard
-          amountToWrap={amountToWrap}
           onClose={returnToPrimaryVariant}
           {...props}
         ></WrapCard>
@@ -90,7 +103,6 @@ export const BalanceCard = (props: BalanceCardProps) => {
       
       {activeVariant.value === BalanceCardVariants.VARIANT_UNWRAP && (
         <UnwrapCard
-          amountToUnwrap={amountToUnwrap}
           onClose={returnToPrimaryVariant}
           {...props}
         ></UnwrapCard>

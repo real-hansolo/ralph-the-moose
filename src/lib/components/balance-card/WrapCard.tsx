@@ -4,6 +4,7 @@ import {
   Heading,
   HeadingVariant,
   IconButtonClose,
+  InProgressStatusFrame,
   InputAssetAmountWithLabel,
   Label,
   Modal,
@@ -111,13 +112,18 @@ export const WrapCard = ({
       <div className="relative flex w-full flex-row justify-between">
         <Heading title="Wrapping" variant={HeadingVariant.H4} />
         <div className="ml-auto">
-          <IconButtonClose size={4} onClick={onClose ? onClose : () => {}} />
+          <IconButtonClose size={4} onClick={onClose ? onClose : () => {
+            SWrapCardView.value = "default";
+          }} />
         </div>
       </div>
       <div className="flex w-full flex-col items-center justify-center gap-4">
         <LightFrame className="w-full items-center gap-4">
           <div className="font-heading-h5 relative inline-block w-full overflow-auto whitespace-normal text-center font-gluten text-lg font-bold leading-[18px] tracking-[-0.04em] text-text-primary">
-            {SWrapStatusMessage.value}
+            <InProgressStatusFrame
+              title={`Wrapping ${amountToWrap.value} ${tokenShortName}`}
+              message={SWrapStatusMessage.value}
+            />
           </div>
         </LightFrame>
       </div>

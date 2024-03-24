@@ -225,7 +225,7 @@ export default class Web3Gateway {
       Ralph,
       provider,
     );
-    
+
     const walletAddress = await this.wallet.getAddress();
     try {
       // eslint-disable-next-line @typescript-eslint/no-unsafe-call
@@ -257,7 +257,14 @@ export default class Web3Gateway {
       };
       return error as BaseErrorDTO;
     }
-
+    const walletNetwork = await this.wallet.getChainId();
+    if (walletNetwork !== chain.chainId) {
+      statusMessage.value = `Please connect to ${chain.name} network`;
+      return {
+        success: false,
+        msg: `Please connect to ${chain.name} network`,
+      };
+    }
     const message = this.__generateHexFromWrapMessage(amount);
     const signer = await this.wallet.getSigner();
     const tx = {
@@ -267,20 +274,10 @@ export default class Web3Gateway {
       chainId: chain.chainId,
       gasLimit: chain.gasLimit,
     };
-    statusMessage.value = `Wrapping ${amount} on ${chain.name}: ${chain.ralphReservoirAddress}`;
     const estimatedGas = await signer.estimateGas(tx);
-    statusMessage.value = `Waiting for confirmation! Estimated Gas: ${estimatedGas.toString()}. Gas Limit: ${chain.gasLimit}`; // TODO: what is the correct format ?
+    statusMessage.value = `Estd Gas: ${estimatedGas.toString()}. Limit: ${chain.gasLimit}`; // TODO: what is the correct format ?
 
     try {
-      const walletNetwork = await this.wallet.getChainId();
-      if (walletNetwork !== chain.chainId) {
-        statusMessage.value = `Please connect to ${chain.name} network`;
-        return {
-          success: false,
-          msg: `Please connect to ${chain.name} network`,
-        };
-      }
-      statusMessage.value = `Wrapping in progress..`;
       const receipt = await signer.sendTransaction(tx);
       await receipt.wait();
       statusMessage.value = `Wrapping ended!`;

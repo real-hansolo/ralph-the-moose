@@ -8,10 +8,10 @@ export {
   type MintCompletedStatusFrameProps,
 } from "./MintCompletedStatusFrame";
 export {
-  IsMintingStatusFrame,
-  type IsMintingStatusFrameProps,
-} from "./IsMintingStatusFrame";
+  InProgressStatusFrame,
+  type InProgressStatusFrameProps,
+} from "./InProgressStatusFrame";
 export {
   MintEnabledStatusFrame,
-  type MintEnabledStatusFrameProps as MintingEnabledStatusFrameProps,
+  type MintEnabledStatusFrameProps,
 } from "./MintingEnabledStatusFrame";

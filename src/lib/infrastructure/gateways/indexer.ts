@@ -5,7 +5,7 @@ import {
   type GetInscriptionStatusDTO,
   type GetLatestBlockDTO,
   type GetBalanceForAccountDTO,
-  GetTotalMintedForAccountDTO,
+  type GetTotalMintedForAccountDTO,
 } from "../dto/indexer-dto";
 
 export default class IndexerGateway {

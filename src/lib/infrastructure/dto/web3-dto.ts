@@ -9,3 +9,9 @@ export type MintResponseSuccessData = {
 };
 
 export type MintResponseDTO = BaseDTO<MintResponseSuccessData>
+
+export type ClaimableSuccessData = {
+    amount: number;
+};
+export type ClaimableDTO = BaseDTO<ClaimableSuccessData>;
+

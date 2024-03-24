@@ -9,7 +9,7 @@ import {
   type ToastProps,
 } from "~/lib";
 import type MintCardViewModel from "~/lib/infrastructure/view-models/MintCardViewModel";
-import { useAddress, useWallet } from "@thirdweb-dev/react";
+import { useAddress, useChainId, useWallet } from "@thirdweb-dev/react";
 import Web3Gateway from "~/lib/infrastructure/gateways/web3";
 import { type MintResponseDTO } from "~/lib/infrastructure/dto/web3-dto";
 import MintCardPresenter from "~/lib/infrastructure/presenters/MintCardPresenter";
@@ -18,6 +18,7 @@ import { env } from "~/env";
 import IndexerGateway from "~/lib/infrastructure/gateways/indexer";
 import { type TChainConfig } from "~/lib/infrastructure/config/chains";
 import { MintWarningStatusFrame } from "~/lib/components/mint-card/MintWarningStatusFrame";
+import { toHex } from "thirdweb";
 
 export const RalphMintCard = ({
   toasts,
@@ -28,6 +29,7 @@ export const RalphMintCard = ({
 }) => {
   const wallet = useWallet();
   const walletAddress = useAddress();
+  const walletChainID = useChainId();
   const indexerHost = env.NEXT_PUBLIC_INDEXER_URL;
   const indexerGateway = new IndexerGateway(indexerHost);
   const web3Gateway = new Web3Gateway(wallet, toasts);
@@ -56,7 +58,6 @@ export const RalphMintCard = ({
   // Effect to enable or disable minting
   effect(() => {
     if (!wallet) {
-      console.log("[Mint - Disabled]: Wallet not connected");
       SdisableMinting.value = true;
       return;
     }
@@ -120,14 +121,26 @@ export const RalphMintCard = ({
     indexerGateway: IndexerGateway,
     transactionHash: string,
     numAttempts: number,
+    mintingAmount: number,
+    tokenShortName: string,
   ) => {
     for (let i = 0; i < numAttempts; i++) {
       const inscriptionStatus =
         await indexerGateway.getInscriptionStatus(transactionHash);
-      console.log(`[Inscription Status]: ${i}/${numAttempts}`, inscriptionStatus);
+      console.log(
+        `[Inscription Status]: ${i}/${numAttempts}`,
+        inscriptionStatus,
+      );
       if (inscriptionStatus.success) {
         return inscriptionStatus;
       }
+      statusFrame.value = (
+        <IsMintingStatusFrame
+          message={`Looking for your transaction. Attempt ${i}/${numAttempts}`}
+          isMintingAmount={mintingAmount}
+          tokenShortName={tokenShortName}
+        />
+      );
       // Wait for 0.5 second
       await new Promise((resolve) => setTimeout(resolve, 1000));
     }
@@ -155,15 +168,21 @@ export const RalphMintCard = ({
 
     // Network Validation!
     const chain = activeNetwork;
-    const walletChainID = await wallet.getChainId();
-    if (walletChainID !== chain.value.chainId) {
-      console.log(
-        `[Mint - Error]: Wrong network detected. ${walletChainID} !== ${chain.value.chainId}`,
-      );
+    if (!walletChainID) {
       statusFrame.value = (
         <MintErrorStatusFrame
-          error="Oh Snap!"
-          message="You are on the wrong network."
+          error="Ah Dayum!!"
+          message="Couldn't detect wallet's network!"
+        />
+      );
+      SisMinting.value = false;
+      return;
+    }
+    if (toHex(walletChainID) !== toHex(chain.value.chainId)) {
+      statusFrame.value = (
+        <MintErrorStatusFrame
+          error={`Oh Snap!`}
+          message={`You are on the wrong network pal. wallet: ${walletChainID} !== network: ${chain.value.chainId}`} // TODO: Please use one of the recommended wallets.
         />
       );
       return;
@@ -190,6 +209,8 @@ export const RalphMintCard = ({
         indexerGateway,
         mintResponse.data.txHash,
         maxAttempts,
+        amount.value, // TODO: should be human readable
+        token,
       );
       if (!inscriptionStatus.success) {
         statusFrame.value = (
@@ -199,7 +220,6 @@ export const RalphMintCard = ({
             explorerLink={mintResponse.data.explorerLink}
           />
         );
-        // SisMinting.value = false;
         return;
       } else {
         if (inscriptionStatus.data.valid === 0) {
@@ -237,13 +257,10 @@ export const RalphMintCard = ({
   const onMint = () => {
     mint()
       .then(() => {
-        console.log("Minting");
+        console.log("[Mint Status]: Minting Ended!");
       })
       .catch((e) => {
-        console.log("Error minting man" + e);
-      })
-      .finally(() => {
-        console.log("Minting completed");
+        console.log("[Mint Status]: Error minting" + e);
       });
   };
 

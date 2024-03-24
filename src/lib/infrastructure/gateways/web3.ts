@@ -1,11 +1,13 @@
 import { type WalletInstance } from "@thirdweb-dev/react";
 import { toWei } from "thirdweb";
 import { env } from "~/env";
-import { type MintResponseDTO } from "../dto/web3-dto";
+import { type ClaimableDTO, type MintResponseDTO } from "../dto/web3-dto";
 import { type BaseErrorDTO } from "../dto/base";
 import { type Signal } from "@preact/signals-react";
 import { type ToastProps } from "~/lib";
 import { type TChainConfig } from "../config/chains";
+import { ethers } from "ethers";
+import RalphReservoirABI from "../abi/RalphReservoir.json";
 
 export default class Web3Gateway {
   private feeWalletAddress: string;
@@ -28,7 +30,7 @@ export default class Web3Gateway {
     }
     const chainID = await this.wallet.getChainId();
     return chainID;
-  }
+  };
   __generateHexFromMintMessage = (amount: number): string => {
     // TODO: hook up amount to the message. default 10000000000
     const json = `{"p": "elkrc-404", "op": "mint", "tick": "PR", "amount": ${amount}}`;
@@ -86,36 +88,49 @@ export default class Web3Gateway {
         msg: "Transaction failed. Try again or get in touch?",
       };
     }
+  }
 
-    // const chainID = await this.wallet.getChainId();
+  async fetchClaimableAmount(chain: TChainConfig): Promise<ClaimableDTO> {
+    if (!this.wallet) {
+      return {
+        success: false,
+        msg: "Looks like your wallet is not connected!",
+      } as BaseErrorDTO;
+    }
+    const chainID = await this.wallet.getChainId();
+    if (chainID !== chain.chainId) {
+      return {
+        success: false,
+        msg: "Wrong Network",
+      } as BaseErrorDTO;
+    }
+    const provider = new ethers.providers.JsonRpcProvider(
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
+      chain.jsonRpcProvider,
+    );
+    const contract = new ethers.Contract(
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
+      chain.ralphReservoirAddress,
+      RalphReservoirABI,
+      provider,
+    );
 
-    // const baseSepoliaTestnet = BaseSepoliaTestnet; // TODO: Obtain chain form config
-
-    // if (chainID !== baseSepoliaTestnet.chainId) { // TODO: do this check not in the gateway
-    //   const error = {
-    //     success: false,
-    //     msg: "Wrong Network",
-    //   };
-    //   return error as BaseErrorDTO;
-    // }
-
-    // const tx = prepareTransaction({
-    //   to: `0x${this.feeWalletAddress}`,
-    //   value: toWei("0.00123"),
-    //   chain: {
-    //     ...BaseSepoliaTestnet,
-    //     rpc: "https://sepolia.base.org",
-    //     id: 84532,
-    //   },
-    //   data: `0x${message}`,
-    //   client: createThirdwebClient({
-    //     clientId: this.thirdwebClientID,
-    //   }),
-    // });
-    // console.log("Tx: ", tx);
-    // const gas = await estimateGas({
-    //   transaction: tx,
-    // });
-    // console.log("Gas: ", gas);
+    const walletAddress = await this.wallet.getAddress();
+    try {
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-call
+      const claimable = await contract.claimable(walletAddress);
+      return {
+        success: true,
+        data: {
+          amount: claimable as unknown as number, // TODO: check if this is the correct value
+        },
+      };
+    } catch (e) {
+      console.error(e as Error);
+      return {
+        success: false,
+        msg: "Error fetching claimable balance",
+      };
+    }
   }
 }

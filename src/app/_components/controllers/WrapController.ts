@@ -32,6 +32,8 @@ export const wrap = async (
 export const claim = async (
   web3Gateway: Web3Gateway,
   humanReadableClaimableAmount: number,
+  wallet: Wallet,
+  account: Account,
   chain: TChainConfig,
   statusMessage: Signal<string>,
 ) => {
@@ -40,7 +42,7 @@ export const claim = async (
     console.log(message);
   });
   const amountToClaim = humanReadableClaimableAmount * 10 ** 9;
-  const result = await web3Gateway.claimWrappedTokens(amountToClaim, chain);
+  const result = await web3Gateway.claimWrappedTokens(amountToClaim, wallet, account, chain);
   if (!result.success) {
     return Promise.reject(result.msg);
   }

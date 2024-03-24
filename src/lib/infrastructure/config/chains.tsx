@@ -1,8 +1,8 @@
 import { env } from "~/env";
-import { Base, BaseSepoliaTestnet } from "@thirdweb-dev/chains";
 import { IconNetworkBase } from "~/lib/components";
 import { type Chain } from "thirdweb";
-
+import { base, baseSepolia } from "thirdweb/chains";
+import {  Base, BaseSepoliaTestnet } from "@thirdweb-dev/chains";
 export type TChainConfig = {
   chainId: number;
   name: string;
@@ -30,14 +30,9 @@ export const BASE_MAINNET: TChainConfig = {
   icon: <IconNetworkBase />,
   mintingFeeCurrency: "ETH",
   mintingFee: 0.00123,
-  ralphReservoirAddress: "", // TODO: Add Ralph reservoir address for mainnet
-  ralphTokenAddress: "", // TODO: Add Ralph token address for mainnet
-  thirdWeb: {
-    ...Base,
-    id: Base.chainId,
-    rpc: Base.rpc[1],
-    testnet: undefined,
-  },
+  ralphReservoirAddress: "0x", // TODO: Add Ralph reservoir address for mainnet
+  ralphTokenAddress: "0x", // TODO: Add Ralph token address for mainnet
+  thirdWeb: base,
 };
 
 export const BASE_SEPOLIA_TESTNET: TChainConfig = {
@@ -53,12 +48,7 @@ export const BASE_SEPOLIA_TESTNET: TChainConfig = {
   mintingFee: 0.00123,
   ralphReservoirAddress: "0x16066289b4A453C34e081842308B9E7EF2D6F9e5",
   ralphTokenAddress: "0x5Ccfdb1e9EdE08b4026824e8cAE542eC5E925650",
-  thirdWeb: {
-    ...BaseSepoliaTestnet,
-    id: BaseSepoliaTestnet.chainId,
-    rpc: BaseSepoliaTestnet.rpc[1],
-    testnet: true,
-  },
+  thirdWeb: baseSepolia,
 };
 
 export const getSupportedChains = () => {

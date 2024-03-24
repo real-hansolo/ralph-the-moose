@@ -63,6 +63,10 @@ export interface BalanceCardProps {
    */
   SWrapStatusMessage: Signal<string>;
   /**
+   * SClaimStatusMessage: The status message populated during the claiming process.
+   */
+  SClaimStatusMessage: Signal<string>;
+  /**
    * SWrapCardView: The view of the wrap card.
    */
   SWrapCardView: Signal<"wrapping" | "claiming" | "default">;

@@ -1,15 +1,16 @@
+import { type BigNumber } from "ethers";
 import { type BaseDTO } from "./base";
 
 export type GetAllMintedSuccessDTO = {
-    total_minted: number;
+    total_minted: BigNumber;
 }
 export type GetAllMintedDTO = BaseDTO<GetAllMintedSuccessDTO>;
 
 export type GetAllocationLimitSSuccessDTO = {
-    "total_mintable": number,
-    "max_per_mint": number,
-    "total_allocations": number,
-    "address_count": number
+    "total_mintable": BigNumber,
+    "max_per_mint": BigNumber,
+    "total_allocations": BigNumber,
+    "address_count": BigNumber
 }
 
 export type GetAllocationLimitDTO = BaseDTO<GetAllocationLimitSSuccessDTO>;
@@ -17,7 +18,7 @@ export type GetAllocationLimitDTO = BaseDTO<GetAllocationLimitSSuccessDTO>;
 
 export type GetAllocationForAddressSuccessDTO = {
     "address": string,
-    "allocation_amount": number,
+    "allocation_amount": BigNumber,
 }
 
 export type GetAllocationForAddressDTO = BaseDTO<GetAllocationForAddressSuccessDTO>;
@@ -32,7 +33,7 @@ export type GetInscriptionSuccessDTO = {
     op: string,
     tick: string,
     receiver: string,
-    amount: number,
+    amount: BigNumber,
     valid: number
 }
 
@@ -46,13 +47,13 @@ export type GetLatestBlockSuccessDTO = {
 export type GetLatestBlockDTO = BaseDTO<GetLatestBlockSuccessDTO>;
 
 export type GetBalanceForAccountSuccessDTO = {
-    balance: number
+    balance: BigNumber
 }
 
 export type GetBalanceForAccountDTO = BaseDTO<GetBalanceForAccountSuccessDTO>;
 
 export type GetTotalMintedForAccountSuccessDTO = {
-    minted: number
+    minted: BigNumber
 }
 
 export type GetTotalMintedForAccountDTO = BaseDTO<GetTotalMintedForAccountSuccessDTO>;

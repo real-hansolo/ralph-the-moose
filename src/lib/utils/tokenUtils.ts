@@ -1,4 +1,4 @@
-import { BigNumber } from "ethers";
+import { BigNumber, ethers } from "ethers";
 
 /**
  * Formats a number with the appropriate thousand separators and decimal places.
@@ -15,7 +15,7 @@ export const formatNumber = (number: number) => {
  * @returns The number in token format.
  */
 export const fromHumanReadableNumber = (prTokens: number) => {
-  return BigNumber.from(prTokens).mul(10 ** 18);
+   return ethers.utils.parseEther(prTokens.toString());
 }
 
 /**
@@ -24,5 +24,5 @@ export const fromHumanReadableNumber = (prTokens: number) => {
  * @returns The number in human-readable format.
  */
 export const toHumanReadableNumber = (prTokens: BigNumber) => {
-  return Number(prTokens.div(10 ** 18));
+  return Number(ethers.utils.formatEther(prTokens.toString()));
 }

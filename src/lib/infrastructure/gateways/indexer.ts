@@ -8,7 +8,6 @@ import {
   type GetBalanceForAccountDTO,
   type GetTotalMintedForAccountDTO,
 } from "../dto/indexer-dto";
-import { hexlify } from "ethers/lib/utils";
 
 export default class IndexerGateway {
   constructor(private indexer_url: string) {
@@ -37,7 +36,7 @@ export default class IndexerGateway {
   async getAllMinted(): Promise<GetAllMintedDTO> {
     const response = await this._call<GetAllMintedDTO>("all_minted");
     if (response.success) {
-      const total_minted = BigNumber.from(hexlify(response.data.total_minted));
+      const total_minted = BigNumber.from(response.data.total_minted);
       return {
         success: true,
         data: {
@@ -53,10 +52,11 @@ export default class IndexerGateway {
       await this._call<GetAllocationLimitDTO>("allocation_limits");
     if (response.success) {
       const data = response.data;
-      const total_mintable = BigNumber.from(hexlify(data.total_mintable));
-      const max_per_mint = BigNumber.from(hexlify(data.max_per_mint));
-      const total_allocations = BigNumber.from(hexlify(data.total_allocations));
-      const address_count = BigNumber.from(hexlify(data.address_count));
+      const total_mintable = BigNumber.from(data.total_mintable);
+      const max_per_mint = BigNumber.from(data.max_per_mint);
+      const total_allocations = BigNumber.from(data.total_allocations);
+      const address_count = BigNumber.from(data.address_count);
+      console.log("data", data)
       return {
         success: true,
         data: {
@@ -78,7 +78,7 @@ export default class IndexerGateway {
     );
     if (response.success) {
       const data = response.data;
-      const allocation_amount = BigNumber.from(hexlify(data.allocation_amount));
+      const allocation_amount = BigNumber.from(data.allocation_amount);
       return {
         success: true,
         data: {
@@ -98,7 +98,7 @@ export default class IndexerGateway {
     );
     if (response.success) {
       const data = response.data;
-      const minted = BigNumber.from(hexlify(data.minted));
+      const minted = BigNumber.from(data.minted);
       return {
         success: true,
         data: {
@@ -115,7 +115,7 @@ export default class IndexerGateway {
     );
     if (response.success) {
       const data = response.data;
-      const amount = BigNumber.from(hexlify(data.amount));
+      const amount = BigNumber.from(data.amount);
       return {
         success: true,
         data: {
@@ -150,7 +150,7 @@ export default class IndexerGateway {
       );
       if (response.success) {
         const data = response.data;
-        const balance = BigNumber.from(hexlify(data.balance));
+        const balance = BigNumber.from(data.balance);
         return {
           success: true,
           data: {
@@ -165,7 +165,7 @@ export default class IndexerGateway {
     );
     if (response.success) {
       const data = response.data;
-      const balance = BigNumber.from(hexlify(data.balance));
+      const balance = BigNumber.from(data.balance);
       return {
         success: true,
         data: {

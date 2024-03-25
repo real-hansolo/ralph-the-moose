@@ -52,8 +52,8 @@ export const BASE_SEPOLIA_TESTNET: TChainConfig = {
   mintingFee: 0.00123,
   wrappingFee: 0.00123,
   unwrappingFee: 0.00123,
-  ralphReservoirAddress: "0x16066289b4A453C34e081842308B9E7EF2D6F9e5",
-  ralphTokenAddress: "0x5Ccfdb1e9EdE08b4026824e8cAE542eC5E925650",
+  ralphReservoirAddress: "0x296271298780966bC0550a6B10c8e5BE60fE282f",
+  ralphTokenAddress: "0xA415b2Df73D9E1D0415de58f012E2cB3E059F2E1",
   thirdWeb: baseSepolia,
 };
 

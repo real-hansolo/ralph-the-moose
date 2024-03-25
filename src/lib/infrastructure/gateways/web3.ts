@@ -349,45 +349,44 @@ export default class Web3Gateway {
     account: Account,
     statusMessage: Signal<string>,
   ): Promise<UnwrapDTO> {
-    const message = this.__generateHexFromWrapMessage(
-      amount,
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-      chain.ralphReservoirAddress,
-    );
-    const thirdWebTx = prepareTransaction({
-      to: `${chain.ralphReservoirAddress}`,
-      chain: chain.thirdWeb,
-      client: this.thirdWebClient,
-      value: toWei("0.00123"),
-      data: `0x${message}`,
-    });
-
-    const estimatedGas = await estimateGas({ transaction: thirdWebTx });
-    statusMessage.value = `Estd Gas: ${estimatedGas.toString()}. Limit: ${chain.gasLimit}`; // TODO: what is the correct format ?
-
     try {
-      const { transactionHash } = await sendTransaction({
-        transaction: thirdWebTx,
+      const transaction = prepareContractCall({
+        contract: getContract({
+          client: this.thirdWebClient,
+          address: chain.ralphReservoirAddress,
+          chain: chain.thirdWeb,
+        }),
+        method: {
+          "inputs": [
+            {
+              "internalType": "uint256",
+              "name": "amount",
+              "type": "uint256"
+            }
+          ],
+          "name": "unwrap",
+          "outputs": [],
+          "stateMutability": "payable",
+          "type": "function"
+        },
+        params: [BigInt(amount)],
+        value: toWei("0.00123"), // TODO: hardcoded fee
+      });
+
+      const receipt = await sendTransaction({
+        transaction: transaction,
         account: account,
       });
-      statusMessage.value = `Unwrapping ended!`;
-      const timestamp = new Date().toLocaleDateString(); // TODO: check if this is okay or we should stick with the receipt timestamp
-      const explorerLink = `${chain.explorerUrl}/tx/${transactionHash}`;
+      console.log(`[Unwrap Receipt]: ${JSON.stringify(receipt)}`);
       return {
         success: true,
-        data: {
-          unwrappedAmount: amount,
-          timestamp: timestamp,
-          explorerLink: explorerLink,
-          tokenShortName: "PR",
-          txHash: transactionHash,
-        },
+        data: {},
       };
     } catch (e) {
       console.error(e as Error);
       return {
         success: false,
-        msg: "Transaction failed. Try again or get in touch?",
+        msg: "Unwrapping failed. Try again or get in touch?",
       };
     }
   }

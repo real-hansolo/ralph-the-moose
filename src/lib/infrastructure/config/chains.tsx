@@ -12,8 +12,10 @@ export type TChainConfig = {
   explorerName: string;
   gasLimit: number;
   icon: React.ReactNode;
-  mintingFeeCurrency: string;
+  networkCurrency: string;
   mintingFee: number;
+  wrappingFee: number;
+  unwrappingFee: number;
   ralphReservoirAddress: string;
   ralphTokenAddress: string;
   thirdWeb: Chain;
@@ -28,8 +30,10 @@ export const BASE_MAINNET: TChainConfig = {
   explorerName: Base.explorers[0].name,
   gasLimit: 30000,
   icon: <IconNetworkBase />,
-  mintingFeeCurrency: "ETH",
+  networkCurrency: "ETH",
   mintingFee: 0.00123,
+  wrappingFee: 0.00123,
+  unwrappingFee: 0.00123,
   ralphReservoirAddress: "0x", // TODO: Add Ralph reservoir address for mainnet
   ralphTokenAddress: "0x", // TODO: Add Ralph token address for mainnet
   thirdWeb: base,
@@ -44,8 +48,10 @@ export const BASE_SEPOLIA_TESTNET: TChainConfig = {
   explorerName: BaseSepoliaTestnet.explorers[0].name,
   gasLimit: 200000,
   icon: <IconNetworkBase />,
-  mintingFeeCurrency: "ETH",
+  networkCurrency: "ETH",
   mintingFee: 0.00123,
+  wrappingFee: 0.00123,
+  unwrappingFee: 0.00123,
   ralphReservoirAddress: "0x16066289b4A453C34e081842308B9E7EF2D6F9e5",
   ralphTokenAddress: "0x5Ccfdb1e9EdE08b4026824e8cAE542eC5E925650",
   thirdWeb: baseSepolia,

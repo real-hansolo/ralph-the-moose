@@ -35,7 +35,13 @@ export type WrapSuccessDTO = {
 
 export type WrapDTO = BaseDTO<WrapSuccessDTO>;
 
-export type UnwrapDTO = BaseDTO<NonNullable<unknown>>;
+export type UnwrapDTO = BaseDTO<{
+    txHash: string;
+    timestamp: string;
+    explorerLink: string;
+    unwrappedAmount: number;
+    tokenShortName: string;
+}>;
 
 
 

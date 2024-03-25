@@ -371,16 +371,31 @@ export default class Web3Gateway {
         },
         params: [BigInt(amount)],
         value: toWei("0.00123"), // TODO: hardcoded fee
+        gas: BigInt(chain.gasLimit), // TODO: hardcoded gas limit
       });
 
+      const estimatedGas = await estimateGas({
+        transaction: transaction,
+      });
+      statusMessage.value = `Estimated Gas: ${estimatedGas.toString()}. Gas Limit: ${chain.gasLimit}`;
       const receipt = await sendTransaction({
         transaction: transaction,
         account: account,
       });
       console.log(`[Unwrap Receipt]: ${JSON.stringify(receipt)}`);
+      const transactionHash = receipt.transactionHash;
+      const explorerLink = `${chain.explorerUrl}/tx/${transactionHash}`;
+      const timestamp = new Date().toLocaleDateString();
+      
       return {
         success: true,
-        data: {},
+        data: {
+          txHash: transactionHash,
+          timestamp: timestamp,
+          explorerLink: explorerLink,
+          unwrappedAmount: amount / 10 ** 9, // TODO: 10 ** 9 is hardcoded
+          tokenShortName: "PR", // TODO: hardcoded value
+        },
       };
     } catch (e) {
       console.error(e as Error);

@@ -1,4 +1,4 @@
-import { BigNumber, ethers } from "ethers";
+import { type BigNumber, ethers } from "ethers";
 
 /**
  * Formats a number with the appropriate thousand separators and decimal places.

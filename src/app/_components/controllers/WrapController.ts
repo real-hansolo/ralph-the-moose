@@ -16,9 +16,8 @@ export const wrap = async (
     const message = `[WRAP CONTROLLER]: ${statusMessage.value}`;
     console.log(message);
   });
-  const amountToWrap = humanReadableWrappingAmount * 10 ** 9;
   const result: WrapDTO = await web3Gateway.sendWrapTransaction(
-    amountToWrap,
+    humanReadableWrappingAmount,
     chain,
     wallet,
     account,
@@ -41,8 +40,7 @@ export const claim = async (
     const message = `[CLAIM CONTROLLER]: ${statusMessage.value}`;
     console.log(message);
   });
-  const amountToClaim = humanReadableClaimableAmount * 10 ** 9;
-  const result = await web3Gateway.claimWrappedTokens(amountToClaim, wallet, account, chain);
+  const result = await web3Gateway.claimWrappedTokens(humanReadableClaimableAmount, wallet, account, chain);
   if (!result.success) {
     return Promise.reject(result.msg);
   }

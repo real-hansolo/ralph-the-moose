@@ -15,8 +15,8 @@ import {
   type MintResponseDTO,
   type WrapDTO,
   type ClaimDTO,
+  type UnwrapDTO,
 } from "../dto/web3-dto";
-import { ethers5Adapter } from "thirdweb/adapters/ethers5";
 import { type Signal } from "@preact/signals-react";
 import { type TChainConfig } from "../config/chains";
 import { ethers } from "ethers";
@@ -231,13 +231,6 @@ export default class Web3Gateway {
       // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
       chain.ralphReservoirAddress,
     );
-    const tx = {
-      to: `${chain.ralphReservoirAddress}`,
-      value: toWei("0.00123"),
-      data: `0x${message}`,
-      chainId: chain.chainId,
-      gasLimit: chain.gasLimit,
-    };
     const thirdWebTx = prepareTransaction({
       to: `${chain.ralphReservoirAddress}`,
       chain: chain.thirdWeb,
@@ -261,6 +254,129 @@ export default class Web3Gateway {
         success: true,
         data: {
           wrappedAmount: amount,
+          timestamp: timestamp,
+          explorerLink: explorerLink,
+          tokenShortName: "PR",
+          txHash: transactionHash,
+        },
+      };
+    } catch (e) {
+      console.error(e as Error);
+      return {
+        success: false,
+        msg: "Transaction failed. Try again or get in touch?",
+      };
+    }
+  }
+
+  async checkSpendingAllowanceForRalphReservoir(
+    chain: TChainConfig,
+    walletAddress: string,
+    unwrapRequestAmount: number,
+  ): Promise<boolean> {
+    const provider = new ethers.providers.JsonRpcProvider(
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
+      chain.jsonRpcProvider,
+    );
+    const contract = new ethers.Contract(
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
+      chain.ralphTokenAddress,
+      Ralph,
+      provider,
+    );
+
+    try {
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-call
+      const allowance = await contract.allowance(walletAddress, chain.ralphReservoirAddress);
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-return, @typescript-eslint/no-unsafe-call
+      return allowance.gt(BigInt(unwrapRequestAmount));
+    } catch (e) {
+      console.error(e as Error);
+      return false;
+    }
+  }
+
+  async approveRalphReservoirToSpendPRToken(
+    chain: TChainConfig,
+    wallet: Wallet,
+    account: Account,
+    amount: number,
+  ): Promise<boolean> {
+    try {
+      const transaction = prepareContractCall({
+        contract: getContract({
+          client: this.thirdWebClient,
+          address: chain.ralphTokenAddress,
+          chain: chain.thirdWeb,
+        }),
+        method: {
+          inputs: [
+            {
+              internalType: "address",
+              name: "spender",
+              type: "address",
+            },
+            {
+              internalType: "uint256",
+              name: "amount",
+              type: "uint256",
+            },
+          ],
+          name: "approve",
+          outputs: [],
+          stateMutability: "nonpayable",
+          type: "function",
+        },
+        params: [chain.ralphReservoirAddress, BigInt(amount)],
+      });
+
+      const receipt = await sendTransaction({
+        transaction: transaction,
+        account: account,
+      });
+      console.log(`[Receipt]: ${JSON.stringify(receipt)}`);
+      return true;
+    } catch (e: unknown) {
+      console.error(e as Error);
+      return false;
+    }
+  }
+
+  async unwrapPRToken(
+    amount: number,
+    chain: TChainConfig,
+    wallet: Wallet,
+    account: Account,
+    statusMessage: Signal<string>,
+  ): Promise<UnwrapDTO> {
+    const message = this.__generateHexFromWrapMessage(
+      amount,
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
+      chain.ralphReservoirAddress,
+    );
+    const thirdWebTx = prepareTransaction({
+      to: `${chain.ralphReservoirAddress}`,
+      chain: chain.thirdWeb,
+      client: this.thirdWebClient,
+      value: toWei("0.00123"),
+      data: `0x${message}`,
+    });
+
+    const estimatedGas = await estimateGas({ transaction: thirdWebTx });
+    statusMessage.value = `Estd Gas: ${estimatedGas.toString()}. Limit: ${chain.gasLimit}`; // TODO: what is the correct format ?
+
+    try {
+      const { transactionHash } = await sendTransaction({
+        transaction: thirdWebTx,
+        account: account,
+      });
+      statusMessage.value = `Unwrapping ended!`;
+      const timestamp = new Date().toLocaleDateString(); // TODO: check if this is okay or we should stick with the receipt timestamp
+      const explorerLink = `${chain.explorerUrl}/tx/${transactionHash}`;
+      return {
+        success: true,
+        data: {
+          unwrappedAmount: amount,
           timestamp: timestamp,
           explorerLink: explorerLink,
           tokenShortName: "PR",

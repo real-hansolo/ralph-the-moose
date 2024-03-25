@@ -13,6 +13,7 @@ import { claim, wrap } from "./controllers/WrapController";
 import { type Chain, toHex } from "thirdweb";
 import { type Account, type Wallet } from "thirdweb/wallets";
 import { type BaseErrorViewModel } from "~/lib/infrastructure/view-models/base";
+import { unwrap } from "./controllers/UnwrapController";
 
 export const RalphBalaceCard = ({
   toasts,
@@ -51,18 +52,20 @@ export const RalphBalaceCard = ({
   const { data, isLoading, isError } = useQuery<BalanceCardViewModel>({
     queryKey: ["BalanceCard"],
     queryFn: async () => {
-      if(!connectedWallet || !connectedAccount || !connectedWalletNetwork) {
+      if (!connectedWallet || !connectedAccount || !connectedWalletNetwork) {
         return {
           status: "error",
           title: "Wallet not connected!",
-          message: "Could not fetch balance data. Please connect your wallet."
+          message: "Could not fetch balance data. Please connect your wallet.",
         } as BaseErrorViewModel;
       }
-      if(toHex(connectedWalletNetwork.id) !== toHex(activeNetwork.value.chainId)) {
+      if (
+        toHex(connectedWalletNetwork.id) !== toHex(activeNetwork.value.chainId)
+      ) {
         return {
           status: "error",
           title: "Network Error",
-          message: `Please connect your wallet to the correct network. Expected ${activeNetwork.value.name} but connected to ${connectedWalletNetwork.name}`
+          message: `Please connect your wallet to the correct network. Expected ${activeNetwork.value.name} but connected to ${connectedWalletNetwork.name}`,
         } as BaseErrorViewModel;
       }
       const viewModel = await balanceCardPresenter.present();
@@ -75,10 +78,89 @@ export const RalphBalaceCard = ({
   const amountToUnwrap = useSignal<number>(0);
 
   const SWrapStatusMessage = useSignal<string>("");
+  const SUnwrapStatusMessage = useSignal<string>("");
   const SClaimStatusMessage = useSignal<string>("");
   const SWrapCardView = useSignal<"wrapping" | "claiming" | "default">(
     "default",
   );
+  const SUnwrapCardView = useSignal<"unwrapping" | "default">("default");
+
+  const onUnwrap = () => {
+    if (!connectedAccount || !connectedWallet || !connectedWalletNetwork) {
+      toasts.value.push({
+        message: "Please connect your wallet",
+        title: "Wall-E.T.",
+        status: "error",
+      });
+      return;
+    }
+    if (
+      toHex(activeNetwork.value.chainId) !== toHex(connectedWalletNetwork.id)
+    ) {
+      toasts.value = [
+        {
+          message: "Please connect to the correct network",
+          title: "Network Error",
+          status: "error",
+        },
+      ];
+      return;
+    }
+    if (
+      !data ||
+      isLoading ||
+      isError ||
+      !data.status ||
+      data.status !== "success"
+    ) {
+      toasts.value.push({
+        message: "Tryin' to unwrap, but something went wrong!",
+        title: "Try again later",
+        status: "error",
+      });
+      return;
+    }
+    if (data.data.wrappedBalance.value === 0) {
+      toasts.value.push({
+        message: "You have no PR to unwrap",
+        title: "No PR",
+        status: "error",
+      });
+      return;
+    }
+    SUnwrapCardView.value = "unwrapping";
+    unwrap(
+      web3Gateway,
+      data.data.wrappedBalance.value,
+      connectedWallet,
+      connectedAccount,
+      activeNetwork.value,
+      SUnwrapStatusMessage,
+    )
+      .then(async () => {
+        SUnwrapStatusMessage.value = "All's good in the hood!";
+        // wait 2 seconds
+        await new Promise((resolve) => setTimeout(resolve, 2000));
+        toasts.value.push({
+          message: `You unwrapd' ${amountToUnwrap.value} PR!`,
+          title: "You own it!",
+          status: "success",
+        });
+      })
+      .catch(async (error) => {
+        console.error("[UNWRAP] Unwrap failed", error);
+        SUnwrapStatusMessage.value = error;
+        toasts.value.push({
+          message: `Get in touch. We can work this out!`,
+          title: "Unwrap failed!",
+          status: "error",
+        });
+        await new Promise((resolve) => setTimeout(resolve, 2000));
+      })
+      .finally(() => {
+        SUnwrapCardView.value = "default";
+      });
+  };
 
   const onClaim = () => {
     if (!connectedAccount || !connectedWallet || !connectedWalletNetwork) {
@@ -89,15 +171,25 @@ export const RalphBalaceCard = ({
       });
       return;
     }
-    if(toHex(activeNetwork.value.chainId) !== toHex(connectedWalletNetwork.id)) {
-      toasts.value = [{
-        message: "Please connect to the correct network",
-        title: "Network Error",
-        status: "error",
-      }];
+    if (
+      toHex(activeNetwork.value.chainId) !== toHex(connectedWalletNetwork.id)
+    ) {
+      toasts.value = [
+        {
+          message: "Please connect to the correct network",
+          title: "Network Error",
+          status: "error",
+        },
+      ];
       return;
     }
-    if(!data || isLoading || isError || !data.status || data.status !== "success") {
+    if (
+      !data ||
+      isLoading ||
+      isError ||
+      !data.status ||
+      data.status !== "success"
+    ) {
       toasts.value.push({
         message: "Tryin' to claim, but something went wrong!",
         title: "Try again later",
@@ -105,8 +197,8 @@ export const RalphBalaceCard = ({
       });
       return;
     }
-    
-    if(data.data.claimableInscriptions.value === 0) {
+
+    if (data.data.claimableInscriptions.value === 0) {
       toasts.value.push({
         message: "You have no PR to claim",
         title: "No PR",
@@ -129,7 +221,7 @@ export const RalphBalaceCard = ({
         if (result) {
           SWrapStatusMessage.value = "All's good in the hood!";
           // wait 2 seconds
-          await new Promise(resolve => setTimeout(resolve, 2000));
+          await new Promise((resolve) => setTimeout(resolve, 2000));
           toasts.value.push({
             message: `You claimed' ${amountToUnwrap.value} PR!`,
             title: "You own it!",
@@ -145,13 +237,13 @@ export const RalphBalaceCard = ({
           title: "Claim failed!",
           status: "error",
         });
-        await new Promise(resolve => setTimeout(resolve, 2000));
+        await new Promise((resolve) => setTimeout(resolve, 2000));
       })
       .finally(() => {
         SWrapCardView.value = "default";
       });
-  }
-    
+  };
+
   const onWrap = () => {
     SWrapCardView.value = "wrapping";
     // check wallet
@@ -163,12 +255,16 @@ export const RalphBalaceCard = ({
       });
       return;
     }
-    if(toHex(activeNetwork.value.chainId) !== toHex(connectedWalletNetwork.id)) {
-      toasts.value = [{
-        message: "Please connect to the correct network",
-        title: "Network Error",
-        status: "error",
-      }];
+    if (
+      toHex(activeNetwork.value.chainId) !== toHex(connectedWalletNetwork.id)
+    ) {
+      toasts.value = [
+        {
+          message: "Please connect to the correct network",
+          title: "Network Error",
+          status: "error",
+        },
+      ];
       return;
     }
     wrap(
@@ -181,9 +277,10 @@ export const RalphBalaceCard = ({
     )
       .then(async (result) => {
         if (result) {
-          SWrapStatusMessage.value = "Looking good! Come back later to claim your PRs!";
+          SWrapStatusMessage.value =
+            "Looking good! Come back later to claim your PRs!";
           // wait 2 seconds
-          await new Promise(resolve => setTimeout(resolve, 2000));
+          await new Promise((resolve) => setTimeout(resolve, 2000));
           toasts.value.push({
             message: `You wrapd' ${amountToWrap.value} PR, like its hot!`,
             title: "It's a wrap!",
@@ -194,7 +291,7 @@ export const RalphBalaceCard = ({
       .catch(async (error) => {
         console.error("[WRAP] Wrap failed", error);
         SWrapStatusMessage.value = "Shit happens! Try again later";
-        await new Promise(resolve => setTimeout(resolve, 2000));
+        await new Promise((resolve) => setTimeout(resolve, 2000));
         toasts.value.push({
           message: `You wrapd' ${amountToWrap.value} PR, like its hot!`,
           title: "It's a wrap!",
@@ -255,13 +352,16 @@ export const RalphBalaceCard = ({
       tokenShortName={balanceCardViewModel.tokenShortName}
       icon={balanceCardViewModel.icon}
       onWrap={onWrap}
-      onUnwrap={() => {}} // TODO: implement
+      onUnwrap={onUnwrap}
       onClaim={onClaim}
       amountToWrap={amountToWrap}
       amountToUnwrap={amountToUnwrap}
       SWrapStatusMessage={SWrapStatusMessage}
       SWrapCardView={SWrapCardView}
       SClaimStatusMessage={SClaimStatusMessage}
+      SUnwrapStatusMessage={SUnwrapStatusMessage}
+      SUnwrapCardView={SUnwrapCardView}
+      
     />
   );
 };

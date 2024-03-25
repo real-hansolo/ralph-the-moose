@@ -70,6 +70,14 @@ export interface BalanceCardProps {
    * SWrapCardView: The view of the wrap card.
    */
   SWrapCardView: Signal<"wrapping" | "claiming" | "default">;
+  /**
+   * SUnwrapStatusMessage: The status message populated during the unwrapping process.
+   */
+  SUnwrapStatusMessage: Signal<string>;
+  /**
+   * SunwrapCardView: The view of the unwrap card.
+   */
+  SUnwrapCardView: Signal<"unwrapping" | "default">;
 }
 
 /**

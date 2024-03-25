@@ -1,7 +1,7 @@
 import { type Signal } from "@preact/signals-react";
-import { Chain, createThirdwebClient } from "thirdweb";
+import { type Chain, createThirdwebClient } from "thirdweb";
 import { ConnectButton, type Theme } from "thirdweb/react";
-import { Account, type Wallet } from "thirdweb/wallets";
+import { type Account, type Wallet } from "thirdweb/wallets";
 import { env } from "~/env";
 import { TextButton, WalletCard } from "~/lib";
 import {

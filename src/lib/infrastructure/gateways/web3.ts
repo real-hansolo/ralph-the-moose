@@ -23,7 +23,10 @@ import { BigNumber, ethers } from "ethers";
 import RalphReservoirABI from "../abi/RalphReservoir.json";
 import Ralph from "../abi/Ralph.json";
 import { type Account, type Wallet } from "thirdweb/wallets";
-import { fromHumanReadableNumber, toHumanReadableNumber } from "~/lib/utils/tokenUtils";
+import {
+  fromHumanReadableNumber,
+  toHumanReadableNumber,
+} from "~/lib/utils/tokenUtils";
 
 export default class Web3Gateway {
   private feeWalletAddress: string;
@@ -41,17 +44,16 @@ export default class Web3Gateway {
   };
 
   __generateHexFromMintMessage = (amount: BigNumber): string => {
-    // TODO: hook up amount to the message. default 10000000000
     const json = `{"p": "elkrc-404", "op": "mint", "tick": "PR", "amount": ${amount.toString()}}`;
     const hex = Buffer.from(json, "utf8").toString("hex");
     return hex;
   };
 
   __generateHexFromWrapMessage = (
-    bigAmount: number,
+    amount: BigNumber,
     ralphReservoirAddress: string,
   ): string => {
-    const json = `{"p": "elkrc-404", "op": "transfer", "tick": "PR", "to": "${ralphReservoirAddress}", "amount": ${bigAmount}}`;
+    const json = `{"p": "elkrc-404", "op": "transfer", "tick": "PR", "to": "${ralphReservoirAddress}", "amount": ${amount.toString()}}`;
     const hex = Buffer.from(json, "utf8").toString("hex");
     return hex;
   };
@@ -126,10 +128,12 @@ export default class Web3Gateway {
     try {
       // eslint-disable-next-line @typescript-eslint/no-unsafe-call
       const claimable = await contract.claimable(walletAddress);
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
+      // console.log(`[Claimable]: ${BigInt(claimable.toString())}`);
       return {
         success: true,
         data: {
-          amount: toHumanReadableNumber(BigNumber.from(claimable)), 
+          amount: toHumanReadableNumber(BigNumber.from(claimable)),
         },
       };
     } catch (e) {
@@ -148,6 +152,7 @@ export default class Web3Gateway {
     chain: TChainConfig,
   ): Promise<ClaimDTO> {
     try {
+      const amountToClaim = fromHumanReadableNumber(amount);
       const transaction = prepareContractCall({
         contract: getContract({
           client: this.thirdWebClient,
@@ -167,7 +172,7 @@ export default class Web3Gateway {
           stateMutability: "nonpayable",
           type: "function",
         },
-        params: [BigInt(amount)],
+        params: [BigInt(amountToClaim.toBigInt())],
       });
 
       const receipt = await sendTransaction({
@@ -175,7 +180,7 @@ export default class Web3Gateway {
         account: account,
       });
       console.log(`[Receipt]: ${JSON.stringify(receipt)}`);
-      
+
       return {
         success: true,
         data: {},
@@ -229,8 +234,9 @@ export default class Web3Gateway {
     account: Account,
     statusMessage: Signal<string>,
   ): Promise<WrapDTO> {
+    const amountToWrap = fromHumanReadableNumber(amount);
     const message = this.__generateHexFromWrapMessage(
-      amount,
+      amountToWrap,
       // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
       chain.ralphReservoirAddress,
     );
@@ -290,7 +296,10 @@ export default class Web3Gateway {
 
     try {
       // eslint-disable-next-line @typescript-eslint/no-unsafe-call
-      const allowance = await contract.allowance(walletAddress, chain.ralphReservoirAddress);
+      const allowance = await contract.allowance(
+        walletAddress,
+        chain.ralphReservoirAddress,
+      );
       // eslint-disable-next-line @typescript-eslint/no-unsafe-return, @typescript-eslint/no-unsafe-call
       return allowance.gt(BigInt(unwrapRequestAmount));
     } catch (e) {
@@ -307,7 +316,9 @@ export default class Web3Gateway {
   ): Promise<boolean> {
     try {
       // TODO: hardcoded value
-      const bigAmount = amount ?? `115792089237316195423570985008687907853269984665640564039457584007913129639935`
+      const bigAmount =
+        amount ??
+        `115792089237316195423570985008687907853269984665640564039457584007913129639935`;
       const transaction = prepareContractCall({
         contract: getContract({
           client: this.thirdWebClient,
@@ -362,17 +373,17 @@ export default class Web3Gateway {
           chain: chain.thirdWeb,
         }),
         method: {
-          "inputs": [
+          inputs: [
             {
-              "internalType": "uint256",
-              "name": "amount",
-              "type": "uint256"
-            }
+              internalType: "uint256",
+              name: "amount",
+              type: "uint256",
+            },
           ],
-          "name": "unwrap",
-          "outputs": [],
-          "stateMutability": "payable",
-          "type": "function"
+          name: "unwrap",
+          outputs: [],
+          stateMutability: "payable",
+          type: "function",
         },
         params: [BigInt(amount)],
         value: toWei("0.00123"), // TODO: hardcoded fee
@@ -391,7 +402,7 @@ export default class Web3Gateway {
       const transactionHash = receipt.transactionHash;
       const explorerLink = `${chain.explorerUrl}/tx/${transactionHash}`;
       const timestamp = new Date().toLocaleDateString();
-      
+
       return {
         success: true,
         data: {

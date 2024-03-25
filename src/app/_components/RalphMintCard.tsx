@@ -123,7 +123,7 @@ export const RalphMintCard = ({
         eligibleAmount={data.data.allocation.value}
         expectedReturn={data.data.allocation.value}
         fee={activeNetwork.value.mintingFee}
-        feeCurrency={activeNetwork.value.mintingFeeCurrency}
+        feeCurrency={activeNetwork.value.networkCurrency}
         tokenShortName="PR" // TODO: hardcoded value
       />
     );

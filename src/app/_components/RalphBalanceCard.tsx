@@ -135,7 +135,7 @@ export const RalphBalaceCard = ({
     SUnwrapCardView.value = "unwrapping";
     unwrap(
       web3Gateway,
-      data.data.wrappedBalance.value,
+      amountToUnwrap.value,
       connectedWallet,
       connectedAccount,
       activeNetwork.value,
@@ -240,7 +240,7 @@ export const RalphBalaceCard = ({
           // wait 2 seconds
           await new Promise((resolve) => setTimeout(resolve, 2000));
           toasts.value.push({
-            message: `You claimed' ${amountToUnwrap.value} PR!`,
+            message: `You claimed' ${data.data.claimableInscriptions.value} PR!`,
             title: "You own it!",
             status: "success",
           });
@@ -330,7 +330,7 @@ export const RalphBalaceCard = ({
     const defaultData = {
       inscriptionBalance: 0,
       wrappedBalance: 0,
-      fee: 0,
+      fee: 0, // TODO: hardcoded value
       claimableInscriptions: 0,
       tokenShortName: "PR", // TODO: hardcoded value,
       icon: <RalphLogo variant="icon" />, // TODO: hardcoded value,
@@ -359,13 +359,14 @@ export const RalphBalaceCard = ({
     }
     return defaultData;
   }, [data, isLoading, isError]);
-
+  
   return (
     <BalanceCard
       inscriptionBalance={balanceCardViewModel.inscriptionBalance}
       wrappedBalance={balanceCardViewModel.wrappedBalance}
       claimableAmount={balanceCardViewModel.claimableInscriptions}
-      fee={balanceCardViewModel.fee}
+      fee={activeNetwork.value.wrappingFee} // TODO: split into wrapping and unwrapping fee
+      networkCurrency={activeNetwork.value.networkCurrency}
       tokenShortName={balanceCardViewModel.tokenShortName}
       icon={balanceCardViewModel.icon}
       onWrap={onWrap}

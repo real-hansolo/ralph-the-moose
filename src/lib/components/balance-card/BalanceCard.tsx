@@ -38,6 +38,10 @@ export interface BalanceCardProps {
    */
   fee: number;
   /**
+   * The network currency.
+   */
+  networkCurrency: string;
+  /**
    * Callback function when wrapping is triggered. It should open the wrapping modal.
    */
   onWrap: () => void;

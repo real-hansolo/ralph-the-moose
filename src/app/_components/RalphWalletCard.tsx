@@ -103,7 +103,7 @@ export const RalphWalletCard = (props: RalphWalletCardProps) => {
         wallets={SUPPORTED_WALLETS}
         appMetadata={{
           name: "Ralph",
-          description: "The on-chain meme ecosystem",
+          description: "Project Ralph",
           url: "https://ralphthemoose.com",
         }}
         chain={props.activeNetwork.value.thirdWeb}

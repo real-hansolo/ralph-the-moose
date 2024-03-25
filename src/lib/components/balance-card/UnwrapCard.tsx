@@ -27,7 +27,15 @@ export interface UnwrapCardProps {
    * The wrapped balance i.e. Maximum amount that can be unwrapped
    */
   wrappedBalance: number;
+  /**
+   * The fee for unwrapping
+   */
   fee: number;
+  /**
+   * The network currency
+   * @example "ETH"
+   */
+  networkCurrency: string;
   /**
    * The short name of the token
    */
@@ -59,6 +67,7 @@ export const UnwrapCard = ({
   amountToUnwrap,
   wrappedBalance,
   fee,
+  networkCurrency,
   tokenShortName,
   icon,
   onClose,
@@ -69,7 +78,7 @@ export const UnwrapCard = ({
 }: UnwrapCardProps) => {
   useSignals();
   const wrappedTokenName = `W${tokenShortName.toUpperCase()}`;
-  const amountAfterUnwrapping = amountToUnwrap.value * (1 - fee / 100);
+  const amountAfterUnwrapping = amountToUnwrap.value;
   const defaultView = (
     <div className="flex w-full flex-col items-start justify-center gap-4">
       <div className="relative flex w-full flex-row justify-between">
@@ -84,6 +93,11 @@ export const UnwrapCard = ({
         amount={amountToUnwrap}
         tokenShortName={tokenShortName}
         icon={icon}
+        errorMessage={
+          amountToUnwrap.value > wrappedBalance
+            ? "Unwrap more than what ya got?"
+            : ""
+        }
       />
       <LightFrame className="w-full font-varela text-text-secondary">
         <div className="flex flex-row items-baseline justify-between self-stretch">
@@ -95,7 +109,7 @@ export const UnwrapCard = ({
         </div>
         <div className="flex flex-row items-baseline justify-between self-stretch">
           <div className="relative leading-[14px]">Unwrapping fee</div>
-          <Label label={`${fee} %`} variant="medium" />
+          <Label label={`${fee} ${networkCurrency}`} variant="medium" />
         </div>
         <div className="flex flex-row items-baseline justify-between self-stretch">
           <div className="relative leading-[14px]">You will receive</div>
@@ -105,7 +119,7 @@ export const UnwrapCard = ({
           />
         </div>
         <Button
-          label={`Unwrap ${amountToUnwrap.value} ${wrappedTokenName}`}
+          label={`Unwrap ${formatNumber(amountToUnwrap.value)} ${wrappedTokenName}`}
           variant="primary"
           onClick={onUnwrap}
         />
@@ -134,7 +148,7 @@ export const UnwrapCard = ({
         <LightFrame className="w-full items-center gap-4">
           <div className="font-heading-h5 relative inline-block w-full overflow-auto whitespace-normal text-center font-gluten text-lg font-bold leading-[18px] tracking-[-0.04em] text-text-primary">
             <InProgressStatusFrame
-              title={`Unwrapping ${amountToUnwrap.value} W${tokenShortName}`}
+              title={`Unwrapping ${formatNumber(amountToUnwrap.value)} W${tokenShortName}`}
               message={SUnwrapStatusMessage.value}
             />
           </div>

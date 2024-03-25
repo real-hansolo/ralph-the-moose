@@ -1,3 +1,4 @@
+import { BigNumber } from "ethers";
 import {
   type GetAllocationLimitDTO,
   type GetAllMintedDTO,
@@ -7,6 +8,7 @@ import {
   type GetBalanceForAccountDTO,
   type GetTotalMintedForAccountDTO,
 } from "../dto/indexer-dto";
+import { hexlify } from "ethers/lib/utils";
 
 export default class IndexerGateway {
   constructor(private indexer_url: string) {
@@ -34,12 +36,37 @@ export default class IndexerGateway {
 
   async getAllMinted(): Promise<GetAllMintedDTO> {
     const response = await this._call<GetAllMintedDTO>("all_minted");
+    if (response.success) {
+      const total_minted = BigNumber.from(hexlify(response.data.total_minted));
+      return {
+        success: true,
+        data: {
+          total_minted,
+        },
+      };
+    }
     return response;
   }
 
   async getAllocationLimits(): Promise<GetAllocationLimitDTO> {
     const response =
       await this._call<GetAllocationLimitDTO>("allocation_limits");
+    if (response.success) {
+      const data = response.data;
+      const total_mintable = BigNumber.from(hexlify(data.total_mintable));
+      const max_per_mint = BigNumber.from(hexlify(data.max_per_mint));
+      const total_allocations = BigNumber.from(hexlify(data.total_allocations));
+      const address_count = BigNumber.from(hexlify(data.address_count));
+      return {
+        success: true,
+        data: {
+          total_mintable,
+          max_per_mint,
+          total_allocations,
+          address_count,
+        },
+      };
+    }
     return response;
   }
 
@@ -49,20 +76,62 @@ export default class IndexerGateway {
     const response = await this._call<GetAllocationForAddressDTO>(
       `allocation/${address}`,
     );
+    if (response.success) {
+      const data = response.data;
+      const allocation_amount = BigNumber.from(hexlify(data.allocation_amount));
+      return {
+        success: true,
+        data: {
+          address: data.address,
+          allocation_amount: allocation_amount,
+        },
+      };
+    }
     return response;
   }
 
-  async getTotalMintedForAccount(address: string): Promise<GetTotalMintedForAccountDTO> {
+  async getTotalMintedForAccount(
+    address: string,
+  ): Promise<GetTotalMintedForAccountDTO> {
     const response = await this._call<GetTotalMintedForAccountDTO>(
       `minted/${address}`,
     );
+    if (response.success) {
+      const data = response.data;
+      const minted = BigNumber.from(hexlify(data.minted));
+      return {
+        success: true,
+        data: {
+          minted: minted,
+        },
+      };
+    }
     return response;
   }
-  
+
   async getInscriptionStatus(txHash: string): Promise<GetInscriptionStatusDTO> {
     const response = await this._call<GetInscriptionStatusDTO>(
       `inscriptions/${txHash}`,
     );
+    if (response.success) {
+      const data = response.data;
+      const amount = BigNumber.from(hexlify(data.amount));
+      return {
+        success: true,
+        data: {
+          tx_hash: data.tx_hash,
+          block_number: data.block_number,
+          sender: data.sender,
+          timestamp: data.timestamp,
+          p: data.p,
+          op: data.op,
+          tick: data.tick,
+          receiver: data.receiver,
+          amount: amount,
+          valid: data.valid,
+        },
+      };
+    }
     return response;
   }
 
@@ -71,19 +140,39 @@ export default class IndexerGateway {
     return response;
   }
 
-  async getBalanceForAccount(address: string, latestBlock?: number): Promise<GetBalanceForAccountDTO> {
-    if(latestBlock) {
+  async getBalanceForAccount(
+    address: string,
+    latestBlock?: number,
+  ): Promise<GetBalanceForAccountDTO> {
+    if (latestBlock) {
       const response = await this._call<GetBalanceForAccountDTO>(
         `balances/${address}?block=${latestBlock}`,
-        );
+      );
+      if (response.success) {
+        const data = response.data;
+        const balance = BigNumber.from(hexlify(data.balance));
+        return {
+          success: true,
+          data: {
+            balance: balance,
+          },
+        };
+      }
       return response;
     }
     const response = await this._call<GetBalanceForAccountDTO>(
       `balances/${address}`,
-      );
+    );
+    if (response.success) {
+      const data = response.data;
+      const balance = BigNumber.from(hexlify(data.balance));
+      return {
+        success: true,
+        data: {
+          balance: balance,
+        },
+      };
+    }
     return response;
   }
 }
-
-
-

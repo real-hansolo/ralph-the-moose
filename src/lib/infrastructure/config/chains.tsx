@@ -28,14 +28,14 @@ export const BASE_MAINNET: TChainConfig = {
   jsonRpcProvider: env.NEXT_PUBLIC_CHAIN_BASE_MAINNET_JSON_RPC,
   explorerUrl: Base.explorers[0].url,
   explorerName: Base.explorers[0].name,
-  gasLimit: 30000,
+  gasLimit: 200000,
   icon: <IconNetworkBase />,
   networkCurrency: "ETH",
   mintingFee: 0.00123,
   wrappingFee: 0.00123,
   unwrappingFee: 0.00123,
-  ralphReservoirAddress: "0x", // TODO: Add Ralph reservoir address for mainnet
-  ralphTokenAddress: "0x", // TODO: Add Ralph token address for mainnet
+  ralphReservoirAddress: "0x27e964E016B68EeFbe958Ace62174af0e1CeD053",
+  ralphTokenAddress: "0x05F1938646a897008e813fb03CE7C575eAE45738",
   thirdWeb: base,
 };
 

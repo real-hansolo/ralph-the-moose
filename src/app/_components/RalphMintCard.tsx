@@ -64,7 +64,7 @@ export const RalphMintCard = ({
       const viewModel = await mintCardPresenter.present();
       return viewModel;
     },
-    refetchInterval: 1000,
+    refetchInterval: 500,
   });
 
   // Status Frame Content Signals

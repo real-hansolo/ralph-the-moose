@@ -24,7 +24,7 @@ export type TChainConfig = {
 export const BASE_MAINNET: TChainConfig = {
   chainId: Base.chainId,
   name: "Base",
-  rpcUrl: Base.rpc[1],
+  rpcUrl: "https://mainnet.base.org",
   jsonRpcProvider: env.NEXT_PUBLIC_CHAIN_BASE_MAINNET_JSON_RPC,
   explorerUrl: Base.explorers[0].url,
   explorerName: Base.explorers[0].name,

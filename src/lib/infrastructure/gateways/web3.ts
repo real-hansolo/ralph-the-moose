@@ -281,8 +281,9 @@ export default class Web3Gateway {
   async checkSpendingAllowanceForRalphReservoir(
     chain: TChainConfig,
     walletAddress: string,
-    unwrapRequestAmount: number,
+    humanReadableAmount: number,
   ): Promise<boolean> {
+    const unwrapRequestAmount = fromHumanReadableNumber(humanReadableAmount);
     const provider = new ethers.providers.JsonRpcProvider(
       // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
       chain.jsonRpcProvider,
@@ -301,7 +302,7 @@ export default class Web3Gateway {
         chain.ralphReservoirAddress,
       );
       // eslint-disable-next-line @typescript-eslint/no-unsafe-return, @typescript-eslint/no-unsafe-call
-      return allowance.gt(BigInt(unwrapRequestAmount));
+      return allowance.gt(BigInt(unwrapRequestAmount.toBigInt()));
     } catch (e) {
       console.error(e as Error);
       return false;
@@ -359,13 +360,14 @@ export default class Web3Gateway {
   }
 
   async unwrapPRToken(
-    amount: number,
+    humanReadableAmount: number,
     chain: TChainConfig,
     wallet: Wallet,
     account: Account,
     statusMessage: Signal<string>,
   ): Promise<UnwrapDTO> {
     try {
+      const amount = fromHumanReadableNumber(humanReadableAmount);
       const transaction = prepareContractCall({
         contract: getContract({
           client: this.thirdWebClient,
@@ -385,7 +387,7 @@ export default class Web3Gateway {
           stateMutability: "payable",
           type: "function",
         },
-        params: [BigInt(amount)],
+        params: [BigInt(amount.toBigInt())],
         value: toWei("0.00123"), // TODO: hardcoded fee
         gas: BigInt(chain.gasLimit), // TODO: hardcoded gas limit
       });
@@ -409,7 +411,7 @@ export default class Web3Gateway {
           txHash: transactionHash,
           timestamp: timestamp,
           explorerLink: explorerLink,
-          unwrappedAmount: amount / 10 ** 9, // TODO: 10 ** 9 is hardcoded
+          unwrappedAmount: toHumanReadableNumber(amount),
           tokenShortName: "PR", // TODO: hardcoded value
         },
       };

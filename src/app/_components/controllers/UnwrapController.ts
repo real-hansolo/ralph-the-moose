@@ -12,13 +12,12 @@ export const unwrap = async (
   chain: TChainConfig,
   statusMessage: Signal<string>,
 ) => {
-  const amountToUnwrap = humanReadableUnwrappingAmount * 10 ** 9;
   const walletAddress = account.address;
   // Check allowance
   const allowance = await web3Gateway.checkSpendingAllowanceForRalphReservoir(
     chain,
     walletAddress,
-    amountToUnwrap,
+    humanReadableUnwrappingAmount,
   );
   if (!allowance) {
     statusMessage.value = "Awaiting approval to unwrap your tokens.";
@@ -27,7 +26,6 @@ export const unwrap = async (
         chain,
         wallet,
         account,
-        amountToUnwrap,
       );
     if (!approvalResult) {
       return Promise.reject("Couldn't approve Ralph to unwrap your PR Tokens");
@@ -35,7 +33,7 @@ export const unwrap = async (
   }
   statusMessage.value = "Unwrapping your tokens...";
     const result: UnwrapDTO = await web3Gateway.unwrapPRToken(
-        amountToUnwrap,
+        humanReadableUnwrappingAmount,
         chain,
         wallet,
         account,

@@ -4,6 +4,7 @@ import {
   Heading,
   HeadingVariant,
   IconButtonClose,
+  InProgressStatusFrame,
   InputAssetAmountWithLabel,
   Label,
   Modal,
@@ -42,6 +43,14 @@ export interface UnwrapCardProps {
    * Callback function when unwrapping is triggered
    */
   onUnwrap: () => void;
+  /**
+   * The status message populated during the unwrapping process
+   */
+  SUnwrapStatusMessage: Signal<string>;
+  /**
+   * The view of the unwrap card
+   */
+  SUnwrapCardView: Signal<"unwrapping" | "default">;
 }
 
 export const UnwrapCard = ({
@@ -52,13 +61,14 @@ export const UnwrapCard = ({
   icon,
   onClose,
   onUnwrap,
+  SUnwrapStatusMessage,
+  SUnwrapCardView: SunwrapCardView,
 }: UnwrapCardProps) => {
   useSignals();
   const wrappedTokenName = `W${tokenShortName.toUpperCase()}`;
   const amountAfterUnwrapping = amountToUnwrap.value * (1 - fee / 100);
-  return (
-    <Modal>
-      <div className="flex w-full flex-col items-start justify-center gap-4">
+  const defaultView = (
+    <div className="flex w-full flex-col items-start justify-center gap-4">
         <div className="flex w-full relative flex-row justify-between">
           <Heading title="Unwrap" variant={HeadingVariant.H4} />
           <div className="ml-auto">
@@ -98,6 +108,34 @@ export const UnwrapCard = ({
           />
         </LightFrame>
       </div>
+  )
+
+  const unwrappingView = (
+    <div className="flex w-full flex-col items-start justify-center gap-4">
+      <div className="relative flex w-full flex-row justify-between">
+        <Heading title="Unwrapping" variant={HeadingVariant.H4} />
+        <div className="ml-auto">
+          <IconButtonClose size={4} onClick={onClose ? onClose : () => {
+            SunwrapCardView.value = "default";
+          }} />
+        </div>
+      </div>
+      <div className="flex w-full flex-col items-center justify-center gap-4">
+        <LightFrame className="w-full items-center gap-4">
+          <div className="font-heading-h5 relative inline-block w-full overflow-auto whitespace-normal text-center font-gluten text-lg font-bold leading-[18px] tracking-[-0.04em] text-text-primary">
+            <InProgressStatusFrame
+              title={`Unwrapping ${amountToUnwrap.value} W${tokenShortName}`}
+              message={SUnwrapStatusMessage.value}
+            />
+          </div>
+        </LightFrame>
+      </div>
+    </div>
+  )
+  return (
+    <Modal>
+      {SunwrapCardView.value === "default" && defaultView}
+      {SunwrapCardView.value === "unwrapping" && unwrappingView}
     </Modal>
   );
 };

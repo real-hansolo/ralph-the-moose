@@ -1,7 +1,7 @@
 import { type Signal } from "@preact/signals-react";
 import { type Account, type Wallet } from "thirdweb/wallets";
 import { type TChainConfig } from "~/lib/infrastructure/config/chains";
-import { UnwrapDTO } from "~/lib/infrastructure/dto/web3-dto";
+import { type UnwrapDTO } from "~/lib/infrastructure/dto/web3-dto";
 import type Web3Gateway from "~/lib/infrastructure/gateways/web3";
 
 export const unwrap = async (

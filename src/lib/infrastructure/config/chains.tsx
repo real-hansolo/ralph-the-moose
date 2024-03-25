@@ -25,7 +25,7 @@ export const BASE_MAINNET: TChainConfig = {
   chainId: Base.chainId,
   name: "Base",
   rpcUrl: Base.rpc[1],
-  jsonRpcProvider: "", // TODO: Add JSON RPC URL for mainnet
+  jsonRpcProvider: env.NEXT_PUBLIC_CHAIN_BASE_MAINNET_JSON_RPC,
   explorerUrl: Base.explorers[0].url,
   explorerName: Base.explorers[0].name,
   gasLimit: 30000,

@@ -17,14 +17,15 @@ export const PageFooter = ({
         "text-sm",
       )}
     >
+       <div className="relative flex w-full flex-col items-center justify-center text-center font-varela mb-8 mt-16">
+        {`Ralph's UI may take a few seconds to update balances due to relayer response delays (around 5-6 seconds). Rest assured, your funds are safe, just give it a moment to catch up. Thank you for your patience!`}
+      </div>
       {!menuOpenSignal.value && (
         <div className="items-center">
           <RalphLogo variant="icon" />
         </div>
       )}
-      <div className="relative flex w-full flex-col items-center justify-center text-center font-varela space-y-10">
-        {`Ralph's UI may take a few seconds to update balances due to relayer response delays (around 5-6 seconds). Rest assured, your funds are safe, just give it a moment to catch up. Thank you for your patience!`}
-      </div>
+     
       <div className="flex flex-row items-start justify-start gap-[4px]">
         <div className="relative leading-[14px]">{`Crafted with `}</div>
         <div className="h-full self-stretch">

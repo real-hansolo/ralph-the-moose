@@ -11,9 +11,9 @@ export const PageFooter = ({
   return (
     <div
       className={twMerge(
-        "w-full relative flex flex-col items-center justify-center",
+        "relative flex w-full flex-col items-center justify-center",
         "gap-[16px]",
-        "text-left text-text-inverted font-varela",
+        "text-left font-varela text-text-inverted",
         "text-sm",
       )}
     >
@@ -22,9 +22,12 @@ export const PageFooter = ({
           <RalphLogo variant="icon" />
         </div>
       )}
+      <div className="relative flex w-full flex-col items-center justify-center text-center font-varela space-y-10">
+        {`Ralph's UI may take a few seconds to update balances due to relayer response delays (around 5-6 seconds). Rest assured, your funds are safe, just give it a moment to catch up. Thank you for your patience!`}
+      </div>
       <div className="flex flex-row items-start justify-start gap-[4px]">
         <div className="relative leading-[14px]">{`Crafted with `}</div>
-        <div className="self-stretch h-full">
+        <div className="h-full self-stretch">
           <IconMooseHorn size={4} />
         </div>
         <div className="relative leading-[14px]">by the Ralph team</div>

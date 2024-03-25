@@ -27,7 +27,7 @@ export default class BalanceCardPresenter {
     this.activeNetwork = activeNetwork;
     this.inscriptionBalance = signal(0);
     this.wrappedBalance = signal(0);
-    this.fee = signal(0);
+    this.fee = signal(0.00123); // TODO: Not wired up
     this.claimableInscriptions = signal(0);
 
     this.indexer = indexer;
@@ -52,7 +52,7 @@ export default class BalanceCardPresenter {
       this.inscriptionBalance.value = 0;
       return;
     }
-    this.inscriptionBalance.value = balanceForAccount.data.balance / 1000000000;
+    this.inscriptionBalance.value = balanceForAccount.data.balance;
   }
 
   async __presentWrappedBalance() {
@@ -71,7 +71,7 @@ export default class BalanceCardPresenter {
     if (!wrappedBalance.success) {
       return;
     }
-    this.wrappedBalance.value = wrappedBalance.data.balance / 1000000000; // TODO: 0's
+    this.wrappedBalance.value = wrappedBalance.data.balance;
   }
   async __presentClaimableInscriptions() {
     this.claimableInscriptions.value = 0;
@@ -83,7 +83,7 @@ export default class BalanceCardPresenter {
       return;
     }
     this.claimableInscriptions.value =
-      claimableBalance.data.amount / 1000000000;
+      claimableBalance.data.amount;
   }
 
   async present(): Promise<BalanceCardViewModel> {

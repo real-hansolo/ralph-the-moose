@@ -1,16 +1,15 @@
-import { type BigNumber } from "ethers";
 import { type BaseDTO } from "./base";
 
 export type GetAllMintedSuccessDTO = {
-    total_minted: BigNumber;
+    total_minted: number;
 }
 export type GetAllMintedDTO = BaseDTO<GetAllMintedSuccessDTO>;
 
 export type GetAllocationLimitSSuccessDTO = {
-    "total_mintable": BigNumber,
-    "max_per_mint": BigNumber,
-    "total_allocations": BigNumber,
-    "address_count": BigNumber
+    "total_mintable": number,
+    "max_per_mint": number,
+    "total_allocations": number,
+    "address_count": number
 }
 
 export type GetAllocationLimitDTO = BaseDTO<GetAllocationLimitSSuccessDTO>;
@@ -18,12 +17,15 @@ export type GetAllocationLimitDTO = BaseDTO<GetAllocationLimitSSuccessDTO>;
 
 export type GetAllocationForAddressSuccessDTO = {
     "address": string,
-    "allocation_amount": BigNumber,
+    "allocation_amount": number,
 }
 
 export type GetAllocationForAddressDTO = BaseDTO<GetAllocationForAddressSuccessDTO>;
 
 
+/**
+ * Represents the DTO (Data Transfer Object) for a successful inscription retrieval.
+ */
 export type GetInscriptionSuccessDTO = {
     tx_hash: string,
     block_number: number,
@@ -33,7 +35,7 @@ export type GetInscriptionSuccessDTO = {
     op: string,
     tick: string,
     receiver: string,
-    amount: BigNumber,
+    amount: number,
     valid: number
 }
 
@@ -47,13 +49,13 @@ export type GetLatestBlockSuccessDTO = {
 export type GetLatestBlockDTO = BaseDTO<GetLatestBlockSuccessDTO>;
 
 export type GetBalanceForAccountSuccessDTO = {
-    balance: BigNumber
+    balance: number
 }
 
 export type GetBalanceForAccountDTO = BaseDTO<GetBalanceForAccountSuccessDTO>;
 
 export type GetTotalMintedForAccountSuccessDTO = {
-    minted: BigNumber
+    minted: number
 }
 
 export type GetTotalMintedForAccountDTO = BaseDTO<GetTotalMintedForAccountSuccessDTO>;

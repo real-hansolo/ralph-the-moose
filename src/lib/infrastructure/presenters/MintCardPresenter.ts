@@ -5,7 +5,6 @@ import {
   type GetAllocationLimitDTO,
   type GetAllMintedDTO,
 } from "../dto/indexer-dto";
-import { toHumanReadableNumber } from "~/lib/utils/tokenUtils";
 
 export default class MintCardPresenter {
   public mintedPercentage: Signal<number>;
@@ -36,7 +35,7 @@ export default class MintCardPresenter {
         message: allMinted.msg,
       } as MintCardViewModel;
     } else if (allMinted.success) {
-      this.totalMinted.value = toHumanReadableNumber(allMinted.data.total_minted);
+      this.totalMinted.value = allMinted.data.total_minted;
     }
   }
 
@@ -53,9 +52,9 @@ export default class MintCardPresenter {
         message: allocationLimits.msg,
       } as MintCardViewModel;
     } else {
-      this.mintLimit.value = toHumanReadableNumber(allocationLimits.data.total_mintable); // TODO: check if this is the correct value
+      this.mintLimit.value = allocationLimits.data.total_mintable; // TODO: check if this is the correct value
       this.DEFAULT_ALLOCATION.value =
-      toHumanReadableNumber(allocationLimits.data.max_per_mint);
+      allocationLimits.data.max_per_mint;
     }
   }
 
@@ -95,7 +94,7 @@ export default class MintCardPresenter {
       return;
     } else {
       this.allocation.value =
-        toHumanReadableNumber(allocationForAcountDTO.data.allocation_amount.sub(totalMintedDTO.data.minted));
+        allocationForAcountDTO.data.allocation_amount - totalMintedDTO.data.minted;
       return;
     }
   }

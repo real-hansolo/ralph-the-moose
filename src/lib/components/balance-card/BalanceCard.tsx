@@ -77,7 +77,11 @@ export interface BalanceCardProps {
   /**
    * SunwrapCardView: The view of the unwrap card.
    */
-  SUnwrapCardView: Signal<"unwrapping" | "default">;
+  SUnwrapCardView: Signal<"unwrapping" | "default" | "unwrapping-ended">;
+  /**
+   * SUnwrapEndedStatusFrame: The status frame displayed after unwrapping is completed.
+   */
+  SUnwrapEndedStatusFrame: Signal<React.ReactNode>;
 }
 
 /**

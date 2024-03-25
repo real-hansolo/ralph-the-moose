@@ -13,6 +13,7 @@ import {
 import { LightFrame } from "../layouts/LightFrame";
 import { type Signal } from "@preact/signals-react";
 import { useSignals } from "@preact/signals-react/runtime";
+import { formatNumber } from "~/lib/utils/tokenUtils";
 
 /**
  * Props for the UnwrapModal component
@@ -50,7 +51,8 @@ export interface UnwrapCardProps {
   /**
    * The view of the unwrap card
    */
-  SUnwrapCardView: Signal<"unwrapping" | "default">;
+  SUnwrapCardView: Signal<"unwrapping" | "default" | "unwrapping-ended">;
+  SUnwrapEndedStatusFrame: Signal<React.ReactNode>;
 }
 
 export const UnwrapCard = ({
@@ -63,61 +65,69 @@ export const UnwrapCard = ({
   onUnwrap,
   SUnwrapStatusMessage,
   SUnwrapCardView: SunwrapCardView,
+  SUnwrapEndedStatusFrame,
 }: UnwrapCardProps) => {
   useSignals();
   const wrappedTokenName = `W${tokenShortName.toUpperCase()}`;
   const amountAfterUnwrapping = amountToUnwrap.value * (1 - fee / 100);
   const defaultView = (
     <div className="flex w-full flex-col items-start justify-center gap-4">
-        <div className="flex w-full relative flex-row justify-between">
-          <Heading title="Unwrap" variant={HeadingVariant.H4} />
-          <div className="ml-auto">
-            <IconButtonClose size={4} onClick={onClose ? onClose : () => {}} />
-          </div>
+      <div className="relative flex w-full flex-row justify-between">
+        <Heading title="Unwrap" variant={HeadingVariant.H4} />
+        <div className="ml-auto">
+          <IconButtonClose size={4} onClick={onClose ? onClose : () => {}} />
         </div>
-        <InputAssetAmountWithLabel
-          label="Amount to unwrap"
-          maxAmount={wrappedBalance}
-          amount={amountToUnwrap}
-          tokenShortName={tokenShortName}
-          icon={icon}
-        />
-        <LightFrame className="w-full font-varela text-text-secondary">
-          <div className="self-stretch flex flex-row items-baseline justify-between">
-            <div className="relative leading-[14px]">Unwrap amount</div>
-            <Label
-              label={`${amountToUnwrap.value} ${wrappedTokenName}`}
-              variant="medium"
-            />
-          </div>
-          <div className="self-stretch flex flex-row items-baseline justify-between">
-            <div className="relative leading-[14px]">Unwrapping fee</div>
-            <Label label={`${fee} %`} variant="medium" />
-          </div>
-          <div className="self-stretch flex flex-row items-baseline justify-between">
-            <div className="relative leading-[14px]">You will receive</div>
-            <Label
-              label={`${amountAfterUnwrapping} ${tokenShortName}`}
-              variant="medium"
-            />
-          </div>
-          <Button
-            label={`Unwrap ${amountToUnwrap.value} ${wrappedTokenName}`}
-            variant="primary"
-            onClick={onUnwrap}
-          />
-        </LightFrame>
       </div>
-  )
+      <InputAssetAmountWithLabel
+        label="Amount to unwrap"
+        maxAmount={wrappedBalance}
+        amount={amountToUnwrap}
+        tokenShortName={tokenShortName}
+        icon={icon}
+      />
+      <LightFrame className="w-full font-varela text-text-secondary">
+        <div className="flex flex-row items-baseline justify-between self-stretch">
+          <div className="relative leading-[14px]">Unwrap amount</div>
+          <Label
+            label={`${formatNumber(amountToUnwrap.value)} ${wrappedTokenName}`}
+            variant="medium"
+          />
+        </div>
+        <div className="flex flex-row items-baseline justify-between self-stretch">
+          <div className="relative leading-[14px]">Unwrapping fee</div>
+          <Label label={`${fee} %`} variant="medium" />
+        </div>
+        <div className="flex flex-row items-baseline justify-between self-stretch">
+          <div className="relative leading-[14px]">You will receive</div>
+          <Label
+            label={`${formatNumber(amountAfterUnwrapping)} ${tokenShortName}`}
+            variant="medium"
+          />
+        </div>
+        <Button
+          label={`Unwrap ${amountToUnwrap.value} ${wrappedTokenName}`}
+          variant="primary"
+          onClick={onUnwrap}
+        />
+      </LightFrame>
+    </div>
+  );
 
   const unwrappingView = (
     <div className="flex w-full flex-col items-start justify-center gap-4">
       <div className="relative flex w-full flex-row justify-between">
         <Heading title="Unwrapping" variant={HeadingVariant.H4} />
         <div className="ml-auto">
-          <IconButtonClose size={4} onClick={onClose ? onClose : () => {
-            SunwrapCardView.value = "default";
-          }} />
+          <IconButtonClose
+            size={4}
+            onClick={
+              onClose
+                ? onClose
+                : () => {
+                    SunwrapCardView.value = "default";
+                  }
+            }
+          />
         </div>
       </div>
       <div className="flex w-full flex-col items-center justify-center gap-4">
@@ -131,11 +141,35 @@ export const UnwrapCard = ({
         </LightFrame>
       </div>
     </div>
-  )
+  );
+
+  const unwrappingEndedView = (
+    <div className="flex w-full flex-col items-start justify-center gap-4">
+      <div className="relative flex w-full flex-row justify-between">
+        <Heading title="Unwrapping" variant={HeadingVariant.H4} />
+        <div className="ml-auto">
+          <IconButtonClose
+            size={4}
+            onClick={
+              onClose
+                ? onClose
+                : () => {
+                    SunwrapCardView.value = "default";
+                  }
+            }
+          />
+        </div>
+      </div>
+      <div className="flex w-full flex-col items-center justify-center gap-4">
+        {SUnwrapEndedStatusFrame.value}
+      </div>
+    </div>
+  );
   return (
     <Modal>
       {SunwrapCardView.value === "default" && defaultView}
       {SunwrapCardView.value === "unwrapping" && unwrappingView}
+      {SunwrapCardView.value === "unwrapping-ended" && unwrappingEndedView}
     </Modal>
   );
 };

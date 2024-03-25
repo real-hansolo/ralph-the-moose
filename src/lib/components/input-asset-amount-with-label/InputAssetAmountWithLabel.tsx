@@ -2,6 +2,7 @@ import React from "react";
 import { InputAssetAmount, type InputAssetAmountProps } from "../input-asset-amount";
 import { twMerge } from "tailwind-merge";
 import { IconError } from "..";
+import { formatNumber } from "~/lib/utils/tokenUtils";
 
 /**
  * Props for the InputAssetAmountWithLabel component.
@@ -43,7 +44,8 @@ export const InputAssetAmountWithLabel: React.FC<
 > = ({ label, maxAmount, errorMessage, ...props }) => {
   const labelFinal = label ? label : "Amount to bridge";
   const maxAmountFinal = maxAmount ? parseFloat(maxAmount.toFixed(2)) : 0;
-  const maxAmountString = `${maxAmountFinal} ${props.tokenShortName}`;
+  const formattedMaxAmount = formatNumber(maxAmountFinal);
+  const maxAmountString = `${formattedMaxAmount} ${props.tokenShortName}`;
   return (
     <div className="w-full relative flex flex-col items-start justify-start text-left text-base text-text-secondary font-varela">
       <div className="self-stretch flex flex-row items-center justify-between">

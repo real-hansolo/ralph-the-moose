@@ -44,5 +44,6 @@ export const unwrap = async (
     if (!result.success) {
         return Promise.reject(result.msg);
     }
+    return result;
 
 };

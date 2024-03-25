@@ -2,7 +2,7 @@ import { useSignal, type Signal } from "@preact/signals-react";
 import { useQuery } from "@tanstack/react-query";
 import { useMemo } from "react";
 import { env } from "~/env";
-import { BalanceCard, type ToastProps } from "~/lib";
+import { BalanceCard, IconSuccess, type ToastProps } from "~/lib";
 import { RalphLogo } from "~/lib/components/ralph-logo";
 import { type TChainConfig } from "~/lib/infrastructure/config/chains";
 import IndexerGateway from "~/lib/infrastructure/gateways/indexer";
@@ -14,6 +14,8 @@ import { type Chain, toHex } from "thirdweb";
 import { type Account, type Wallet } from "thirdweb/wallets";
 import { type BaseErrorViewModel } from "~/lib/infrastructure/view-models/base";
 import { unwrap } from "./controllers/UnwrapController";
+import { LightFrame } from "~/lib/components/layouts/LightFrame";
+import { NavLink } from "~/lib/components/nav-link";
 
 export const RalphBalaceCard = ({
   toasts,
@@ -83,8 +85,10 @@ export const RalphBalaceCard = ({
   const SWrapCardView = useSignal<"wrapping" | "claiming" | "default">(
     "default",
   );
-  const SUnwrapCardView = useSignal<"unwrapping" | "default">("default");
-
+  const SUnwrapCardView = useSignal<
+    "unwrapping" | "default" | "unwrapping-ended"
+  >("default");
+  const SUnwrapEndedStatusFrame = useSignal<React.ReactNode>(<></>);
   const onUnwrap = () => {
     if (!connectedAccount || !connectedWallet || !connectedWalletNetwork) {
       toasts.value.push({
@@ -137,15 +141,28 @@ export const RalphBalaceCard = ({
       activeNetwork.value,
       SUnwrapStatusMessage,
     )
-      .then(async () => {
+      .then(async (result) => {
         SUnwrapStatusMessage.value = "All's good in the hood!";
-        // wait 2 seconds
-        await new Promise((resolve) => setTimeout(resolve, 2000));
-        toasts.value.push({
-          message: `You unwrapd' ${amountToUnwrap.value} PR!`,
-          title: "You own it!",
-          status: "success",
-        });
+        SUnwrapCardView.value = "unwrapping-ended";
+        SUnwrapEndedStatusFrame.value = (
+          <LightFrame className="w-full items-center gap-4 text-wrap text-base-colors/neutral-400">
+            <IconSuccess size={12} />
+            <div className="font-heading-h5 relative inline-block w-full overflow-auto whitespace-normal text-center font-gluten text-lg font-bold leading-[18px] tracking-[-0.04em] text-text-primary">
+              {`Unwrapping's wraped up!`}
+            </div>
+            <div className="flex w-full flex-row items-center justify-center gap-4 text-left font-varela text-base">
+              <label>{result.data.timestamp}</label>
+            </div>
+            <NavLink
+              variant="small"
+              label="View in Explorer"
+              url={result.data.explorerLink}
+            />
+          </LightFrame>
+        );
+        // wait 15 seconds
+        await new Promise((resolve) => setTimeout(resolve, 15000));
+        // TODO: add toast
       })
       .catch(async (error) => {
         console.error("[UNWRAP] Unwrap failed", error);
@@ -361,7 +378,7 @@ export const RalphBalaceCard = ({
       SClaimStatusMessage={SClaimStatusMessage}
       SUnwrapStatusMessage={SUnwrapStatusMessage}
       SUnwrapCardView={SUnwrapCardView}
-      
+      SUnwrapEndedStatusFrame={SUnwrapEndedStatusFrame}
     />
   );
 };

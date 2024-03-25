@@ -61,7 +61,7 @@ export const mint = async (
 ): Promise<MintResponseModel> => {
  
   const mintResponseDTO: MintResponseDTO = await web3Gateway.sendMintTransaction(
-    amount * 1000000000, // TODO: cleanup
+    amount, // TODO: cleanup
     chain,
     connectedWallet,
     connectedAccount,
@@ -76,7 +76,7 @@ export const mint = async (
   }
 
   // Poll the indexer for transaction hash
-  const maxAttempts = 60;
+  const maxAttempts = 120;
   try {
     const inscriptionStatusDTO = await pollIndexer(
       indexerGateway,
@@ -113,7 +113,7 @@ export const mint = async (
           message: 'Transaction successful',
           transactionHash: mintResponseDTO.data.txHash,
           timestamp: mintResponseDTO.data.timestamp,
-          amountMinted: mintResponseDTO.data.amountMinted / 1000000000, // TODO: cleanup
+          amountMinted: mintResponseDTO.data.amountMinted,
           tokenShortName: mintResponseDTO.data.tokenShortName,
           explorerLink: mintResponseDTO.data.explorerLink,
         });

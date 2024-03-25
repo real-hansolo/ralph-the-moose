@@ -19,10 +19,11 @@ import {
 } from "../dto/web3-dto";
 import { type Signal } from "@preact/signals-react";
 import { type TChainConfig } from "../config/chains";
-import { ethers } from "ethers";
+import { BigNumber, ethers } from "ethers";
 import RalphReservoirABI from "../abi/RalphReservoir.json";
 import Ralph from "../abi/Ralph.json";
 import { type Account, type Wallet } from "thirdweb/wallets";
+import { fromHumanReadableNumber, toHumanReadableNumber } from "~/lib/utils/tokenUtils";
 
 export default class Web3Gateway {
   private feeWalletAddress: string;
@@ -38,9 +39,10 @@ export default class Web3Gateway {
     const chain = wallet.getChain();
     return chain?.id;
   };
-  __generateHexFromMintMessage = (amount: number): string => {
+
+  __generateHexFromMintMessage = (amount: BigNumber): string => {
     // TODO: hook up amount to the message. default 10000000000
-    const json = `{"p": "elkrc-404", "op": "mint", "tick": "PR", "amount": ${amount}}`;
+    const json = `{"p": "elkrc-404", "op": "mint", "tick": "PR", "amount": ${amount.toString()}}`;
     const hex = Buffer.from(json, "utf8").toString("hex");
     return hex;
   };
@@ -55,12 +57,13 @@ export default class Web3Gateway {
   };
 
   async sendMintTransaction(
-    amount: number,
+    humanReadableAmount: number,
     chain: TChainConfig,
     wallet: Wallet,
     account: Account,
     statusMessage: Signal<string>,
   ): Promise<MintResponseDTO> {
+    const amount = fromHumanReadableNumber(humanReadableAmount);
     const message = this.__generateHexFromMintMessage(amount);
     const thirdWebClient = this.thirdWebClient;
     const thirdWebTx = prepareTransaction({
@@ -89,7 +92,7 @@ export default class Web3Gateway {
       return {
         success: true,
         data: {
-          amountMinted: amount,
+          amountMinted: toHumanReadableNumber(amount),
           timestamp: timestamp,
           explorerLink: explorerLink,
           tokenShortName: "PR",
@@ -126,7 +129,7 @@ export default class Web3Gateway {
       return {
         success: true,
         data: {
-          amount: claimable as unknown as number, // TODO: check if this is the correct value
+          amount: toHumanReadableNumber(BigNumber.from(claimable)), 
         },
       };
     } catch (e) {
@@ -207,7 +210,7 @@ export default class Web3Gateway {
       return {
         success: true,
         data: {
-          balance: balance,
+          balance: toHumanReadableNumber(BigNumber.from(balance)),
         },
       };
     } catch (e) {

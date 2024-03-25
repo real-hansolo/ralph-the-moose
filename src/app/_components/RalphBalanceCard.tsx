@@ -71,7 +71,7 @@ export const RalphBalaceCard = ({
         } as BaseErrorViewModel;
       }
       const viewModel = await balanceCardPresenter.present();
-      // console.log(`[Balance View Model]: ${JSON.stringify(viewModel)}`);
+      console.log(`[Balance View Model]: ${JSON.stringify(viewModel)}`);
       return viewModel;
     },
     refetchInterval: 1000,

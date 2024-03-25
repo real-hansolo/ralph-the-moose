@@ -35,9 +35,6 @@ export const InputAssetAmount = ({
     }
     try {
       amount.value = parseInt(value, 10);
-      console.log(
-        `[DEBUG:: InputAssetAmountComponent]: amount.value: ${amount.value}`,
-      );
     } catch (e) {
       console.log(
         `[ERROR:: InputAssetAmountComponent]: Error parsing ${value} to number`,

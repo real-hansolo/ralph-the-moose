@@ -8,6 +8,8 @@ import {
   type GetBalanceForAccountDTO,
   type GetTotalMintedForAccountDTO,
 } from "../dto/indexer-dto";
+import { toHumanReadableNumber } from "~/lib/utils/tokenUtils";
+import { type BaseDTO } from "../dto/base";
 
 export default class IndexerGateway {
   constructor(private indexer_url: string) {
@@ -33,10 +35,30 @@ export default class IndexerGateway {
     }
   }
 
+  __transformStringToNumber(data: string): number {
+    try {
+      return toHumanReadableNumber(BigNumber.from(data));
+    } catch (e) {
+      console.log("Error transforming string to number", data, e);
+      return 0;
+    }
+  }
+
+  async ping(): Promise<boolean> {
+    const response = await this._call<BaseDTO<null>>("ping");
+    console.log("ping response", response); // TODO: remove
+    return response.success;
+  }
   async getAllMinted(): Promise<GetAllMintedDTO> {
-    const response = await this._call<GetAllMintedDTO>("all_minted");
+    const response = await this._call<
+      BaseDTO<{
+        total_minted: string;
+      }>
+    >("all_minted");
     if (response.success) {
-      const total_minted = BigNumber.from(response.data.total_minted);
+      const total_minted = this.__transformStringToNumber(
+        response.data.total_minted,
+      );
       return {
         success: true,
         data: {
@@ -48,15 +70,25 @@ export default class IndexerGateway {
   }
 
   async getAllocationLimits(): Promise<GetAllocationLimitDTO> {
-    const response =
-      await this._call<GetAllocationLimitDTO>("allocation_limits");
+    const response = await this._call<
+      BaseDTO<{
+        total_mintable: string;
+        max_per_mint: string;
+        total_allocations: string;
+        address_count: string;
+      }>
+    >("allocation_limits");
     if (response.success) {
       const data = response.data;
-      const total_mintable = BigNumber.from(data.total_mintable);
-      const max_per_mint = BigNumber.from(data.max_per_mint);
-      const total_allocations = BigNumber.from(data.total_allocations);
-      const address_count = BigNumber.from(data.address_count);
-      console.log("data", data)
+      const total_mintable = this.__transformStringToNumber(
+        data.total_mintable,
+      );
+      const max_per_mint = this.__transformStringToNumber(data.max_per_mint);
+      const total_allocations = this.__transformStringToNumber(
+        data.total_allocations,
+      );
+      const address_count = this.__transformStringToNumber(data.address_count);
+      // console.log("data", max_per_mint, total_mintable, total_allocations, address_count); // TODO: remove
       return {
         success: true,
         data: {
@@ -73,12 +105,17 @@ export default class IndexerGateway {
   async getAllocationForAddress(
     address: string,
   ): Promise<GetAllocationForAddressDTO> {
-    const response = await this._call<GetAllocationForAddressDTO>(
-      `allocation/${address}`,
-    );
+    const response = await this._call<
+      BaseDTO<{
+        address: string;
+        allocation_amount: string;
+      }>
+    >(`allocation/${address}`);
     if (response.success) {
       const data = response.data;
-      const allocation_amount = BigNumber.from(data.allocation_amount);
+      const allocation_amount = this.__transformStringToNumber(
+        data.allocation_amount,
+      );
       return {
         success: true,
         data: {
@@ -93,12 +130,14 @@ export default class IndexerGateway {
   async getTotalMintedForAccount(
     address: string,
   ): Promise<GetTotalMintedForAccountDTO> {
-    const response = await this._call<GetTotalMintedForAccountDTO>(
-      `minted/${address}`,
-    );
+    const response = await this._call<
+      BaseDTO<{
+        minted: string;
+      }>
+    >(`minted/${address}`);
     if (response.success) {
       const data = response.data;
-      const minted = BigNumber.from(data.minted);
+      const minted = this.__transformStringToNumber(data.minted);
       return {
         success: true,
         data: {
@@ -110,12 +149,23 @@ export default class IndexerGateway {
   }
 
   async getInscriptionStatus(txHash: string): Promise<GetInscriptionStatusDTO> {
-    const response = await this._call<GetInscriptionStatusDTO>(
-      `inscriptions/${txHash}`,
-    );
+    const response = await this._call<
+      BaseDTO<{
+        tx_hash: string;
+        block_number: number;
+        sender: string;
+        timestamp: number;
+        p: string;
+        op: string;
+        tick: string;
+        receiver: string;
+        amount: string;
+        valid: number;
+      }>
+    >(`inscriptions/${txHash}`);
     if (response.success) {
       const data = response.data;
-      const amount = BigNumber.from(data.amount);
+      const amount = this.__transformStringToNumber(data.amount);
       return {
         success: true,
         data: {
@@ -145,12 +195,14 @@ export default class IndexerGateway {
     latestBlock?: number,
   ): Promise<GetBalanceForAccountDTO> {
     if (latestBlock) {
-      const response = await this._call<GetBalanceForAccountDTO>(
-        `balances/${address}?block=${latestBlock}`,
-      );
+      const response = await this._call<
+        BaseDTO<{
+          balance: string;
+        }>
+      >(`balances/${address}?block=${latestBlock}`);
       if (response.success) {
         const data = response.data;
-        const balance = BigNumber.from(data.balance);
+        const balance = this.__transformStringToNumber(data.balance);
         return {
           success: true,
           data: {
@@ -160,12 +212,14 @@ export default class IndexerGateway {
       }
       return response;
     }
-    const response = await this._call<GetBalanceForAccountDTO>(
-      `balances/${address}`,
-    );
+    const response = await this._call<
+      BaseDTO<{
+        balance: string;
+      }>
+    >(`balances/${address}`);
     if (response.success) {
       const data = response.data;
-      const balance = BigNumber.from(data.balance);
+      const balance = this.__transformStringToNumber(data.balance);
       return {
         success: true,
         data: {

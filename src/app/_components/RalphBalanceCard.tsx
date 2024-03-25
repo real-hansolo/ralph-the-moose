@@ -74,7 +74,7 @@ export const RalphBalaceCard = ({
       // console.log(`[Balance View Model]: ${JSON.stringify(viewModel)}`);
       return viewModel;
     },
-    refetchInterval: 1000,
+    refetchInterval: 500,
   });
   const amountToWrap = useSignal<number>(0);
   const amountToUnwrap = useSignal<number>(0);

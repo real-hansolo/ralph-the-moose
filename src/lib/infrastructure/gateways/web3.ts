@@ -300,9 +300,11 @@ export default class Web3Gateway {
     chain: TChainConfig,
     wallet: Wallet,
     account: Account,
-    amount: number,
+    amount?: number,
   ): Promise<boolean> {
     try {
+      // TODO: hardcoded value
+      const bigAmount = amount ?? `115792089237316195423570985008687907853269984665640564039457584007913129639935`
       const transaction = prepareContractCall({
         contract: getContract({
           client: this.thirdWebClient,
@@ -327,7 +329,7 @@ export default class Web3Gateway {
           stateMutability: "nonpayable",
           type: "function",
         },
-        params: [chain.ralphReservoirAddress, BigInt(amount)],
+        params: [chain.ralphReservoirAddress, BigInt(bigAmount)],
       });
 
       const receipt = await sendTransaction({

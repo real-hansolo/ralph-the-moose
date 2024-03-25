@@ -148,7 +148,7 @@ export const RalphBalaceCard = ({
           <LightFrame className="w-full items-center gap-4 text-wrap text-base-colors/neutral-400">
             <IconSuccess size={12} />
             <div className="font-heading-h5 relative inline-block w-full overflow-auto whitespace-normal text-center font-gluten text-lg font-bold leading-[18px] tracking-[-0.04em] text-text-primary">
-              {`Unwrapping's wraped up!`}
+              {`Unwrapping's all wrapped up!`}
             </div>
             <div className="flex w-full flex-row items-center justify-center gap-4 text-left font-varela text-base">
               <label>{result.data.timestamp}</label>

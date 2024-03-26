@@ -59,8 +59,7 @@ export default class MintCardPresenter {
   }
 
   async __presentMintPercentage() {
-    this.mintedPercentage.value = 0;
-    parseFloat(
+    this.mintedPercentage.value = parseFloat(
       ((this.totalMinted.value / this.mintLimit.value) * 100).toFixed(2),
     );
   }

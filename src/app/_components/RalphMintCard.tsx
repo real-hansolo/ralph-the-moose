@@ -90,6 +90,10 @@ export const RalphMintCard = ({
       return;
     }
     if (data.status === "success") {
+      if(data.data.mintedPercentage.value >=100) {
+        SdisableMinting.value = true;
+        return;
+      }
       SdisableMinting.value = false;
       return;
     }
@@ -261,7 +265,7 @@ export const RalphMintCard = ({
       totalSupply={mintCardViewModel.totalSupply}
       totalMinted={mintCardViewModel.totalMinted}
       mintingFee={10} // TODO: add the minting fee
-      mintingDisabled={false}
+      mintingDisabled={SdisableMinting.value}
       tokenShortName="PR" // TODO: hardcoded
       isMinting={SisMinting}
       onMint={onMint}

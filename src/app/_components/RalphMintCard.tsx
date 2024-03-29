@@ -122,6 +122,10 @@ export const RalphMintCard = ({
       mintEnabledStatusFrame.value = <></>;
       return;
     }
+    if(data.data.allocation.value === 0) {
+      mintEnabledStatusFrame.value = <></>;
+      return;
+    }
     mintEnabledStatusFrame.value = (
       <MintEnabledStatusFrame
         eligibleAmount={data.data.allocation.value}
@@ -265,7 +269,7 @@ export const RalphMintCard = ({
       totalSupply={mintCardViewModel.totalSupply}
       totalMinted={mintCardViewModel.totalMinted}
       mintingFee={10} // TODO: add the minting fee
-      mintingDisabled={true} // TODO: add the minting disabled status
+      mintingDisabled={SdisableMinting.value}
       tokenShortName="PR" // TODO: hardcoded
       isMinting={SisMinting}
       onMint={onMint}

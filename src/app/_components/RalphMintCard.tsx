@@ -124,6 +124,7 @@ export const RalphMintCard = ({
     }
     if(data.data.allocation.value === 0) {
       mintEnabledStatusFrame.value = <></>;
+      SdisableMinting.value = true; // TODO: remove this line later
       return;
     }
     mintEnabledStatusFrame.value = (

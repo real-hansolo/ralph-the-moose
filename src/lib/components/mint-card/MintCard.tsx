@@ -2,6 +2,7 @@ import { useSignals } from "@preact/signals-react/runtime";
 import { Button, Heading, HeadingVariant, Label, Card } from "..";
 import { formatNumber } from "../../utils/tokenUtils";
 import { type Signal } from "@preact/signals-react";
+import { useQuery } from "@tanstack/react-query";
 
 export interface MintCardProps {
   mintedPercentage: number;
@@ -16,13 +17,19 @@ export interface MintCardProps {
   
   onMint: () => void;
 }
-
 export const MintCard = (props: MintCardProps) => {
   useSignals();
   const formattedMintLimit = formatNumber(props.mintLimit);
   const formattedTotalSupply = formatNumber(props.totalSupply);
   const formattedTotalMinted = formatNumber(props.totalMinted);
-  
+  const query = useQuery({
+    queryKey: ["MintingDisabled Mint Card"] as unknown as readonly unknown[],
+    queryFn: async () => {
+      console.log(`[Mint Card: Minting Disabled Prop (should be false)]: ${props.mintingDisabled}`);
+      return props.mintingDisabled;
+    },
+    refetchInterval: 500,
+  }); 
   const handleMint = () => {
     props.onMint();
   };

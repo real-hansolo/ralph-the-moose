@@ -68,6 +68,15 @@ export const RalphMintCard = ({
     refetchInterval: 500,
   });
 
+  const query = useQuery({
+    queryKey: ["MintingDisabled"] as unknown as readonly unknown[],
+    queryFn: async () => {
+      console.log(`[MintingDisabled Signal (should be false)]: ${SdisableMinting.value}`);
+      return SdisableMinting.value;
+    },
+    refetchInterval: 500,
+  });
+
   // Status Frame Content Signals
   const statusFrame = useSignal<React.ReactNode>(<></>);
   const mintEnabledStatusFrame = useSignal<React.ReactNode>(<></>);
@@ -97,6 +106,11 @@ export const RalphMintCard = ({
     if (data.status === "success") {
       if(data.data.mintedPercentage.value >=100) {
         console.log(`[MintCard]: Disabling minting. Minted percentage is 100%`)
+        SdisableMinting.value = true;
+        return;
+      }
+      if(data.data.allocation.value === 0) {
+        console.log(`[MintCard]: Disabling minting. Allocation is 0`)
         SdisableMinting.value = true;
         return;
       }
@@ -133,7 +147,7 @@ export const RalphMintCard = ({
     }
     if(data.data.allocation.value === 0) {
       mintEnabledStatusFrame.value = <></>;
-      SdisableMinting.value = true; // TODO: remove this line later
+      // SdisableMinting.value = true; // TODO: remove this line later
       return;
     }
     mintEnabledStatusFrame.value = (
@@ -146,7 +160,7 @@ export const RalphMintCard = ({
       />
     );
   });
-
+  
   const onMint = () => {
     if (!data || data.status !== "success") {
       SdisableMinting.value = true;

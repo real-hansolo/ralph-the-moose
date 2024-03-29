@@ -96,22 +96,24 @@ export const WrapCard = ({
           variant="primary"
           onClick={onWrap}
         />
-         {claimableAmount > 0 && (
-        <div id="claim-section">
-          <div className="flex flex-row items-baseline justify-between self-stretch">
+
+        <div id="claim-section" className="gap-8 space-y-4">
+          <div className="flex flex-row items-baseline justify-between gap-8 self-stretch">
             <div className="relative leading-[14px]">{`Reap what you sow'd`}</div>
-            <Label
-              label={`${formatNumber(claimableAmount)} ${wrappedTokenName}`}
-              variant="medium"
-            />
+            {claimableAmount > 0 && (
+              <Label
+                label={`${formatNumber(claimableAmount)} ${wrappedTokenName}`}
+                variant="medium"
+              />
+            )}
           </div>
-            <Button
-              label={`Claim ${formatNumber(claimableAmount)} ${wrappedTokenName}`}
-              variant="secondary"
-              onClick={onClaim}
-            />
+          <Button
+            label={`Claim ${formatNumber(claimableAmount)} ${wrappedTokenName}`}
+            variant="secondary"
+            disabled={claimableAmount === 0}
+            onClick={onClaim}
+          />
         </div>
-        )}
       </LightFrame>
     </div>
   );

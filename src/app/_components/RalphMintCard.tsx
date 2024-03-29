@@ -62,6 +62,7 @@ export const RalphMintCard = ({
     queryKey: ["MintCard"],
     queryFn: async () => {
       const viewModel = await mintCardPresenter.present();
+      console.log(`[MintCardViewModel]: ${JSON.stringify(viewModel)}`);
       return viewModel;
     },
     refetchInterval: 500,

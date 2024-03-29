@@ -22,14 +22,6 @@ export const MintCard = (props: MintCardProps) => {
   const formattedMintLimit = formatNumber(props.mintLimit);
   const formattedTotalSupply = formatNumber(props.totalSupply);
   const formattedTotalMinted = formatNumber(props.totalMinted);
-  const query = useQuery({
-    queryKey: ["MintingDisabled Mint Card"] as unknown as readonly unknown[],
-    queryFn: async () => {
-      console.log(`[Mint Card: Minting Disabled Prop (should be false)]: ${props.mintingDisabled}`);
-      return props.mintingDisabled;
-    },
-    refetchInterval: 500,
-  }); 
   const handleMint = () => {
     props.onMint();
   };

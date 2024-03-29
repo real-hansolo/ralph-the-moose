@@ -62,17 +62,7 @@ export const RalphMintCard = ({
     queryKey: ["MintCard"],
     queryFn: async () => {
       const viewModel = await mintCardPresenter.present();
-      console.log(`[MintCardViewModel]: ${JSON.stringify(viewModel)}`);
       return viewModel;
-    },
-    refetchInterval: 500,
-  });
-
-  const query = useQuery({
-    queryKey: ["MintingDisabled"] as unknown as readonly unknown[],
-    queryFn: async () => {
-      console.log(`[MintingDisabled Signal (should be false)]: ${SdisableMinting.value}`);
-      return SdisableMinting.value;
     },
     refetchInterval: 500,
   });
@@ -84,46 +74,37 @@ export const RalphMintCard = ({
   // Effect to enable or disable minting
   effect(() => {
     if (!connectedWallet || !connectedAccount || !connectedWalletNetwork) {
-      console.log(`[MintCard]: Disabling minting. Wallet error`)
       SdisableMinting.value = true;
       return;
     }
     if (!data || isLoading) {
       SdisableMinting.value = true;
-      console.log(`[MintCard]: Disabling minting. Data error`)
       return;
     }
     if (isError) {
       SdisableMinting.value = true;
-      console.log(`[MintCard]: Disabling minting. Error`)
       return;
     }
     if (!data.status) {
       SdisableMinting.value = true;
-      console.log(`[MintCard]: Disabling minting. Data status error`)
       return;
     }
     if (data.status === "success") {
       if(data.data.mintedPercentage.value >=100) {
-        console.log(`[MintCard]: Disabling minting. Minted percentage is 100%`)
         SdisableMinting.value = true;
         return;
       }
       if(data.data.allocation.value === 0) {
-        console.log(`[MintCard]: Disabling minting. Allocation is 0`)
         SdisableMinting.value = true;
         return;
       }
-      console.log(`[MintCard]: Enabling minting`)
       SdisableMinting.value = false;
       return;
     }
     if (SisMinting.value) {
-      console.log(`[MintCard]: Disabling minting. Minting in progress`)
       SdisableMinting.value = true;
       return;
     }
-    console.log(`[MintCard]: Disabling minting. Default`)
     return true;
   });
 

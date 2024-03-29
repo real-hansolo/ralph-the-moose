@@ -75,33 +75,41 @@ export const RalphMintCard = ({
   // Effect to enable or disable minting
   effect(() => {
     if (!connectedWallet || !connectedAccount || !connectedWalletNetwork) {
+      console.log(`[MintCard]: Disabling minting. Wallet error`)
       SdisableMinting.value = true;
       return;
     }
     if (!data || isLoading) {
       SdisableMinting.value = true;
+      console.log(`[MintCard]: Disabling minting. Data error`)
       return;
     }
     if (isError) {
       SdisableMinting.value = true;
+      console.log(`[MintCard]: Disabling minting. Error`)
       return;
     }
     if (!data.status) {
       SdisableMinting.value = true;
+      console.log(`[MintCard]: Disabling minting. Data status error`)
       return;
     }
     if (data.status === "success") {
       if(data.data.mintedPercentage.value >=100) {
+        console.log(`[MintCard]: Disabling minting. Minted percentage is 100%`)
         SdisableMinting.value = true;
         return;
       }
+      console.log(`[MintCard]: Enabling minting`)
       SdisableMinting.value = false;
       return;
     }
     if (SisMinting.value) {
+      console.log(`[MintCard]: Disabling minting. Minting in progress`)
       SdisableMinting.value = true;
       return;
     }
+    console.log(`[MintCard]: Disabling minting. Default`)
     return true;
   });
 

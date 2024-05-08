@@ -1,23 +1,11 @@
 import { env } from "~/env";
-import { IconNetworkBase } from "~/lib/components";
+import { IconNetworkBase } from "@maany_shr/ralph-the-moose-ui-kit";
 import { type Chain } from "thirdweb";
 import { base, baseSepolia } from "thirdweb/chains";
 import {  Base, BaseSepoliaTestnet } from "@thirdweb-dev/chains";
-export type TChainConfig = {
-  chainId: number;
-  name: string;
-  rpcUrl: string;
-  jsonRpcProvider: string;
-  explorerUrl: string;
-  explorerName: string;
-  gasLimit: number;
-  icon: React.ReactNode;
-  networkCurrency: string;
-  mintingFee: number;
-  wrappingFee: number;
-  unwrappingFee: number;
-  ralphReservoirAddress: string;
-  ralphTokenAddress: string;
+import { type TChainConfig as ChainConfig } from "@maany_shr/ralph-the-moose-ui-kit";
+
+export type TChainConfig = ChainConfig & {
   thirdWeb: Chain;
 };
 

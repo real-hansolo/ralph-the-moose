@@ -3,7 +3,7 @@ import { type Chain, createThirdwebClient } from "thirdweb";
 import { ConnectButton, type Theme } from "thirdweb/react";
 import { type Account, type Wallet } from "thirdweb/wallets";
 import { env } from "~/env";
-import { TextButton, WalletCard } from "~/lib";
+import { TextButton, WalletCard } from "@maany_shr/ralph-the-moose-ui-kit";
 import {
   SUPPORTED_CHAINS,
   type TChainConfig,

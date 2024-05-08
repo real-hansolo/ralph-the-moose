@@ -1,12 +1,11 @@
 import { type Signal } from "@preact/signals-react";
 import { type Account, type Wallet } from "thirdweb/wallets";
-import { InProgressStatusFrame } from "~/lib";
+import { InProgressStatusFrame, MintWarningStatusFrame } from "@maany_shr/ralph-the-moose-ui-kit";
 import { type TChainConfig } from "~/lib/infrastructure/config/chains";
 import { type MintResponseDTO } from "~/lib/infrastructure/dto/web3-dto";
 import type IndexerGateway from "~/lib/infrastructure/gateways/indexer";
 import type Web3Gateway from "~/lib/infrastructure/gateways/web3";
 import { formatNumber } from "~/lib/utils/tokenUtils";
-import { MintWarningStatusFrame } from "~/lib/components/mint-card/MintWarningStatusFrame";
 
 
 export const pollIndexer = async (

@@ -8,7 +8,7 @@ import { ThirdwebProvider } from "thirdweb/react";
 
 export default function Home() {
   noStore();
-  useSignals();
+  // useSignals();
   return (
     <ThirdwebProvider>
       <RalphHome />

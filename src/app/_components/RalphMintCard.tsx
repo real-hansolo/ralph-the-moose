@@ -6,8 +6,9 @@ import {
   MintCompletedStatusFrame,
   MintEnabledStatusFrame,
   MintErrorStatusFrame,
+  MintWarningStatusFrame,
   type ToastProps,
-} from "~/lib";
+} from "@maany_shr/ralph-the-moose-ui-kit";
 import type MintCardViewModel from "~/lib/infrastructure/view-models/MintCardViewModel";
 import Web3Gateway from "~/lib/infrastructure/gateways/web3";
 import MintCardPresenter from "~/lib/infrastructure/presenters/MintCardPresenter";
@@ -15,7 +16,6 @@ import { useQuery } from "@tanstack/react-query";
 import { env } from "~/env";
 import IndexerGateway from "~/lib/infrastructure/gateways/indexer";
 import { type TChainConfig } from "~/lib/infrastructure/config/chains";
-import { MintWarningStatusFrame } from "~/lib/components/mint-card/MintWarningStatusFrame";
 import { type Chain } from "thirdweb";
 import { formatNumber } from "~/lib/utils/tokenUtils";
 import { type Account, type Wallet } from "thirdweb/wallets";

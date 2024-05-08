@@ -1,4 +1,4 @@
-import { PageTemplate, type ToastProps } from "~/lib";
+"use client";
 import { RalphWalletCard } from "../_components/RalphWalletCard";
 import { RalphMintCard } from "../_components/RalphMintCard";
 import { RalphBalaceCard } from "../_components/RalphBalanceCard";
@@ -8,7 +8,7 @@ import {
   SUPPORTED_CHAINS,
   type TChainConfig,
 } from "~/lib/infrastructure/config/chains";
-import { useSignals } from "@preact/signals-react/runtime";
+// import { useSignals } from "@preact/signals-react/runtime";
 import {
   useActiveAccount,
   useActiveWallet,
@@ -16,9 +16,10 @@ import {
   useDisconnect,
 } from "thirdweb/react";
 import { type Chain } from "thirdweb";
+import { PageTemplate, ToastProps } from "@maany_shr/ralph-the-moose-ui-kit";
 
 export const RalphHome = () => {
-  useSignals();
+  // useSignals();
   /**
    * Hooks and Wallet Information
    */
@@ -45,7 +46,7 @@ export const RalphHome = () => {
         supportedNetworks={SUPPORTED_CHAINS}
         activeNetwork={activeNetwork}
       >
-        {!isWalletConnected && (
+         {!isWalletConnected && (
           <RalphWalletCard
             activeNetwork={activeNetwork}
             status={isWalletConnected ? "connected" : "disconnected"}
@@ -55,6 +56,7 @@ export const RalphHome = () => {
             connectedWalletNetwork={connectedWalletNetwork}
           />
         )}
+        
         <RalphMintCard
           toasts={toasts}
           activeNetwork={activeNetwork}
@@ -80,7 +82,7 @@ export const RalphHome = () => {
             connectedAccount={connectedAccount}
             connectedWalletNetwork={connectedWalletNetwork}
           />
-        )}
+        )} 
       </PageTemplate>
     </div>
   );

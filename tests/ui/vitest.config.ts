@@ -1,15 +1,15 @@
 import { defineProject, mergeConfig } from "vitest/config";
+import react from "@vitejs/plugin-react";
 import sharedConfig from "../vitest.shared";
+
 const config = mergeConfig(
   sharedConfig,
   // eslint-disable-next-line @typescript-eslint/no-unsafe-call
   defineProject({
     test: {
-      name: "server",
-      environment: "node",
-      rootDir: "tests/server",
-      include: ["**/*.test.ts"],
-      globals: true,
+      name: "ui",
+      environment: "jsdom",
+      include: ["**/*.test.tsx", "**/*.test.ts"],
       coverage: {
         provider: "v8",
         reporter: ["json", "json-summary", "html", "lcov", "text"],
@@ -22,17 +22,18 @@ const config = mergeConfig(
         //   lines: 10,
         // },
         exclude: [
-          "**/*.ts",
           "tests/**/*.{ts,tsx}",
           "**/*.config.{ts,tsx,js}",
           ".storybook/",
           "stories/**/*.{ts,tsx}",
           ".eslint*",
         ],
-        include: ["src/lib/infrastructure/server/**/*.ts"],
       },
     },
+
+    plugins: [react()],
   }),
 );
 
+// console.log(config)
 export default config;

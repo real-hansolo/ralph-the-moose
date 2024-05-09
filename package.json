@@ -12,7 +12,7 @@
     "test:ui": "vitest --run --coverage --project ui",
     "test:gateway": "vitest --run --coverage --project gateway",
     "test:server": "vitest --run --coverage --project server",
-    "test:client": "vitest --run --coverage --project ui",
+    "test:client": "vitest --run --coverage --project client",
     "storybook": "storybook dev -p 6006",
     "build-storybook": "storybook build",
     "build-tailwind": "tailwindcss -i ./src/app/styles/globals.css -o ./.storybook/tailwind.css",

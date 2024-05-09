@@ -1,4 +1,4 @@
-name: Component Tests
+name: Client Tests
 on:
   push:
     branches:

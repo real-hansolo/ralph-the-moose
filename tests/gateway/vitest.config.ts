@@ -9,7 +9,26 @@ const config = mergeConfig(
       environment: "node",
       rootDir: "tests/gateway",
       include: ["**/*.test.ts"],
-      globals: true
+      globals: true,
+      coverage: {
+        provider: "v8",
+        reporter: ["json", "json-summary", "html", "lcov", "text"],
+        reportOnFailure: true,
+        // TODO: update coverage thresholds
+        // thresholds: {
+        //   statements: 10,
+        //   branches: 10,
+        //   functions: 10,
+        //   lines: 10,
+        // },
+        exclude: [
+          "tests/**/*.{ts,tsx}",
+          "**/*.config.{ts,tsx,js}",
+          ".storybook/",
+          "stories/**/*.{ts,tsx}",
+          ".eslint*",
+        ],
+      },
     },
   }),
 );

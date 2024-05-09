@@ -1,9 +1,10 @@
 import { defineProject, mergeConfig } from 'vitest/config'
 import react from '@vitejs/plugin-react'
-import sharedConfig from '../../vitest.shared'
+import sharedConfig from '../vitest.shared'
 
 const config =  mergeConfig(
   sharedConfig,
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-call
   defineProject({
     test: {
       name: 'component',
@@ -15,5 +16,5 @@ const config =  mergeConfig(
   })
 )
 
-console.log(config)
+// console.log(config)
 export default config

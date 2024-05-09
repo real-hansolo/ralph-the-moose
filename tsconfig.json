@@ -27,8 +27,6 @@
     "baseUrl": ".",
     "paths": {
       "~/*": ["./src/*"],
-      "@/components/*": ["./src/lib/components/*"],
-      "@/assets/*": ["./src/lib/assets/*"],
     }
   },
   "include": [

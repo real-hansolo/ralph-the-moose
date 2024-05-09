@@ -4,9 +4,17 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node-version: [21.4.0, 20.4.0]
     steps:
       - name: Checkout 🛎️
         uses: actions/checkout@v3
+
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v3
+        with:
+          node-version: ${{ matrix.node-version }}
 
       - name: Install 🔧
         run: |
@@ -18,4 +26,3 @@ jobs:
       - name: Build Storybook 🔧
         run: |
           npm run build-storybook
-  

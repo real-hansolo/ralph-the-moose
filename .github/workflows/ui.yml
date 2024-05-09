@@ -1,4 +1,4 @@
-name: Component Tests
+name: UI Tests
 on:
   push:
     branches:
@@ -22,4 +22,4 @@ jobs:
       - name: Install dependencies
         run: npm install
       - name: Run Component Tests
-        run: npm run test:component
+        run: npm run test:ui

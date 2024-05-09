@@ -66,7 +66,7 @@ export const RalphWalletCard = (props: RalphWalletCardProps) => {
       primaryText: "#3D1F16",
       secondaryText: "#8E5A45",
       secondaryButtonHoverBg: "#FBF7F3",
-      walletSelectorButtonHoverBg: "#D1AC98",
+      tertiaryBg: "#D1AC98",
       secondaryIconHoverBg: "#F6E6DC",
       secondaryIconHoverColor: "#009F55",
       skeletonBg: "#8E5A45",
@@ -146,7 +146,7 @@ export const RalphWalletCard = (props: RalphWalletCardProps) => {
       address={
         props.connectedAccount?.address ?? "Not connected"
       }
-      walletName={props.connectedWallet?.metadata.name ?? "Not connected"}
+      walletName={props.connectedWallet?.id ?? "Not connected"}
       connectButton={connectButton}
       disconnectButton={disconnectButton}
     />

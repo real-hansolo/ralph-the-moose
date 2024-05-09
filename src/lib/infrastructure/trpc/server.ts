@@ -11,8 +11,8 @@ import { type TRPCErrorResponse } from "@trpc/server/rpc";
 import { headers } from "next/headers";
 import { cache } from "react";
 
-import { appRouter, type AppRouter } from "~/server/api/root";
-import { createTRPCContext } from "~/server/api/trpc";
+import { appRouter, type AppRouter } from "~/lib/infrastructure/server/api/root";
+import { createTRPCContext } from "~/lib/infrastructure/server/api/trpc";
 import { transformer } from "./shared";
 
 /**
@@ -23,6 +23,7 @@ const createContext = cache(() => {
   const heads = new Headers(headers());
   heads.set("x-trpc-source", "rsc");
 
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-return
   return createTRPCContext({
     headers: heads,
   });

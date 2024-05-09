@@ -1,4 +1,4 @@
-name: Component Tests
+name: Gateway/Repository Tests
 on:
   push:
     branches:

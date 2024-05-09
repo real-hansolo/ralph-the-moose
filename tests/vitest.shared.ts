@@ -1,10 +1,11 @@
 import { defineConfig } from 'vitest/config'
 import path from 'path'
 
+// eslint-disable-next-line @typescript-eslint/no-unsafe-call
 const sharedConfig = defineConfig({
   resolve: {
     alias: {
-      "~": path.resolve(__dirname, "src"),
+      "~": path.resolve(__dirname, "../src"),
     }
   },
   test: {

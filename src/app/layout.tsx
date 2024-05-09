@@ -1,11 +1,11 @@
-import "~/styles/globals.css";
+import "./styles/globals.css";
 import { SpeedInsights } from '@vercel/speed-insights/next';
 import { AxiomWebVitals } from "next-axiom";
 import { HighlightInit } from '@highlight-run/next/client'
 
 import { Inter } from "next/font/google";
 
-import { TRPCReactProvider } from "~/trpc/react";
+import { TRPCReactProvider } from "~/lib/infrastructure/trpc/react";
 
 import { env } from "~/env";
 

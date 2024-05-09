@@ -1,6 +1,6 @@
 {
   "name": "ralph-the-moose",
-  "version": "0.1.0",
+  "version": "1.0.0-alpha",
   "private": true,
   "type": "module",
   "scripts": {
@@ -10,10 +10,11 @@
     "start": "next start",
     "test": "vitest --run --coverage",
     "test:component": "vitest --run --coverage --project component",
+    "test:gateway": "vitest --run --coverage --project gateway",
     "storybook": "storybook dev -p 6006",
     "build-storybook": "storybook build",
-    "build-tailwind": "tailwindcss -i ./src/styles/globals.css -o ./.storybook/tailwind.css",
-    "build-tailwind:watch": "tailwindcss --watch -i ./src/styles/globals.css -o ./.storybook/tailwind.css"
+    "build-tailwind": "tailwindcss -i ./src/app/styles/globals.css -o ./.storybook/tailwind.css",
+    "build-tailwind:watch": "tailwindcss --watch -i ./src/app/styles/globals.css -o ./.storybook/tailwind.css"
   },
   "dependencies": {
     "@highlight-run/next": "^7.3.5",
@@ -72,7 +73,7 @@
     "storybook": "^7.6.10",
     "tailwindcss": "^3.3.5",
     "typescript": "^5.1.6",
-    "vitest": "^1.2.1"
+    "vitest": "^1.6.0"
   },
   "ct3aMetadata": {
     "initVersion": "7.26.0"

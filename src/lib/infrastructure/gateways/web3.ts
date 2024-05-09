@@ -20,8 +20,8 @@ import {
 import { type Signal } from "@preact/signals-react";
 import { type TChainConfig } from "../config/chains";
 import { BigNumber, ethers } from "ethers";
-import RalphReservoirABI from "../abi/RalphReservoir.json";
-import Ralph from "../abi/Ralph.json";
+import RalphReservoirABI from "../config/abi/RalphReservoir.json";
+import Ralph from "../config/abi/Ralph.json";
 import { type Account, type Wallet } from "thirdweb/wallets";
 import {
   fromHumanReadableNumber,

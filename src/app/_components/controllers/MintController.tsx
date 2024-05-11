@@ -1,5 +1,5 @@
 import { type Signal } from "@preact/signals-react";
-import { type Account, type Wallet } from "thirdweb/wallets";
+import { type Account, type Wallet } from "@maany_shr/thirdweb/wallets";
 import { InProgressStatusFrame, MintWarningStatusFrame } from "@maany_shr/ralph-the-moose-ui-kit";
 import { type TChainConfig } from "~/lib/infrastructure/config/chains";
 import { type MintResponseDTO } from "~/lib/infrastructure/dto/web3-dto";

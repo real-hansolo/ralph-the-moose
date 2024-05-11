@@ -9,8 +9,8 @@ import Web3Gateway from "~/lib/infrastructure/gateways/web3";
 import BalanceCardPresenter from "~/lib/infrastructure/presenters/BalanceCardPresenter";
 import type BalanceCardViewModel from "~/lib/infrastructure/view-models/BalanceCardViewModel";
 import { claim, wrap } from "./controllers/WrapController";
-import { type Chain, toHex } from "thirdweb";
-import { type Account, type Wallet } from "thirdweb/wallets";
+import { type Chain, toHex } from "@maany_shr/thirdweb";
+import { type Account, type Wallet } from "@maany_shr/thirdweb/wallets";
 import { type BaseErrorViewModel } from "~/lib/infrastructure/view-models/base";
 import { unwrap } from "./controllers/UnwrapController";
 

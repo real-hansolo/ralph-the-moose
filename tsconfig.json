@@ -27,6 +27,7 @@
     "baseUrl": ".",
     "paths": {
       "~/*": ["./src/*"],
+      "@/sdk/*": ["./src/sdk/*"],
     }
   },
   "include": [
@@ -37,6 +38,6 @@
     "**/*.cjs",
     "**/*.js",
     ".next/types/**/*.ts"
-  ],
+, "src/app/api/web3/thirdweb-wallet-provider.jsx"  ],
   "exclude": ["node_modules", "coverage", ".storybook"]
 }

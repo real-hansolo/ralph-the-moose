@@ -7,7 +7,7 @@ import {
   toWei,
   prepareContractCall,
   getContract,
-} from "thirdweb";
+} from "@maany_shr/thirdweb";
 import { env } from "~/env";
 import {
   type GetWrappedBalanceDTO,
@@ -22,7 +22,7 @@ import { type TChainConfig } from "../config/chains";
 import { BigNumber, ethers } from "ethers";
 import RalphReservoirABI from "../config/abi/RalphReservoir.json";
 import Ralph from "../config/abi/Ralph.json";
-import { type Account, type Wallet } from "thirdweb/wallets";
+import { type Account, type Wallet } from "@maany_shr/thirdweb/wallets";
 import {
   fromHumanReadableNumber,
   toHumanReadableNumber,

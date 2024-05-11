@@ -14,15 +14,17 @@ import {
   useActiveWallet,
   useActiveWalletChain,
   useDisconnect,
-} from "thirdweb/react";
-import { type Chain } from "thirdweb";
-import { PageTemplate, ToastProps } from "@maany_shr/ralph-the-moose-ui-kit";
+} from "@maany_shr/thirdweb/react";
+import { type Chain } from "@maany_shr/thirdweb";
+import { PageTemplate, type ToastProps } from "@maany_shr/ralph-the-moose-ui-kit";
+import { ThirdwebWalletProvider } from "../api/web3/thirdweb-wallet-provider";
 
 export const RalphHome = () => {
   // useSignals();
   /**
    * Hooks and Wallet Information
    */
+  ThirdwebWalletProvider();
   const connectedAccount = useActiveAccount();
   const connectedWallet = useActiveWallet();
   const connectedWalletNetwork: Chain | undefined = useActiveWalletChain();

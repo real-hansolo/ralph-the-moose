@@ -1,7 +1,7 @@
 import { type Signal } from "@preact/signals-react";
-import { type Chain, createThirdwebClient } from "thirdweb";
-import { ConnectButton, type Theme } from "thirdweb/react";
-import { type Account, type Wallet } from "thirdweb/wallets";
+import { type Chain, createThirdwebClient } from "@maany_shr/thirdweb";
+import { ConnectButton, type Theme } from "@maany_shr/thirdweb/react";
+import { type Account, type Wallet } from "@maany_shr/thirdweb/wallets";
 import { env } from "~/env";
 import { TextButton, WalletCard } from "@maany_shr/ralph-the-moose-ui-kit";
 import {

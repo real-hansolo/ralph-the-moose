@@ -16,9 +16,9 @@ import { useQuery } from "@tanstack/react-query";
 import { env } from "~/env";
 import IndexerGateway from "~/lib/infrastructure/gateways/indexer";
 import { type TChainConfig } from "~/lib/infrastructure/config/chains";
-import { type Chain } from "thirdweb";
+import { type Chain } from "@maany_shr/thirdweb";
 import { formatNumber } from "~/lib/utils/tokenUtils";
-import { type Account, type Wallet } from "thirdweb/wallets";
+import { type Account, type Wallet } from "@maany_shr/thirdweb/wallets";
 import { type MintResponseModel, mint } from "./controllers/MintController";
 
 export const RalphMintCard = ({

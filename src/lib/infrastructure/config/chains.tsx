@@ -1,7 +1,7 @@
 import { env } from "~/env";
 import { IconNetworkBase } from "@maany_shr/ralph-the-moose-ui-kit";
-import { type Chain } from "thirdweb";
-import { base as Base, baseSepolia as BaseSepolia } from "thirdweb/chains";
+import { type Chain } from "@maany_shr/thirdweb";
+import { base as Base, baseSepolia as BaseSepolia } from "@maany_shr/thirdweb/chains";
 import { type TChainConfig as ChainConfig } from "@maany_shr/ralph-the-moose-ui-kit";
 
 export type TChainConfig = ChainConfig & {

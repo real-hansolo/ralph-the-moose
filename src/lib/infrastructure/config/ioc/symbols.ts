@@ -6,6 +6,7 @@ const SIGNALS = {
 const GATEWAYS = {
     WALLET_PROVIDER: Symbol.for('WalletProvider'),
     NETWORK_GATEWAY: Symbol.for('NetworkGateway'),
+    RPC_GATEWAY: Symbol.for('RpcGateway'),
     WEB3_GATEWAY: Symbol.for('Web3Gateway'),
 }
 

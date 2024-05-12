@@ -16,7 +16,7 @@ export default class RalphReservoirGateway implements RalphReservoirOutputPort {
     ) {
     }
   getContract(network: TNetwork): ethers.Contract {
-    const provider = new ethers.providers.JsonRpcProvider(network.rpc);
+    const provider = new ethers.providers.JsonRpcProvider(network.rpcProvider);
     return new ethers.Contract(
       network.contracts.ralphReservoirAddress,
       RalphReservoirABI,
@@ -48,5 +48,5 @@ export default class RalphReservoirGateway implements RalphReservoirOutputPort {
       }
   }
 
-  
+
 }

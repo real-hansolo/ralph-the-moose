@@ -9,6 +9,9 @@ export const env = createEnv({
   server: {
     NODE_ENV: z.enum(["development", "test", "production"]),
     HIGHLIGHT_PROJECT_ID: z.string(),
+    ALCHEMY_BASE_API_KEY: z.string(),
+    ALCHEMY_BASE_SEPOLIA_API_KEY: z.string(),
+    INFURA_API_KEY: z.string(),
   },
 
   /**
@@ -24,6 +27,10 @@ export const env = createEnv({
     NEXT_PUBLIC_FEE_WALLET_ADDRESS: z.string(),
     NEXT_PUBLIC_CHAIN_BASE_SEPOLIA_JSON_RPC: z.string(),
     NEXT_PUBLIC_CHAIN_BASE_MAINNET_JSON_RPC: z.string(),
+    NEXT_PUBLIC_CHAIN_BASE_GAS_LIMIT: z.number(),
+    NEXT_PUBLIC_CHAIN_BASE_SEPOLIA_GAS_LIMIT: z.number(),
+    NEXT_PUBLIC_CHAIN_AVALANCHE_GAS_LIMIT: z.number(),
+    NEXT_PUBLIC_CHAIN_AVALANCHE_FUJI_CHAIN_ID: z.number(),
   },
 
   /**
@@ -33,12 +40,19 @@ export const env = createEnv({
   runtimeEnv: {
     NODE_ENV: process.env.NODE_ENV,
     HIGHLIGHT_PROJECT_ID: process.env.HIGHLIGHT_PROJECT_ID ?? "no-project-id",
+    ALCHEMY_BASE_API_KEY: process.env.ALCHEMY_BASE_API_KEY ?? "no-alchemy-api-key",
+    ALCHEMY_BASE_SEPOLIA_API_KEY: process.env.ALCHEMY_BASE_SEPOLIA_API_KEY ?? "no-alchemy-sepolia-api-key",
+    INFURA_API_KEY: process.env.INFURA_API_KEY ?? "no-infura-api-key",
     NEXT_PUBLIC_ENABLE_TESTNETS: process.env.NEXT_PUBLIC_ENABLE_TESTNETS?.trim().toLocaleLowerCase() === "true",
     NEXT_PUBLIC_THIRDWEB_CLIENT_ID: process.env.NEXT_PUBLIC_THIRDWEB_CLIENT_ID ?? "no-client-id",
     NEXT_PUBLIC_INDEXER_URL: process.env.NEXT_PUBLIC_INDEXER_URL ?? "http://localhost:8080",
     NEXT_PUBLIC_FEE_WALLET_ADDRESS: process.env.NEXT_PUBLIC_FEE_WALLET_ADDRESS ?? "0x",
     NEXT_PUBLIC_CHAIN_BASE_SEPOLIA_JSON_RPC: process.env.NEXT_PUBLIC_CHAIN_BASE_SEPOLIA_JSON_RPC ?? "http://localhost:8545",
     NEXT_PUBLIC_CHAIN_BASE_MAINNET_JSON_RPC: process.env.NEXT_PUBLIC_CHAIN_BASE_MAINNET_JSON_RPC ?? "http://localhost:8545",
+    NEXT_PUBLIC_CHAIN_BASE_GAS_LIMIT: parseInt(process.env.NEXT_PUBLIC_CHAIN_BASE_GAS_LIMIT ?? "200000"),
+    NEXT_PUBLIC_CHAIN_BASE_SEPOLIA_GAS_LIMIT: parseInt(process.env.NEXT_PUBLIC_BASE_SEPOLIA_CHAIN_GAS_LIMIT ?? "200000"),
+    NEXT_PUBLIC_CHAIN_AVALANCHE_GAS_LIMIT: parseInt(process.env.NEXT_PUBLIC_CHAIN_AVALANCHE_GAS_LIMIT ?? "200000"),
+    NEXT_PUBLIC_CHAIN_AVALANCHE_FUJI_CHAIN_ID: parseInt(process.env.NEXT_PUBLIC_CHAIN_AVALANCHE_FUJI_GAS_LIMIT ?? "200000"),
   },
   /**
    * Run `build` or `dev` with `SKIP_ENV_VALIDATION` to skip env validation. This is especially

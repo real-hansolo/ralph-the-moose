@@ -1,4 +1,5 @@
 "use client";
+import "reflect-metadata";
 import { RalphWalletCard } from "../_components/RalphWalletCard";
 import { RalphMintCard } from "../_components/RalphMintCard";
 import { RalphBalaceCard } from "../_components/RalphBalanceCard";

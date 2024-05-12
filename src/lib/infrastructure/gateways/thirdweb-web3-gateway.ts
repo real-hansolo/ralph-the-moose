@@ -17,6 +17,8 @@ import type {
 } from "~/lib/core/dto/web3-gateway-dto";
 import type { TNetwork, TPreparedTransaction } from "~/lib/core/entity/models";
 import type Web3GatewayOutputPort from "~/lib/core/ports/secondary/web3-gateway-output-port";
+import { api } from "~/lib/infrastructure/trpc/react";
+
 
 export default class ThirdwebWeb3Gateway
   implements Web3GatewayOutputPort<Wallet, PreparedTransaction>
@@ -96,11 +98,34 @@ export default class ThirdwebWeb3Gateway
     const explorerLink = `${transactionDetails.network.explorer.url}/tx/${transactionHash}`;
     const timestamp = new Date().toLocaleDateString();
 
+    const txDetailsDTOQuery = api.rpc.getTransaction.useQuery({
+      hash: transactionHash,
+      networkId: transactionDetails.network.chainId,
+    })
+    const txDetailsDTO = txDetailsDTOQuery.data;
+    if(txDetailsDTOQuery.error ?? !txDetailsDTO ?? !txDetailsDTO.success ?? !txDetailsDTO.data) {
+      return {
+        success: true,
+        data: {
+          status: "partial",
+          blockNumber: -1,
+          hash: transactionHash,
+          explorerUrl: explorerLink,
+          timestamp: timestamp,
+          from: thirdwebAccount.address,
+          to: transactionDetails.to,
+          value: transactionDetails.value,
+          data: transactionDetails.data,
+          network: transactionDetails.network,
+        },
+      };
+    }
+    const blockNumber = txDetailsDTO.data.blockNumber;
     return {
       success: true,
       data: {
         status: "success",
-        blockNumber: 1234,
+        blockNumber: blockNumber,
         hash: transactionHash,
         explorerUrl: explorerLink,
         timestamp: timestamp,

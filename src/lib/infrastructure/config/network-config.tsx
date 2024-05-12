@@ -8,7 +8,7 @@ export const BASE: TNetwork = {
         name: "BaseScan",
         url: "https://base.basescan.org/" 
     },
-    rpc: "https://mainnet.infura.io/v3/your-api-key",
+    rpcProvider: "alchemy",
     nativeCurrency: "ETH",
     gasLimit: 200000,
     fee: { 
@@ -30,7 +30,7 @@ export const BASE_SEPOLIA: TNetwork = {
         name: "BaseScan",
         url: "https://sepolia.basescan.org/" 
     },
-    rpc: "https://sepolia.infura.io/v3/your-api-key",
+    rpcProvider: "alchemy",
     nativeCurrency: "ETH",
     gasLimit: 200000,
     fee: { 

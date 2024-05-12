@@ -8,15 +8,19 @@ import type {
   ConnectedWalletsDTO,
   DisconnectWalletDTO,
   SupportedWalletsDTO,
-} from "~/lib/infrastructure/dto/wallet-provider-dto";
-import { injectable } from "inversify";
+} from "~/lib/core/dto/wallet-provider-dto";
+import { inject, injectable } from "inversify";
+import { GATEWAYS } from "~/lib/infrastructure/config/ioc/symbols";
+import NetworkGateway from "~/lib/infrastructure/gateways/network-gateway";
+import type { TNetworkDTO } from "~/lib/core/dto/network-dto";
 
 @injectable()
 export class ThirdwebWalletProvider
   implements WalletProviderOutputPort<Wallet>
 {
- 
-
+  constructor(
+    @inject(GATEWAYS.NETWORK_GATEWAY) private networkGateway: NetworkGateway,
+  ) {}
   getName(): string {
     return "thirdweb";
   }
@@ -25,7 +29,7 @@ export class ThirdwebWalletProvider
     const thirdwebMetamask = createWallet("io.metamask");
     return {
       success: true,
-      data: [ "Metamask" ],
+      data: ["Metamask"],
       walletInstances: [
         {
           name: "Metamask",
@@ -40,7 +44,7 @@ export class ThirdwebWalletProvider
       const walletStore = connectionManager.activeWalletStore;
       const thidwebWallet: Wallet | undefined = walletStore.getValue();
       const activeWallet =
-        __transform__thirdweb_wallet_to_Wallet(thidwebWallet);
+        this.__transform__thirdweb_wallet_to_Wallet(thidwebWallet);
       return {
         success: true,
         data: activeWallet,
@@ -72,7 +76,7 @@ export class ThirdwebWalletProvider
       data: connectedWallets.map((thirdwebWallet) => {
         try {
           const wallet =
-            __transform__thirdweb_wallet_to_Wallet(thirdwebWallet);
+            this.__transform__thirdweb_wallet_to_Wallet(thirdwebWallet);
           return wallet;
         } catch (error: unknown) {
           return {
@@ -81,19 +85,29 @@ export class ThirdwebWalletProvider
             activeAccount: "unknown",
             availableAccounts: [],
             activeNetwork: {
-              chainId: 0,
               name: "Unknown",
+              chainId: 0,
+              explorer: { name: "", url: "" },
+              rpcProvider: '',
+              nativeCurrency: "",
+              gasLimit: 0,
+              fee: { minting: 0, wrapping: 0, unwrapping: 0 },
+              contracts: {
+                ralphReservoirAddress: "",
+                ralphTokenAddress: "",
+              },
+              icon: undefined,
             },
           };
         }
       }),
     };
   }
-  
+
   disconnect(wallet: Wallet): DisconnectWalletDTO {
     const disconnect = connectionManager.disconnectWallet;
     let walletAddress = wallet.getAccount()?.address;
-    if(walletAddress === undefined) {
+    if (walletAddress === undefined) {
       walletAddress = "unknown";
     }
     try {
@@ -106,47 +120,51 @@ export class ThirdwebWalletProvider
           address: walletAddress,
         },
       };
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
       return {
         success: false,
         // eslint-disable-next-line @typescript-eslint/no-unsafe-call
-        data: { error: error.toString()},
-      }
+        data: { error: error.toString() },
+      };
     }
   }
-}
 
-
-function __transform__thirdweb_chain_to_Network(chain: Chain): TNetwork {
-  return {
-    chainId: chain.id,
-    name: chain.name ?? "Unknown Name",
-  };
-}
-
-function __transform__thirdweb_wallet_to_Wallet(wallet: Wallet | undefined): TWallet {
-  if (wallet === undefined) {
-    throw new Error("Wallet is undefined");
-  }
-  const activeAccount = wallet.getAccount();
-  if (activeAccount === undefined) {
-    throw new Error("Active account is undefined");
+  __transform__thirdweb_chain_to_Network(chain: Chain): TNetwork {
+    const walletNetworkDTO: TNetworkDTO = this.networkGateway.getNetwork(
+      chain.id,
+    );
+    if (!walletNetworkDTO.success) {
+      throw new Error(
+        `Wallet network ${chain.name}: ${chain.id} is not supported!`,
+      );
+    }
+    return walletNetworkDTO.data;
   }
 
-  const walletChain = wallet.getChain();
-  if (walletChain === undefined) {
-    throw new Error("Wallet chain is undefined");
+  __transform__thirdweb_wallet_to_Wallet(wallet: Wallet | undefined): TWallet {
+    if (wallet === undefined) {
+      throw new Error("Wallet is undefined");
+    }
+    const activeAccount = wallet.getAccount();
+    if (activeAccount === undefined) {
+      throw new Error("Active account is undefined");
+    }
+
+    const walletChain = wallet.getChain();
+    if (walletChain === undefined) {
+      throw new Error("Wallet chain is undefined");
+    }
+
+    const walletNetwork =
+      this.__transform__thirdweb_chain_to_Network(walletChain);
+
+    return {
+      name: wallet.id,
+      provider: "thirdweb",
+      activeAccount: activeAccount.address,
+      availableAccounts: [],
+      activeNetwork: walletNetwork,
+    };
   }
-
-  const walletNetwork =
-    __transform__thirdweb_chain_to_Network(walletChain);
-
-  return {
-    name: wallet.id,
-    provider: "thirdweb",
-    activeAccount: activeAccount.address,
-    availableAccounts: [],
-    activeNetwork: walletNetwork,
-  };
 }

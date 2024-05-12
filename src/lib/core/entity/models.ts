@@ -8,7 +8,7 @@ export const NetworkSchema = z.object({
     url: z.string().url(),
     name: z.string(),
   }),
-  rpc: z.string().url(),
+  rpcProvider: z.enum(["infura", "alchemy"]).or(z.string().url()),
   nativeCurrency: z.string(),
   gasLimit: z.number(),
   fee: z.object({
@@ -53,7 +53,7 @@ export const PreparedTransactionSchema = z.object({
 export type TPreparedTransaction = z.infer<typeof PreparedTransactionSchema>;
 
 export const ExecutedTransactionSchema = PreparedTransactionSchema.merge(z.object({
-  status: z.string(),
+  status: z.enum(["success", "error", "partial"]),
   hash: z.string(),
   blockNumber: z.number(),
   timestamp: z.string(),

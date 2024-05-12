@@ -10,7 +10,7 @@ import {
 } from "~/lib/infrastructure/config/chains";
 import { RALPH_PUBLIC_ICON_URL } from "~/lib/infrastructure/config/ralph_public_assets";
 import { SUPPORTED_WALLETS } from "~/lib/infrastructure/config/wallets";
-import { appContainer, signalsContainer } from "~/lib/infrastructure/config/ioc/container";
+import { clientContainer, signalsContainer } from "~/lib/infrastructure/config/ioc/container";
 import type WalletProviderOutputPort from "~/lib/core/ports/secondary/wallet-provider-output-port";
 import { GATEWAYS, SIGNALS } from "~/lib/infrastructure/config/ioc/symbols";
 
@@ -53,7 +53,7 @@ export const RalphWalletCard = () => {
   const S_ActiveWalletName = useSignal<string>("");
   const S_ActiveWalletAddress = useSignal<string>("");
 
-  const walletProvider: WalletProviderOutputPort<Wallet> = appContainer.get<
+  const walletProvider: WalletProviderOutputPort<Wallet> = clientContainer.get<
     WalletProviderOutputPort<Wallet>
   >(GATEWAYS.WALLET_PROVIDER);
   

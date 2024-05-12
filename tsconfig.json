@@ -28,7 +28,11 @@
     "paths": {
       "~/*": ["./src/*"],
       "@/sdk/*": ["./src/sdk/*"],
-    }
+    },
+
+    /** Iversify */
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true,
   },
   "include": [
     ".eslintrc.cjs",

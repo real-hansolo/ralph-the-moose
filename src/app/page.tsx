@@ -1,4 +1,5 @@
 "use client";
+import "reflect-metadata"; // Client side Inversion of Control
 import { unstable_noStore as noStore } from "next/cache";
 import { useSignals } from "@preact/signals-react/runtime";
 import {

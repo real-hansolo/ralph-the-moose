@@ -8,7 +8,9 @@ import type {
   ConnectedWalletsDTO,
   SupportedWalletsDTO,
 } from "~/lib/infrastructure/dto/wallet-provider-dto";
+import { injectable } from "inversify";
 
+@injectable()
 export class ThirdwebWalletProvider
   implements WalletProviderOutputPort<Wallet>
 {

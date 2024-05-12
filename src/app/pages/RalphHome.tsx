@@ -20,9 +20,10 @@ import {
   PageTemplate,
   type ToastProps,
 } from "@maany_shr/ralph-the-moose-ui-kit";
-import { ThirdwebWalletProvider } from "../api/web3/thirdweb-wallet-provider";
 import type WalletProviderOutputPort from "~/lib/core/ports/secondary/wallet-provider-output-port";
 import { type Wallet } from "@maany_shr/thirdweb/wallets";
+import { appContainer } from "~/lib/infrastructure/config/ioc/container";
+import { GATEWAYS } from "~/lib/infrastructure/config/ioc/symbols";
 
 export const RalphHome = () => {
   // useSignals();
@@ -30,7 +31,7 @@ export const RalphHome = () => {
    * Hooks and Wallet Information
    */
   const walletProvider: WalletProviderOutputPort<Wallet> =
-    new ThirdwebWalletProvider();
+    appContainer.get<WalletProviderOutputPort<Wallet>>(GATEWAYS.WALLET_PROVIDER);
   // console.log(walletProvider.getActiveWallet());
   console.log(walletProvider.getConnectedWallets());
   const connectedAccount = useActiveAccount();

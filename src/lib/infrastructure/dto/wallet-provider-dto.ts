@@ -36,3 +36,14 @@ const SupportedWalletsDTOSchema = DTOSchemaFactory(
 export type SupportedWalletsDTO<TWalletInstance> = z.infer<
   typeof SupportedWalletsDTOSchema
 > & {walletInstances? : [{name: string, walletInstance: TWalletInstance}]};
+
+
+const DisconnectWalletDTO = DTOSchemaFactory(z.object({
+  name: z.string(),
+  provider: z.string(),
+  address: z.string(),
+}), z.object({
+  error: z.string(),
+}));
+
+export type DisconnectWalletDTO = z.infer<typeof DisconnectWalletDTO>;

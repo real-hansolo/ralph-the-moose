@@ -6,6 +6,7 @@ import type WalletProviderOutputPort from "~/lib/core/ports/secondary/wallet-pro
 import type {
   ActiveWalletDTO,
   ConnectedWalletsDTO,
+  DisconnectWalletDTO,
   SupportedWalletsDTO,
 } from "~/lib/infrastructure/dto/wallet-provider-dto";
 import { injectable } from "inversify";
@@ -14,6 +15,7 @@ import { injectable } from "inversify";
 export class ThirdwebWalletProvider
   implements WalletProviderOutputPort<Wallet>
 {
+ 
 
   getName(): string {
     return "thirdweb";
@@ -32,6 +34,7 @@ export class ThirdwebWalletProvider
       ],
     };
   }
+
   getActiveWallet(): ActiveWalletDTO<Wallet> {
     try {
       const walletStore = connectionManager.activeWalletStore;
@@ -85,6 +88,32 @@ export class ThirdwebWalletProvider
         }
       }),
     };
+  }
+  
+  disconnect(wallet: Wallet): DisconnectWalletDTO {
+    const disconnect = connectionManager.disconnectWallet;
+    let walletAddress = wallet.getAccount()?.address;
+    if(walletAddress === undefined) {
+      walletAddress = "unknown";
+    }
+    try {
+      disconnect(wallet);
+      return {
+        success: true,
+        data: {
+          name: wallet.id,
+          provider: "thirdweb",
+          address: walletAddress,
+        },
+      };
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    } catch (error: any) {
+      return {
+        success: false,
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-call
+        data: { error: error.toString()},
+      }
+    }
   }
 }
 

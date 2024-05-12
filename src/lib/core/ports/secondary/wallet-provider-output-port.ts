@@ -1,4 +1,4 @@
-import type { ActiveWalletDTO, ConnectedWalletsDTO, SupportedWalletsDTO } from "~/lib/infrastructure/dto/wallet-provider-dto";
+import type { ActiveWalletDTO, ConnectedWalletsDTO, DisconnectWalletDTO, SupportedWalletsDTO } from "~/lib/infrastructure/dto/wallet-provider-dto";
 
 
 export default interface WalletProviderOutputPort<TWalletInstance> {
@@ -6,4 +6,5 @@ export default interface WalletProviderOutputPort<TWalletInstance> {
     getConnectedWallets(): ConnectedWalletsDTO;
     getActiveWallet(): ActiveWalletDTO<TWalletInstance>;
     getSupportedWallets(): SupportedWalletsDTO<TWalletInstance>;
+    disconnect(wallet: TWalletInstance): DisconnectWalletDTO;
 }

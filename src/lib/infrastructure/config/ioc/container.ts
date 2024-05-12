@@ -6,11 +6,14 @@ import type NetworkGatewayOutputPort from '~/lib/core/ports/secondary/network-ga
 import NetworkGateway from '../../gateways/network-gateway';
 import { type TSignal } from '~/lib/core/entity/signals';
 import { signal } from '@preact/signals-react';
+import type Web3GatewayOutputPort from '~/lib/core/ports/secondary/web3-gateway-output-port';
+import ThirdwebWeb3Gateway from '../../gateways/thirdweb-web3-gateway';
 
 const appContainer = new Container();
 appContainer.bind<WalletProviderOutputPort<unknown>>(GATEWAYS.WALLET_PROVIDER).to(ThirdwebWalletProvider);
 appContainer.bind<NetworkGatewayOutputPort>(GATEWAYS.NETWORK_GATEWAY).to(NetworkGateway);
-
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+appContainer.bind<Web3GatewayOutputPort<any, any>>(GATEWAYS.WEB3_GATEWAY).to(ThirdwebWeb3Gateway);
 const signalsContainer = new Container();
 signalsContainer.bind<TSignal<boolean>>(SIGNALS.MINTING_ENABLED).toConstantValue(
     {

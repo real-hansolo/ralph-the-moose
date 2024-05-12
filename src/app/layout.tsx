@@ -1,3 +1,4 @@
+import "reflect-metadata"; // Server side Inversion of Control
 import "./styles/globals.css";
 import { SpeedInsights } from '@vercel/speed-insights/next';
 import { AxiomWebVitals } from "next-axiom";

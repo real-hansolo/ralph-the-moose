@@ -13,7 +13,6 @@ import {
   useActiveAccount,
   useActiveWallet,
   useActiveWalletChain,
-  useDisconnect,
 } from "@maany_shr/thirdweb/react";
 import { type Chain } from "@maany_shr/thirdweb";
 import {
@@ -37,10 +36,9 @@ export const RalphHome = () => {
   const connectedAccount = useActiveAccount();
   const connectedWallet = useActiveWallet();
   const connectedWalletNetwork: Chain | undefined = useActiveWalletChain();
-  const { disconnect } = useDisconnect();
   const onDisconnect = () => {
     if (!connectedWallet) return;
-    disconnect(connectedWallet);
+    walletProvider.disconnect(connectedWallet);
   };
   const isWalletConnected = connectedWallet !== undefined;
 

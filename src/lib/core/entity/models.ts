@@ -22,23 +22,43 @@ export const NetworkSchema = z.object({
   }),
 });
 
-export type TNetwork = z.infer<typeof NetworkSchema>
+export type TNetwork = z.infer<typeof NetworkSchema>;
 
 export const WalletSchema = z.object({
-    name: z.string(),
-    provider: z.string(),
-    activeAccount: z.string(),
-    availableAccounts: z.array(z.string()),
-    activeNetwork: NetworkSchema,
-  });
+  name: z.string(),
+  provider: z.string(),
+  activeAccount: z.string(),
+  availableAccounts: z.array(z.string()),
+  activeNetwork: NetworkSchema,
+});
 
 export type TWallet = z.infer<typeof WalletSchema>;
 
-
-export const KeyValueStore = z.object({
-  activeNetwork: NetworkSchema,
-  supportedNetworks: z.array(NetworkSchema),
-  activeWallet: WalletSchema,
-  connectedWallets: z.array(WalletSchema),
-  supportedWallets: z.array(z.string()),
+export const ContractSchema = z.object({
+  name: z.string(),
+  address: z.string(),
+  abi: z.any(),
+  network: NetworkSchema,
 });
+
+export type TContract = z.infer<typeof ContractSchema>;
+
+export const PreparedTransactionSchema = z.object({
+  to: z.string(),
+  value: z.string(),
+  data: z.string().optional(),
+  network: NetworkSchema,
+});
+
+export type TPreparedTransaction = z.infer<typeof PreparedTransactionSchema>;
+
+export const ExecutedTransactionSchema = PreparedTransactionSchema.merge(z.object({
+  status: z.string(),
+  hash: z.string(),
+  blockNumber: z.number(),
+  timestamp: z.string(),
+  explorerUrl: z.string().url(),
+  from: z.string(),
+}));
+
+export type TExecutedTransaction = z.infer<typeof ExecutedTransactionSchema>;

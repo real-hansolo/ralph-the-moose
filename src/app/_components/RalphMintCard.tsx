@@ -20,6 +20,8 @@ import { type Chain } from "@maany_shr/thirdweb";
 import { formatNumber } from "~/lib/utils/tokenUtils";
 import { type Account, type Wallet } from "@maany_shr/thirdweb/wallets";
 import { type MintResponseModel, mint } from "./controllers/MintController";
+import { signalsContainer } from "~/lib/infrastructure/config/ioc/container";
+import { SIGNALS } from "~/lib/infrastructure/config/ioc/symbols";
 
 export const RalphMintCard = ({
   toasts,
@@ -44,7 +46,9 @@ export const RalphMintCard = ({
   connectedWalletNetwork: Chain | undefined;
 }) => {
   // Signals
-  const SdisableMinting = useSignal<boolean>(true);
+  const S_MINTING_ENABLED = signalsContainer.get<Signal<boolean>>(SIGNALS.MINTING_ENABLED);
+
+  const SdisableMinting = S_MINTING_ENABLED;
   const SisMinting = useSignal<boolean>(false);
   const SStatusMessage = useSignal<string>("");
   if (!connectedWallet || !connectedAccount || !connectedWalletNetwork) {

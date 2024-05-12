@@ -1,4 +1,4 @@
-import { useSignal } from "@preact/signals-react";
+import { type Signal, useSignal } from "@preact/signals-react";
 import { type Chain, createThirdwebClient } from "@maany_shr/thirdweb";
 import { ConnectButton, type Theme } from "@maany_shr/thirdweb/react";
 import { type Wallet } from "@maany_shr/thirdweb/wallets";
@@ -10,9 +10,9 @@ import {
 } from "~/lib/infrastructure/config/chains";
 import { RALPH_PUBLIC_ICON_URL } from "~/lib/infrastructure/config/ralph_public_assets";
 import { SUPPORTED_WALLETS } from "~/lib/infrastructure/config/wallets";
-import { appContainer } from "~/lib/infrastructure/config/ioc/container";
+import { appContainer, signalsContainer } from "~/lib/infrastructure/config/ioc/container";
 import type WalletProviderOutputPort from "~/lib/core/ports/secondary/wallet-provider-output-port";
-import { GATEWAYS } from "~/lib/infrastructure/config/ioc/symbols";
+import { GATEWAYS, SIGNALS } from "~/lib/infrastructure/config/ioc/symbols";
 
 /**
  * Props for the RalphWalletCard component.

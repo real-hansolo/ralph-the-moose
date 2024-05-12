@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { WalletSchema } from "~/lib/core/models";
+import { WalletSchema } from "~/lib/core/entity/models";
 import { DTOSchemaFactory } from "~/sdk/dto";
 
 const ActiveWalletDTOSchema = DTOSchemaFactory(
@@ -17,7 +17,7 @@ export type ActiveWalletDTO<TWallet> = z.infer<typeof ActiveWalletDTOSchema> & {
   walletInstance?: TWallet;
 };
 
-const ConnectedWalletsDTOSchema = DTOSchemaFactory(
+export const ConnectedWalletsDTOSchema = DTOSchemaFactory(
   z.array(WalletSchema),
   z.object({
     type: z.enum(["no_wallets_connected", "unknown_error"]),
@@ -26,7 +26,7 @@ const ConnectedWalletsDTOSchema = DTOSchemaFactory(
 
 export type ConnectedWalletsDTO = z.infer<typeof ConnectedWalletsDTOSchema>;
 
-const SupportedWalletsDTOSchema = DTOSchemaFactory(
+export const SupportedWalletsDTOSchema = DTOSchemaFactory(
   z.array(z.string()),
   z.object({
     type: z.enum(["no_wallets_supported", "unknown_error"]),
@@ -38,7 +38,7 @@ export type SupportedWalletsDTO<TWalletInstance> = z.infer<
 > & {walletInstances? : [{name: string, walletInstance: TWalletInstance}]};
 
 
-const DisconnectWalletDTO = DTOSchemaFactory(z.object({
+export const DisconnectWalletDTOSchema = DTOSchemaFactory(z.object({
   name: z.string(),
   provider: z.string(),
   address: z.string(),
@@ -46,4 +46,4 @@ const DisconnectWalletDTO = DTOSchemaFactory(z.object({
   error: z.string(),
 }));
 
-export type DisconnectWalletDTO = z.infer<typeof DisconnectWalletDTO>;
+export type DisconnectWalletDTO = z.infer<typeof DisconnectWalletDTOSchema>;

@@ -1,7 +1,7 @@
 import { type Chain } from "@maany_shr/thirdweb/chains";
 import { createWallet, type Wallet } from "@maany_shr/thirdweb/wallets";
 import { connectionManager } from "@maany_shr/thirdweb/react";
-import { type TWallet, type TNetwork } from "~/lib/core/models";
+import { type TWallet, type TNetwork } from "~/lib/core/entity/models";
 import type WalletProviderOutputPort from "~/lib/core/ports/secondary/wallet-provider-output-port";
 import type {
   ActiveWalletDTO,

@@ -1,9 +1,9 @@
-import { type BaseDTO } from "~/sdk/dto";
-import { type TNetwork } from "../../models";
+import type { ActiveWalletDTO, ConnectedWalletsDTO, SupportedWalletsDTO } from "~/lib/infrastructure/dto/wallet-provider-dto";
 
-export default interface WalletProviderOutputPort<TWallet> {
-    getSupportedWallets(): Promise<BaseDTO<TWallet[]>>;
-    getActiveWallet(): Promise<BaseDTO<TWallet>>;
-    getActiveWalletNetwork(): Promise<BaseDTO<TNetwork>>;
-    setActiveWallet(wallet: TWallet): Promise<BaseDTO<void>>;
+
+export default interface WalletProviderOutputPort<TWalletInstance> {
+    getName(): string;
+    getConnectedWallets(): ConnectedWalletsDTO;
+    getActiveWallet(): ActiveWalletDTO<TWalletInstance>;
+    getSupportedWallets(): SupportedWalletsDTO<TWalletInstance>;
 }

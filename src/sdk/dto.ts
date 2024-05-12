@@ -1,11 +1,22 @@
-export type BaseSuccessDTO<TData> = {
-    status: "success";
-    data: TData;
-}
+import { z } from "zod";
 
-export type BaseErrorDTO = {
-    status: "error";
-    message: string;
-}
+export const DTOSchemaFactory = <TSuccessData, TErrorData>(
+  successDataSchema: z.Schema<TSuccessData>,
+  errorTypes: z.Schema<TErrorData>,
+) => {
+  return z.discriminatedUnion("success", [
+    z.object({
+      success: z.literal(true),
+      data: successDataSchema,
+    }),
+    z.object({
+      success: z.literal(false),
+      data: errorTypes,
+    }),
+  ]);
+};
 
-export type BaseDTO<TData> = BaseSuccessDTO<TData> | BaseErrorDTO;
+export type BaseDTO<TSuccessData, TErrorData> = z.infer<
+  ReturnType<typeof DTOSchemaFactory<TSuccessData, TErrorData>>
+>;
+

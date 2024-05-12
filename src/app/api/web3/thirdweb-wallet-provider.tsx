@@ -44,7 +44,7 @@ export class ThirdwebWalletProvider
       return {
         success: true,
         data: activeWallet,
-        wallet: thidwebWallet,
+        walletInstance: thidwebWallet,
       };
     } catch (error: unknown) {
       return {

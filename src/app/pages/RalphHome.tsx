@@ -8,7 +8,6 @@ import {
   SUPPORTED_CHAINS,
   type TChainConfig,
 } from "~/lib/infrastructure/config/chains";
-// import { useSignals } from "@preact/signals-react/runtime";
 import {
   useActiveAccount,
   useActiveWallet,
@@ -19,27 +18,14 @@ import {
   PageTemplate,
   type ToastProps,
 } from "@maany_shr/ralph-the-moose-ui-kit";
-import type WalletProviderOutputPort from "~/lib/core/ports/secondary/wallet-provider-output-port";
-import { type Wallet } from "@maany_shr/thirdweb/wallets";
-import { appContainer } from "~/lib/infrastructure/config/ioc/container";
-import { GATEWAYS } from "~/lib/infrastructure/config/ioc/symbols";
 
 export const RalphHome = () => {
-  // useSignals();
   /**
    * Hooks and Wallet Information
    */
-  const walletProvider: WalletProviderOutputPort<Wallet> =
-    appContainer.get<WalletProviderOutputPort<Wallet>>(GATEWAYS.WALLET_PROVIDER);
-  // console.log(walletProvider.getActiveWallet());
-  console.log(walletProvider.getConnectedWallets());
   const connectedAccount = useActiveAccount();
   const connectedWallet = useActiveWallet();
   const connectedWalletNetwork: Chain | undefined = useActiveWalletChain();
-  const onDisconnect = () => {
-    if (!connectedWallet) return;
-    walletProvider.disconnect(connectedWallet);
-  };
   const isWalletConnected = connectedWallet !== undefined;
 
   /**
@@ -56,14 +42,7 @@ export const RalphHome = () => {
         activeNetwork={activeNetwork}
       >
         {!isWalletConnected && (
-          <RalphWalletCard
-            activeNetwork={activeNetwork}
-            status={isWalletConnected ? "connected" : "disconnected"}
-            onDisconnect={onDisconnect}
-            connectedWallet={connectedWallet}
-            connectedAccount={connectedAccount}
-            connectedWalletNetwork={connectedWalletNetwork}
-          />
+          <RalphWalletCard/>
         )}
 
         <RalphMintCard
@@ -83,14 +62,7 @@ export const RalphHome = () => {
           />
         }
         {isWalletConnected && (
-          <RalphWalletCard
-            activeNetwork={activeNetwork}
-            status={isWalletConnected ? "connected" : "disconnected"}
-            onDisconnect={onDisconnect}
-            connectedWallet={connectedWallet}
-            connectedAccount={connectedAccount}
-            connectedWalletNetwork={connectedWalletNetwork}
-          />
+          <RalphWalletCard/>
         )}
       </PageTemplate>
     </div>

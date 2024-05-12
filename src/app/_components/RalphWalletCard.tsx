@@ -1,7 +1,7 @@
-import { type Signal } from "@preact/signals-react";
+import { useSignal } from "@preact/signals-react";
 import { type Chain, createThirdwebClient } from "@maany_shr/thirdweb";
 import { ConnectButton, type Theme } from "@maany_shr/thirdweb/react";
-import { type Account, type Wallet } from "@maany_shr/thirdweb/wallets";
+import { type Wallet } from "@maany_shr/thirdweb/wallets";
 import { env } from "~/env";
 import { TextButton, WalletCard } from "@maany_shr/ralph-the-moose-ui-kit";
 import {
@@ -10,43 +10,76 @@ import {
 } from "~/lib/infrastructure/config/chains";
 import { RALPH_PUBLIC_ICON_URL } from "~/lib/infrastructure/config/ralph_public_assets";
 import { SUPPORTED_WALLETS } from "~/lib/infrastructure/config/wallets";
+import { appContainer } from "~/lib/infrastructure/config/ioc/container";
+import type WalletProviderOutputPort from "~/lib/core/ports/secondary/wallet-provider-output-port";
+import { GATEWAYS } from "~/lib/infrastructure/config/ioc/symbols";
 
 /**
  * Props for the RalphWalletCard component.
  */
-export interface RalphWalletCardProps {
-  /**
-   * The status of the wallet connection.
-   * Possible values are "connected" or "disconnected".
-   */
-  status: "connected" | "disconnected";
-  /**
-   * The connected wallet
-   */
-  connectedWallet?: Wallet;
-  /**
-   * The connected account
-   */
-  connectedAccount?: Account;
-  /**
-   * Connected Wallet's Network
-   */
-  connectedWalletNetwork: Chain | undefined;
-  /**
-   * The currently active network
-   */
-  activeNetwork: Signal<TChainConfig>;
-  /**
-   * Callback function to be called when the wallet is disconnected.
-   */
-  onDisconnect: () => void;
-}
+// export interface RalphWalletCardProps {
+//   /**
+//    * The status of the wallet connection.
+//    * Possible values are "connected" or "disconnected".
+//    */
+//   status: "connected" | "disconnected";
+//   /**
+//    * The connected wallet
+//    */
+//   connectedWallet?: Wallet;
+//   /**
+//    * The connected account
+//    */
+//   connectedAccount?: Account;
+//   /**
+//    * Connected Wallet's Network
+//    */
+//   connectedWalletNetwork: Chain | undefined;
+//   /**
+//    * The currently active network
+//    */
+//   activeNetwork: Signal<TChainConfig>;
+//   /**
+//    * Callback function to be called when the wallet is disconnected.
+//    */
+//   onDisconnect: () => void;
+// }
 
 /**
  * Wraps the WalletCard component with the ThirdWeb ConnectWallet component
  */
-export const RalphWalletCard = (props: RalphWalletCardProps) => {
+export const RalphWalletCard = () => {
+  const S_Wallet_Connection_Status = useSignal<"connected" | "disconnected">("disconnected");
+  const S_ActiveWalletName = useSignal<string>("");
+  const S_ActiveWalletAddress = useSignal<string>("");
+
+  const walletProvider: WalletProviderOutputPort<Wallet> = appContainer.get<
+    WalletProviderOutputPort<Wallet>
+  >(GATEWAYS.WALLET_PROVIDER);
   
+  const activeWalletDTO = walletProvider.getActiveWallet();
+  if (!activeWalletDTO.success) {
+    S_Wallet_Connection_Status.value = "disconnected";
+  } else {
+    S_Wallet_Connection_Status.value = "connected";
+    S_ActiveWalletName.value = activeWalletDTO.data.name;
+    S_ActiveWalletAddress.value = activeWalletDTO.data.activeAccount;
+  }
+
+  
+  /**
+   * Disconnect Wallet
+   */
+  const onDisconnect = () => {
+    const connectedWalletInstance = activeWalletDTO.walletInstance;
+    if (!connectedWalletInstance) return;
+    walletProvider.disconnect(connectedWalletInstance);
+  };
+
+  const disconnectButton = (
+    <TextButton text="Disconnect" size="medium" onClick={onDisconnect} />
+  );
+
   /**
    * Theme for the Connect Wallet Modal
    */
@@ -106,47 +139,37 @@ export const RalphWalletCard = (props: RalphWalletCardProps) => {
           description: "Project Ralph",
           url: "https://ralphthemoose.com",
         }}
-        chain={props.activeNetwork.value.thirdWeb}
+        // chain={props.activeNetwork.value.thirdWeb}
         chains={supportedChains}
         connectButton={{
           label: "Connect Wallet",
           className: "connectButton",
           // style: {}
         }}
-        connectModal={
-          {
-            title: "Connect Wallet",
-            titleIcon: "Connect your wallet to get started",
-            size: "wide",
-            welcomeScreen: {
-              title: "Welcome to Ralph",
-              subtitle: "Connect your wallet to get started",
-              img: {
-                src: RALPH_PUBLIC_ICON_URL,
-                width: 100,
-                height: 100,
-              },
+        connectModal={{
+          title: "Connect Wallet",
+          titleIcon: "Connect your wallet to get started",
+          size: "wide",
+          welcomeScreen: {
+            title: "Welcome to Ralph",
+            subtitle: "Connect your wallet to get started",
+            img: {
+              src: RALPH_PUBLIC_ICON_URL,
+              width: 100,
+              height: 100,
             },
-            showThirdwebBranding: false,
-          }
-        }
+          },
+          showThirdwebBranding: false,
+        }}
       />
     </div>
-  );
-  /**
-   * The Disconnect Wallet Button
-   */
-  const disconnectButton = (
-    <TextButton text="Disconnect" size="medium" onClick={props.onDisconnect} />
   );
 
   return (
     <WalletCard
-      status={props.status}
-      address={
-        props.connectedAccount?.address ?? "Not connected"
-      }
-      walletName={props.connectedWallet?.id ?? "Not connected"}
+      status={S_Wallet_Connection_Status.value}
+      address={S_ActiveWalletAddress.value}
+      walletName={S_ActiveWalletName.value}
       connectButton={connectButton}
       disconnectButton={disconnectButton}
     />

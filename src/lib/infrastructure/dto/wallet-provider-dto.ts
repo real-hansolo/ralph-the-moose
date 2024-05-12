@@ -14,7 +14,7 @@ const ActiveWalletDTOSchema = DTOSchemaFactory(
 );
 
 export type ActiveWalletDTO<TWallet> = z.infer<typeof ActiveWalletDTOSchema> & {
-  wallet?: TWallet;
+  walletInstance?: TWallet;
 };
 
 const ConnectedWalletsDTOSchema = DTOSchemaFactory(

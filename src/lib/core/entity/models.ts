@@ -26,6 +26,7 @@ export type TNetwork = z.infer<typeof NetworkSchema>;
 
 export const WalletSchema = z.object({
   name: z.string(),
+  id: z.string(),
   provider: z.string(),
   activeAccount: z.string(),
   availableAccounts: z.array(z.string()),

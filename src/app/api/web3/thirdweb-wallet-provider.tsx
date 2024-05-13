@@ -1,18 +1,19 @@
-import { type Chain } from "@maany_shr/thirdweb/chains";
-import { createWallet, type Wallet } from "@maany_shr/thirdweb/wallets";
+import { type Wallet } from "@maany_shr/thirdweb/wallets";
 import { connectionManager } from "@maany_shr/thirdweb/react";
-import { type TWallet, type TNetwork } from "~/lib/core/entity/models";
+import { type TWallet } from "~/lib/core/entity/models";
 import type WalletProviderOutputPort from "~/lib/core/ports/secondary/wallet-provider-output-port";
 import type {
   ActiveWalletDTO,
   ConnectedWalletsDTO,
   DisconnectWalletDTO,
+  FromWalletInstanceDTO,
+  GetWalletInstanceDTO,
   SupportedWalletsDTO,
 } from "~/lib/core/dto/wallet-provider-dto";
 import { inject, injectable } from "inversify";
 import { GATEWAYS } from "~/lib/infrastructure/config/ioc/symbols";
 import NetworkGateway from "~/lib/infrastructure/gateways/network-gateway";
-import type { TNetworkDTO } from "~/lib/core/dto/network-dto";
+import { getNetworkFromThirdwebChain } from "~/lib/utils/networkUtils";
 
 @injectable()
 export class ThirdwebWalletProvider
@@ -25,44 +26,116 @@ export class ThirdwebWalletProvider
     return "thirdweb";
   }
 
-  getSupportedWallets(): SupportedWalletsDTO<Wallet> {
-    const thirdwebMetamask = createWallet("io.metamask");
+  getWalletInstance(wallet: TWallet): GetWalletInstanceDTO<Wallet> {
+    const thirdwebWallet = connectionManager.connectedWallets.getValue();
+    const walletInstance = thirdwebWallet.find(
+      (connectedWallet) => connectedWallet.id === wallet.id,
+    );
+    if (walletInstance === undefined) {
+      return {
+        success: false,
+        data: {
+          type: "wallet_provider_error",
+          message: `Wallet ${wallet.id} not found in thirdweb provider!`,
+        },
+      };
+    }
     return {
       success: true,
-      data: ["Metamask"],
-      walletInstances: [
+      data: walletInstance,
+    };
+  }
+
+  fromWalletInstance(walletInstance: Wallet): FromWalletInstanceDTO {
+    const activeAccount = walletInstance.getAccount();
+    const walletChain = walletInstance.getChain();
+    if (walletChain === undefined) {
+      return {
+        success: false,
+        data: {
+          type: "wallet_provider_error",
+          message: `Wallet ${walletInstance.id} is not connected to any chain!`,
+        },
+      };
+    }
+    if(activeAccount === undefined) {
+      return {
+        success: false,
+        data: {
+          type: "wallet_provider_error",
+          message: `Wallet ${walletInstance.id} has no active account!`,
+        },
+      };
+    }
+    const walletNetwork = getNetworkFromThirdwebChain(walletChain);
+    return {
+      success: true,
+      data: {
+        name: walletInstance.id,
+        id: walletInstance.id,
+        provider: "thirdweb",
+        activeAccount: activeAccount?.address,
+        availableAccounts: [],
+        activeNetwork: walletNetwork,
+      },
+    };
+  }
+
+  getSupportedWallets(): SupportedWalletsDTO {
+    return {
+      success: true,
+      data: [
         {
-          name: "Metamask",
-          walletInstance: thirdwebMetamask,
+          name: "io.metamask",
+          id: "io.metamask",
+          provider: "thirdweb",
         },
       ],
     };
   }
 
   getActiveWallet(): ActiveWalletDTO<Wallet> {
-    try {
-      const walletStore = connectionManager.activeWalletStore;
-      const thidwebWallet: Wallet | undefined = walletStore.getValue();
-      const activeWallet =
-        this.__transform__thirdweb_wallet_to_Wallet(thidwebWallet);
-      return {
-        success: true,
-        data: activeWallet,
-        walletInstance: thidwebWallet,
-      };
-    } catch (error: unknown) {
+    const walletStore = connectionManager.activeWalletStore;
+    const thidwebWallet: Wallet | undefined = walletStore.getValue();
+    if (thidwebWallet === undefined) {
       return {
         success: false,
         data: {
-          type: "unknown_error",
+          type: "wallet_not_connected",
         },
       };
     }
+    const dto = this.fromWalletInstance(thidwebWallet);
+    if (!dto.success) {
+      return {
+        success: false,
+        data: {
+          type: "wallet_not_connected",
+        },
+      };
+    }
+    const wallet = dto.data;
+    if (!wallet.activeAccount) {
+      return {
+        success: false,
+        data: {
+          type: "wallet_not_connected",
+        },
+      };
+    }
+    return {
+      success: true,
+      data: {
+        ...wallet,
+        activeAccount: wallet.activeAccount,
+      },
+      walletInstance: thidwebWallet,
+    };
   }
 
   getConnectedWallets(): ConnectedWalletsDTO {
     const store = connectionManager.connectedWallets;
-    const connectedWallets = store.getValue();
+    const connectedWallets = store.getValue().filter((wallet) => wallet !== undefined);
     if (connectedWallets.length === 0) {
       return {
         success: false,
@@ -71,36 +144,16 @@ export class ThirdwebWalletProvider
         },
       };
     }
+    const transformedWallets = connectedWallets.map((wallet) => {
+      const dto = this.fromWalletInstance(wallet);
+      if (dto.success && dto.data.activeAccount !== undefined) {
+        return dto.data;
+      }
+    }).filter((wallet) => wallet?.activeAccount !== undefined);
+
     return {
       success: true,
-      data: connectedWallets.map((thirdwebWallet) => {
-        try {
-          const wallet =
-            this.__transform__thirdweb_wallet_to_Wallet(thirdwebWallet);
-          return wallet;
-        } catch (error: unknown) {
-          return {
-            name: thirdwebWallet.id,
-            provider: "thirdweb",
-            activeAccount: "unknown",
-            availableAccounts: [],
-            activeNetwork: {
-              name: "Unknown",
-              chainId: 0,
-              explorer: { name: "", url: "" },
-              rpcProvider: '',
-              nativeCurrency: "",
-              gasLimit: 0,
-              fee: { minting: 0, wrapping: 0, unwrapping: 0 },
-              contracts: {
-                ralphReservoirAddress: "",
-                ralphTokenAddress: "",
-              },
-              icon: undefined,
-            },
-          };
-        }
-      }),
+      data: transformedWallets as unknown as TWallet[],
     };
   }
 
@@ -128,43 +181,5 @@ export class ThirdwebWalletProvider
         data: { error: error.toString() },
       };
     }
-  }
-
-  __transform__thirdweb_chain_to_Network(chain: Chain): TNetwork {
-    const walletNetworkDTO: TNetworkDTO = this.networkGateway.getNetwork(
-      chain.id,
-    );
-    if (!walletNetworkDTO.success) {
-      throw new Error(
-        `Wallet network ${chain.name}: ${chain.id} is not supported!`,
-      );
-    }
-    return walletNetworkDTO.data;
-  }
-
-  __transform__thirdweb_wallet_to_Wallet(wallet: Wallet | undefined): TWallet {
-    if (wallet === undefined) {
-      throw new Error("Wallet is undefined");
-    }
-    const activeAccount = wallet.getAccount();
-    if (activeAccount === undefined) {
-      throw new Error("Active account is undefined");
-    }
-
-    const walletChain = wallet.getChain();
-    if (walletChain === undefined) {
-      throw new Error("Wallet chain is undefined");
-    }
-
-    const walletNetwork =
-      this.__transform__thirdweb_chain_to_Network(walletChain);
-
-    return {
-      name: wallet.id,
-      provider: "thirdweb",
-      activeAccount: activeAccount.address,
-      availableAccounts: [],
-      activeNetwork: walletNetwork,
-    };
   }
 }

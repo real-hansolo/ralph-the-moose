@@ -1,9 +1,11 @@
 import { z } from "zod";
-import { WalletSchema } from "~/lib/core/entity/models";
+import { type TWallet, WalletSchema } from "~/lib/core/entity/models";
 import { DTOSchemaFactory } from "~/sdk/dto";
 
 const ActiveWalletDTOSchema = DTOSchemaFactory(
-  WalletSchema,
+  WalletSchema.merge(z.object({
+    activeAccount: z.string(),
+  })),
   z.object({
     type: z.enum([
       "unknown_error",
@@ -13,8 +15,8 @@ const ActiveWalletDTOSchema = DTOSchemaFactory(
   }),
 );
 
-export type ActiveWalletDTO<TWallet> = z.infer<typeof ActiveWalletDTOSchema> & {
-  walletInstance?: TWallet;
+export type ActiveWalletDTO<TWalletInstance> = z.infer<typeof ActiveWalletDTOSchema> & {
+  walletInstance?: TWalletInstance;
 };
 
 export const ConnectedWalletsDTOSchema = DTOSchemaFactory(
@@ -26,16 +28,23 @@ export const ConnectedWalletsDTOSchema = DTOSchemaFactory(
 
 export type ConnectedWalletsDTO = z.infer<typeof ConnectedWalletsDTOSchema>;
 
-export const SupportedWalletsDTOSchema = DTOSchemaFactory(
-  z.array(z.string()),
-  z.object({
-    type: z.enum(["no_wallets_supported", "unknown_error"]),
-  }),
-);
 
-export type SupportedWalletsDTO<TWalletInstance> = z.infer<
-  typeof SupportedWalletsDTOSchema
-> & {walletInstances? : [{name: string, walletInstance: TWalletInstance}]};
+
+export type SupportedWalletsDTO = {
+  success: true;
+  data: {
+    name: string;
+    id: string;
+    provider: string;
+  }[];
+} | {
+  success: false;
+  data: {
+    type: "wallet_provider_error";
+    message: string;
+  }
+}
+  
 
 
 export const DisconnectWalletDTOSchema = DTOSchemaFactory(z.object({
@@ -47,3 +56,26 @@ export const DisconnectWalletDTOSchema = DTOSchemaFactory(z.object({
 }));
 
 export type DisconnectWalletDTO = z.infer<typeof DisconnectWalletDTOSchema>;
+
+export type GetWalletInstanceDTO<TWalletInstance> = {
+  success: true;
+  data: TWalletInstance;
+} | {
+  success: false;
+  data: {
+    type: "wallet_provider_error";
+    message: string;
+  };
+};
+
+
+export type FromWalletInstanceDTO = {
+  success: true;
+  data: TWallet;
+} | {
+  success: false;
+  data: {
+    type: "wallet_provider_error";
+    message: string;
+  };
+};

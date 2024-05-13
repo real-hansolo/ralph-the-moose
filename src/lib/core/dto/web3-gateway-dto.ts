@@ -3,6 +3,7 @@ import {
   ContractSchema,
   ExecutedTransactionSchema,
   NetworkSchema,
+  PreparedContractCallSchema,
   PreparedTransactionSchema,
 } from "../entity/models";
 import { z } from "zod";
@@ -73,7 +74,7 @@ export const EstimateGasDTOSchema = DTOSchemaFactory(
   z.object({
     type: z.enum(["estimate_gas_error"]),
     message: z.string(),
-    preparedTransaction: PreparedTransactionSchema,
+    preparedTransaction: PreparedTransactionSchema.or(PreparedContractCallSchema),
   }),
 );
 

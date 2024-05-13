@@ -1,7 +1,6 @@
 import type RalphReservoirOutputPort from "~/lib/core/ports/secondary/ralph-reservoir-output-port";
 import type {
   TContract,
-  TExecutedTransaction,
   TNetwork,
   TPreparedContractCall,
   TWallet,
@@ -18,19 +17,14 @@ import {
   fromHumanReadableNumber,
   toHumanReadableNumber,
 } from "~/lib/utils/tokenUtils";
-import { inject, injectable } from "inversify";
-import { GATEWAYS } from "../config/ioc/symbols";
-// eslint-disable-next-line @typescript-eslint/consistent-type-imports
-import type Web3GatewayOutputPort from "~/lib/core/ports/secondary/web3-gateway-output-port";
+import { injectable } from "inversify";
 import { api } from "../trpc/react";
-import type { TExecutedTransactionDTO } from "~/lib/core/dto/web3-gateway-dto";
 import type { TSignal, TTransactionGasStatus } from "~/lib/core/entity/signals";
+import { callThirdWebContractUtil } from "~/lib/utils/transactionUtils";
 
 @injectable()
 export default class RalphReservoirGateway implements RalphReservoirOutputPort {
   constructor(
-    @inject(GATEWAYS.WEB3_GATEWAY)
-    private web3Gateway: Web3GatewayOutputPort<unknown, unknown, unknown>,
   ) {}
 
   __getEthContract(network: TNetwork): ethers.Contract {
@@ -57,61 +51,6 @@ export default class RalphReservoirGateway implements RalphReservoirOutputPort {
       network: network,
     };
   }
-
-  async __callContract(
-    wallet: TWallet,
-    preparedContractCall: TPreparedContractCall,
-    gasStatusSignal: TSignal<TTransactionGasStatus>,
-  ): Promise<TExecutedTransactionDTO> {
-    const preparedTransactionDTO =
-      this.web3Gateway.prepareContractCall(preparedContractCall);
-    if (!preparedTransactionDTO.success) {
-      return {
-        success: false,
-        data: {
-          from: wallet.activeAccount,
-          to: preparedContractCall.contract.address,
-          value: preparedContractCall.value,
-          data: preparedContractCall.data,
-          network: preparedContractCall.contract.network,
-          message: "Error preparing contract call",
-          type: "transaction_error",
-        },
-      };
-    }
-    const web3GatewayPreparedContractCall =
-      preparedTransactionDTO.preparedContractCall;
-
-    const estimatedGasDTO = await this.web3Gateway.estimateGas(
-      web3GatewayPreparedContractCall,
-    );
-    if (estimatedGasDTO.success) {
-      gasStatusSignal
-    }
-
-    const executedTransactionDTO = await this.web3Gateway.callContract(
-      web3GatewayPreparedContractCall,
-      preparedContractCall,
-      wallet,
-    );
-    if (!executedTransactionDTO.success) {
-      return {
-        success: false,
-        data: {
-          from: wallet.activeAccount,
-          to: preparedContractCall.contract.address,
-          value: preparedContractCall.value,
-          data: preparedContractCall.data,
-          network: preparedContractCall.contract.network,
-          message: `Error executing contract call. ${executedTransactionDTO.data.message}`,
-          type: "transaction_error",
-          
-        },
-      };
-    }
-    return executedTransactionDTO;
-  }
-
 
   async getClaimableAmount(
     walletAddress: string,
@@ -166,13 +105,14 @@ export default class RalphReservoirGateway implements RalphReservoirOutputPort {
       value: "0",
     };
 
-    const executedTransactionDTO = await this.__callContract(wallet, preparedContractCall, gasStatusSignal);
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
+    const executedTransactionDTO = await callThirdWebContractUtil(wallet, preparedContractCall, gasStatusSignal);
     if(!executedTransactionDTO.success) {
       return {
         success: false,
         data: {
           message: executedTransactionDTO.data.message,
-          walletAddress: wallet.activeAccount,
+          walletAddress: wallet.activeAccount ?? "address_not_known",
           network: network.name,
         },
       };
@@ -235,13 +175,13 @@ export default class RalphReservoirGateway implements RalphReservoirOutputPort {
     };
    
 
-    const executedTransactionDTO = await this.__callContract(wallet, contractCallDetails, gasStatusSignal);
+    const executedTransactionDTO = await callThirdWebContractUtil(wallet, contractCallDetails, gasStatusSignal);
     if(!executedTransactionDTO.success) {
       return {
         success: false,
         data: {
           message: executedTransactionDTO.data.message,
-          walletAddress: wallet.activeAccount,
+          walletAddress: wallet.activeAccount ?? "address_not_known",
           network: network.name,
         },
       };

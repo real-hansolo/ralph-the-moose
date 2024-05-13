@@ -12,7 +12,7 @@ import type { ActiveWalletDTO } from "../core/dto/wallet-provider-dto";
 export const callThirdWebContractUtil = async (
   wallet: TWallet,
   preparedContractCall: TPreparedContractCall,
-  gasStatusSignal: TSignal<TTransactionGasStatus>,
+  gasStatusSignal?: TSignal<TTransactionGasStatus>,
 ): Promise<TExecutedTransactionDTO> => {
   const web3Gateway = clientContainer.get<
     Web3GatewayOutputPort<Wallet, PreparedTransaction, PreparedTransaction>
@@ -119,7 +119,7 @@ export const callThirdWebContractUtil = async (
   const estimatedGasDTO = await web3Gateway.estimateGas(
     web3GatewayPreparedContractCall,
   );
-  if (estimatedGasDTO.success) {
+  if (estimatedGasDTO.success && gasStatusSignal) {
     gasStatusSignal.value.value = {
       estimatedGas: Number(estimatedGasDTO.data), // Convert bigint to number
       gasLimit: preparedContractCall.contract.network.gasLimit,

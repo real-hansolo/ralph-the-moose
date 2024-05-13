@@ -1,7 +1,8 @@
-import { type Signal } from "@preact/signals-react";
-import { type TNetwork, NetworkSchema } from "./models";
+import { signal, type Signal } from "@preact/signals-react";
+import type { TNetwork, TPreparedTransaction } from "./models";
+import { injectable } from "inversify";
 
-export type TSignal<TValue> = {
+export interface TSignal<TValue> {
     name: string;
     description: string;
     value: Signal<TValue>;
@@ -45,3 +46,21 @@ type TMintingError = {
 }
 
 export type TMintInfo = TMintingStatus | TMintingSuccess | TMintingError;
+
+
+export type TTransactionGasStatus = {
+    estimatedGas: number;
+    gasLimit: number;
+    preparedTransaction: TPreparedTransaction | undefined;
+}
+
+@injectable()
+export class S_TransactionGasStatus implements TSignal<TTransactionGasStatus> {
+    name = "Transaction Gas Status";
+    description ="Signal to show transaction gas status";
+    value = signal({
+        gasLimit: 0,
+        estimatedGas: 0,
+        preparedTransaction: undefined
+    });
+}

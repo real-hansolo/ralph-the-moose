@@ -18,4 +18,17 @@ export const rpcRouter = createTRPCRouter({
       );
       return rpcGateway.getTransactionByHash(input.networkId, input.hash);
     }),
+    
+    getRpcProvider: publicProcedure
+    .input(
+      z.object({
+        networkId: z.number(),
+      }),
+    )
+    .query(({ input }) => {
+      const rpcGateway = serverContainer.get<RPCGatewayOutputPort>(
+        GATEWAYS.RPC_GATEWAY,
+      );
+      return rpcGateway.getRpcURL(input.networkId);
+    }),
 });

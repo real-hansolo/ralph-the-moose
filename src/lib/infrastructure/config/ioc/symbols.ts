@@ -1,5 +1,6 @@
 const SIGNALS = {
     ACTIVE_NETWORK: Symbol.for('ActiveNetwork'),
+    TRANSACTION_GAS_STATUS: Symbol.for('TransactionGasStatus'),
     MINTING_ENABLED: Symbol.for('MintingEnabled'),
 }
 

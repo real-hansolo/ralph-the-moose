@@ -11,7 +11,8 @@
         "name": "Next.js: client-side",
         "type": "chrome",
         "request": "launch",
-        "url": "http://localhost:3000"
+        "url": "http://localhost:3000",
+        "userDataDir": "${workspaceRoot}/.vscode/chrome",
       },
       {
         "name": "Next.js: full stack",

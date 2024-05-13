@@ -52,13 +52,43 @@ export const PreparedTransactionSchema = z.object({
 
 export type TPreparedTransaction = z.infer<typeof PreparedTransactionSchema>;
 
-export const ExecutedTransactionSchema = PreparedTransactionSchema.merge(z.object({
-  status: z.enum(["success", "error", "partial"]),
-  hash: z.string(),
-  blockNumber: z.number(),
-  timestamp: z.string(),
-  explorerUrl: z.string().url(),
-  from: z.string(),
-}));
+export const ExecutedTransactionSchema = PreparedTransactionSchema.merge(
+  z.object({
+    status: z.enum(["success", "error", "partial"]),
+    hash: z.string(),
+    blockNumber: z.number(),
+    timestamp: z.string(),
+    explorerUrl: z.string().url(),
+    from: z.string(),
+  }),
+);
 
 export type TExecutedTransaction = z.infer<typeof ExecutedTransactionSchema>;
+
+export const PreparedContractCallSchema = z.object({
+  contract: ContractSchema,
+  method: z.object({
+    inputs: z.array(
+      z.object({
+        name: z.string(),
+        type: z.string(),
+        internalType: z.string().optional(),
+      }),
+    ),
+    name: z.string(),
+    outputs: z.array(
+      z.object({
+        name: z.string(),
+        type: z.string(),
+        internalType: z.string().optional(),
+      }),
+    ),
+    stateMutability: z.any(),
+    type: z.any(),
+  }),
+  params: z.array(z.string().or(z.bigint()).or(z.boolean())),
+  value: z.string(),
+  data: z.string().optional(),
+});
+
+export type TPreparedContractCall = z.infer<typeof PreparedContractCallSchema>;

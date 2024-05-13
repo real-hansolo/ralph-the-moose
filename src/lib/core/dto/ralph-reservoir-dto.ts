@@ -1,5 +1,6 @@
 import { z } from "zod";
 import { DTOSchemaFactory } from "~/sdk/dto";
+import { ExecutedTransactionSchema } from "../entity/models";
 
 export const ClaimableDTOSchema = DTOSchemaFactory(
     z.object({
@@ -13,3 +14,15 @@ export const ClaimableDTOSchema = DTOSchemaFactory(
 );
 
 export type ClaimableDTO = z.infer<typeof ClaimableDTOSchema>;
+
+
+export const ClaimDTOSchema = DTOSchemaFactory(
+    ExecutedTransactionSchema,
+    z.object({
+        walletAddress: z.string(),
+        network: z.string(),
+        message: z.string(),
+    }),
+);
+
+export type ClaimDTO = z.infer<typeof ClaimDTOSchema>;

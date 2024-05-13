@@ -3,6 +3,8 @@ import {
   createThirdwebClient,
   toWei,
   prepareTransaction,
+  prepareContractCall,
+  getContract,
   estimateGas,
   sendTransaction,
   type PreparedTransaction,
@@ -14,46 +16,43 @@ import type {
   TPreparedTransactionDTO,
   TExecutedTransactionDTO,
   TEstimateGasDTO,
+  TPreparedContractCallDTO,
 } from "~/lib/core/dto/web3-gateway-dto";
-import type { TNetwork, TPreparedTransaction } from "~/lib/core/entity/models";
+import type {
+  TPreparedContractCall,
+  TPreparedTransaction,
+} from "~/lib/core/entity/models";
 import type Web3GatewayOutputPort from "~/lib/core/ports/secondary/web3-gateway-output-port";
 import { api } from "~/lib/infrastructure/trpc/react";
+import { injectable } from "inversify";
 
-
+@injectable()
 export default class ThirdwebWeb3Gateway
-  implements Web3GatewayOutputPort<Wallet, PreparedTransaction>
+  implements
+    Web3GatewayOutputPort<Wallet, PreparedTransaction, PreparedTransaction>
 {
   private thirdWebClient: ThirdwebClient;
-  constructor() {
+  constructor(
+  ) {
     this.thirdWebClient = createThirdwebClient({
       clientId: env.NEXT_PUBLIC_THIRDWEB_CLIENT_ID,
     });
   }
 
-
-  async prepareTransaction(
-    to: string,
-    network: TNetwork,
-    value: string,
-    data: string,
-  ): Promise<TPreparedTransactionDTO<PreparedTransaction>> {
+  prepareTransaction(
+    transactionDetails: TPreparedTransaction,
+  ): TPreparedTransactionDTO<PreparedTransaction> {
     try {
-      const chain = getThirdWebChain(network.name);
+      const chain = getThirdWebChain(transactionDetails.network.name);
       const thirdWebTx = prepareTransaction({
-        to: to,
-        value: toWei(value),
-        data: `0x${data}`,
+        to: transactionDetails.to,
+        value: toWei(transactionDetails.value),
+        data: `0x${transactionDetails.data}`,
         chain: chain,
         client: this.thirdWebClient,
       });
       return {
         success: true,
-        data: {
-          to: to,
-          value: value,
-          data: data,
-          network: network,
-        },
         preparedTransaction: thirdWebTx as PreparedTransaction,
       };
     } catch (e) {
@@ -62,10 +61,10 @@ export default class ThirdwebWeb3Gateway
         data: {
           type: "prepared_transaction_error",
           message: `Error preparing transaction using Thirdweb`,
-          to: to,
-          value: value,
-          data: data,
-          network: network,
+          to: transactionDetails.to,
+          value: transactionDetails.value,
+          data: transactionDetails.data,
+          network: transactionDetails.network,
         },
       };
     }
@@ -101,9 +100,14 @@ export default class ThirdwebWeb3Gateway
     const txDetailsDTOQuery = api.rpc.getTransaction.useQuery({
       hash: transactionHash,
       networkId: transactionDetails.network.chainId,
-    })
+    });
     const txDetailsDTO = txDetailsDTOQuery.data;
-    if(txDetailsDTOQuery.error ?? !txDetailsDTO ?? !txDetailsDTO.success ?? !txDetailsDTO.data) {
+    if (
+      txDetailsDTOQuery.error ??
+      !txDetailsDTO ??
+      !txDetailsDTO.success ??
+      !txDetailsDTO.data
+    ) {
       return {
         success: true,
         data: {
@@ -138,13 +142,76 @@ export default class ThirdwebWeb3Gateway
     };
   }
 
-  async estimateGas(preparedTransaction: PreparedTransaction): Promise<TEstimateGasDTO> {
+  prepareContractCall(
+    preparedContractCall: TPreparedContractCall,
+  ): TPreparedContractCallDTO<PreparedTransaction> {
+    let thirdwebChain;
+    try {
+      thirdwebChain = getThirdWebChain(
+        preparedContractCall.contract.network.name,
+      );
+    } catch (e) {
+      return {
+        success: false,
+        data: {
+          type: "contract_preparation_error",
+          message: `Error preparing contract call using Thirdweb. Mapping for chain: ${preparedContractCall.contract.network.name} not found.`,
+        },
+      };
+    }
+
+    try {
+      const thirdwebContract = getContract({
+        client: this.thirdWebClient,
+        address: preparedContractCall.contract.address,
+        chain: thirdwebChain,
+      });
+      const transaction = prepareContractCall({
+        contract: thirdwebContract,
+        method: {
+          name: preparedContractCall.method.name,
+          type: preparedContractCall.method.type,
+          inputs: preparedContractCall.method.inputs,
+          outputs: preparedContractCall.method.outputs,
+          stateMutability: preparedContractCall.method.stateMutability,
+        },
+        params: preparedContractCall.params,
+      });
+      return {
+        success: true,
+        preparedContractCall: transaction as PreparedTransaction,
+      };
+    } catch (e) {
+      return {
+        success: false,
+        data: {
+          type: "contract_preparation_error",
+          message: `Error preparing contract call for method ${preparedContractCall.method.name} of ${preparedContractCall.contract.name} using Thirdweb. Network: ${preparedContractCall.contract.network.name} `,
+        },
+      };
+    }
+  }
+
+  async callContract(preparedContractCall: PreparedTransaction, contractCallDetails: TPreparedContractCall, wallet: Wallet): Promise<TExecutedTransactionDTO> {
+    const transactionDetails: TPreparedTransaction = {
+      to: contractCallDetails.contract.address,
+      value: contractCallDetails.value,
+      data: contractCallDetails.data,
+      network: contractCallDetails.contract.network,
+    };
+    const executedTransactionDTO = await this.sendTransaction(preparedContractCall, transactionDetails, wallet);
+    return executedTransactionDTO;
+  }
+
+  async estimateGas(
+    preparedTransaction: PreparedTransaction,
+  ): Promise<TEstimateGasDTO> {
     const estimatedGas = await estimateGas({
       transaction: preparedTransaction,
     });
     return {
-        success: true,
-        data: estimatedGas,
+      success: true,
+      data: estimatedGas,
     };
   }
 }

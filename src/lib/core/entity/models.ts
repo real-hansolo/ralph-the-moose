@@ -20,6 +20,10 @@ export const NetworkSchema = z.object({
     ralphReservoirAddress: z.string(),
     ralphTokenAddress: z.string(),
   }),
+  indexer: z.object({
+    url: z.string().url(),
+    secure: z.boolean(),
+  })
 });
 
 export type TNetwork = z.infer<typeof NetworkSchema>;

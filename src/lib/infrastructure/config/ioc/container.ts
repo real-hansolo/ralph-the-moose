@@ -17,7 +17,7 @@ const clientContainer = new Container();
 clientContainer.bind<NetworkGatewayOutputPort>(GATEWAYS.NETWORK_GATEWAY).to(NetworkGateway);
 clientContainer.bind<WalletProviderOutputPort<unknown>>(GATEWAYS.WALLET_PROVIDER).to(ThirdwebWalletProvider);
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-clientContainer.bind<Web3GatewayOutputPort<any, any>>(GATEWAYS.WEB3_GATEWAY).to(ThirdwebWeb3Gateway);
+clientContainer.bind<Web3GatewayOutputPort<any, any, any>>(GATEWAYS.WEB3_GATEWAY).to(ThirdwebWeb3Gateway);
 const signalsContainer = new Container();
 signalsContainer.bind<TSignal<boolean>>(SIGNALS.MINTING_ENABLED).toConstantValue(
     {

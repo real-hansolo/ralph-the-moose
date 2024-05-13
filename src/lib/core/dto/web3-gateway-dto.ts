@@ -19,7 +19,7 @@ export const ContractDTOSchema = DTOSchemaFactory(
 export type TContractDTO = z.infer<typeof ContractDTOSchema>;
 
 export const TPreparedTransactionDTOSchema = DTOSchemaFactory(
-  PreparedTransactionSchema,
+  z.any(),
   z.object({
     type: z.enum(["prepared_transaction_error"]),
     message: z.string(),
@@ -49,12 +49,24 @@ export const TExecutedTransactionDTOSchema = DTOSchemaFactory(
     value: z.string(),
     data: z.string().optional(),
     network: NetworkSchema,
-  }),
+  })
 );
+
 
 export type TExecutedTransactionDTO = z.infer<
   typeof TExecutedTransactionDTOSchema
 >;
+
+export const TPreparedContractCallDTOSchema = DTOSchemaFactory(
+  z.optional(z.string()),
+  z.object({
+    type: z.enum(["contract_preparation_error"]),
+    message: z.string(),
+  })
+)
+
+export type TPreparedContractCallDTO<TPreparedContractCall> = z.infer<typeof TPreparedContractCallDTOSchema> & { preparedContractCall?: TPreparedContractCall };
+
 
 export const EstimateGasDTOSchema = DTOSchemaFactory(
   z.bigint(),

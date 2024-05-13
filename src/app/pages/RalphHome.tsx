@@ -19,6 +19,11 @@ import {
   PageTemplate,
   type ToastProps,
 } from "@maany_shr/ralph-the-moose-ui-kit";
+import { GATEWAYS } from "~/lib/infrastructure/config/ioc/symbols";
+import type NetworkGatewayOutputPort from "~/lib/core/ports/secondary/network-gateway-output-port";
+import { type TNetwork } from "~/lib/core/entity/models";
+import type IndexerGatewayOutputPort from "~/lib/core/ports/secondary/indexer-gateway-output-port";
+import { clientContainer } from "~/lib/infrastructure/config/ioc/container";
 
 export const RalphHome = () => {
   /**
@@ -29,6 +34,22 @@ export const RalphHome = () => {
   const connectedWalletNetwork: Chain | undefined = useActiveWalletChain();
   const isWalletConnected = connectedWallet !== undefined;
 
+  const indexerFactory: (network: TNetwork) => IndexerGatewayOutputPort = clientContainer.get(GATEWAYS.INDEXER_GATEWAY_FACTORY);
+  const networkGateway: NetworkGatewayOutputPort = clientContainer.get<NetworkGatewayOutputPort>(GATEWAYS.NETWORK_GATEWAY);
+  const activeNetworkDTO = networkGateway.getActiveNetwork();
+  if (!activeNetworkDTO.success) {
+    throw new Error("Error getting active network");
+  }
+  const tempActiveNetwork = activeNetworkDTO.data;
+  const indexer = indexerFactory(tempActiveNetwork);
+  indexer.getAllMinted()
+    .then((res) => {
+      console.log(res);
+    })
+    .catch((e) => {
+      console.log("Error fetching minted", e);
+    });
+  
   /**
    * [Signal] Toasts: Store the toasts to be displayed on the screen.
    */

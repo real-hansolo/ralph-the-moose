@@ -1,5 +1,5 @@
 import { signal, type Signal } from "@preact/signals-react";
-import type { TNetwork, TPreparedTransaction } from "./models";
+import type { TNetwork, TPreparedContractCall, TPreparedTransaction } from "./models";
 import { injectable } from "inversify";
 
 export interface TSignal<TValue> {
@@ -51,7 +51,7 @@ export type TMintInfo = TMintingStatus | TMintingSuccess | TMintingError;
 export type TTransactionGasStatus = {
     estimatedGas: number;
     gasLimit: number;
-    preparedTransaction: TPreparedTransaction | undefined;
+    preparedTransaction: TPreparedTransaction |TPreparedContractCall |  undefined;
 }
 
 @injectable()

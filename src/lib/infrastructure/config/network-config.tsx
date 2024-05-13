@@ -21,6 +21,10 @@ export const BASE: TNetwork = {
         ralphTokenAddress: "0x05F1938646a897008e813fb03CE7C575eAE45738"
     },
     icon: <IconNetworkBase />,
+    indexer: {
+        url: "http://162.244.82.115:8000", // TODO: move to env
+        secure: false,
+    },
 }
 
 export const BASE_SEPOLIA: TNetwork = {
@@ -43,5 +47,9 @@ export const BASE_SEPOLIA: TNetwork = {
         ralphTokenAddress: "0xA415b2Df73D9E1D0415de58f012E2cB3E059F2E1",
     },
     icon: <IconNetworkBase />,
+    indexer: {
+        url: "http://162.244.82.115:8000",
+        secure: false,
+    },
 }
 

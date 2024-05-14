@@ -1,6 +1,6 @@
 import { type Wallet } from "@maany_shr/thirdweb/wallets";
 import type { TExecutedTransactionDTO } from "../core/dto/web3-gateway-dto";
-import type { TWallet, TPreparedContractCall } from "../core/entity/models";
+import type { TWallet, TPreparedContractCall, TPreparedTransaction } from "../core/entity/models";
 import type { TSignal, TTransactionGasStatus } from "../core/entity/signals";
 import type Web3GatewayOutputPort from "../core/ports/secondary/web3-gateway-output-port";
 import { type PreparedTransaction } from "@maany_shr/thirdweb";
@@ -94,7 +94,7 @@ export const callThirdWebContractUtil = async (
         value: preparedContractCall.value,
         data: preparedContractCall.data,
         network: preparedContractCall.contract.network,
-        message: "Error preparing contract call",
+        message: `Error preparing contract call. ${preparedTransactionDTO.data.message}`,
         type: "transaction_error",
       },
     };
@@ -133,19 +133,129 @@ export const callThirdWebContractUtil = async (
     thirdwebWallet,
   );
 
-  if (!executedTransactionDTO.success) {
+  return executedTransactionDTO;
+};
+
+export const sendThirdWebTransactionUtil = async (
+  wallet: TWallet,
+  preparedTransaction: TPreparedTransaction,
+  gasStatusSignal?: TSignal<TTransactionGasStatus>,
+): Promise<TExecutedTransactionDTO> => {
+  const web3Gateway = clientContainer.get<
+    Web3GatewayOutputPort<Wallet, PreparedTransaction, PreparedTransaction>
+  >(GATEWAYS.WEB3_GATEWAY);
+  const walletProvider = clientContainer.get<WalletProviderOutputPort<Wallet>>(
+    GATEWAYS.WALLET_PROVIDER,
+  );
+  const activeWalletDTO: ActiveWalletDTO<Wallet> =
+    walletProvider.getActiveWallet();
+  if (!activeWalletDTO.success) {
     return {
       success: false,
       data: {
-        from: wallet.activeAccount,
-        to: preparedContractCall.contract.address,
-        value: preparedContractCall.value,
-        data: preparedContractCall.data,
-        network: preparedContractCall.contract.network,
-        message: `Error executing contract call. ${executedTransactionDTO.data.message}`,
+        from: wallet.activeAccount ?? "",
+        to: preparedTransaction.to,
+        value: preparedTransaction.value,
+        data: preparedTransaction.data,
+        network: preparedTransaction.network,
+        message: `Error getting active wallet. ${activeWalletDTO.data.type}`,
         type: "transaction_error",
       },
     };
   }
+
+  if (activeWalletDTO.data.activeAccount === undefined) {
+    return {
+      success: false,
+      data: {
+        from: wallet.activeAccount ?? "",
+        to: preparedTransaction.to,
+        value: preparedTransaction.value,
+        data: preparedTransaction.data,
+        network: preparedTransaction.network,
+        message: "Cannot determine active account of connected wallet.",
+        type: "transaction_error",
+      },
+    };
+  }
+
+  if (activeWalletDTO.data.activeAccount !== wallet.activeAccount) {
+    return {
+      success: false,
+      data: {
+        from: wallet.activeAccount ?? "",
+        to: preparedTransaction.to,
+        value: preparedTransaction.value,
+        data: preparedTransaction.data,
+        network: preparedTransaction.network,
+        message: `Account being used for transaction is not active. ${wallet.activeAccount} is not active. The active account is: ${activeWalletDTO.data.activeAccount}`,
+        type: "transaction_error",
+      },
+    };
+  }
+
+  const thirdwebWallet = activeWalletDTO.walletInstance;
+  if (thirdwebWallet === undefined) {
+    return {
+      success: false,
+      data: {
+        from: wallet.activeAccount,
+        to: preparedTransaction.to,
+        value: preparedTransaction.value,
+        data: preparedTransaction.data,
+        network: preparedTransaction.network,
+        message: "Cannot proceed. Thirdweb Wallet Instance was not found in thirdweb provider",
+        type: "transaction_error",
+      },
+    };
+  }
+
+  const preparedTransactionDTO = web3Gateway.prepareTransaction(preparedTransaction);
+  if (!preparedTransactionDTO.success) {
+    return {
+      success: false,
+      data: {
+        from: wallet.activeAccount,
+        to: preparedTransaction.to,
+        value: preparedTransaction.value,
+        data: preparedTransaction.data,
+        network: preparedTransaction.network,
+        message: `Error preparing transaction. ${preparedTransactionDTO.data.message}`,
+        type: "transaction_error",
+      },
+    };
+  }
+  const web3GatewayPreparedTransaction = preparedTransactionDTO.preparedTransaction;
+  
+  if (!web3GatewayPreparedTransaction) {
+    return {
+      success: false,
+      data: {
+        from: wallet.activeAccount,
+        to: preparedTransaction.to,
+        value: preparedTransaction.value,
+        data: preparedTransaction.data,
+        network: preparedTransaction.network,
+        message: "Error preparing transaction",
+        type: "transaction_error",
+      },
+    };
+  }
+
+  const estimatedGasDTO = await web3Gateway.estimateGas(web3GatewayPreparedTransaction);
+  if (estimatedGasDTO.success && gasStatusSignal) {
+    gasStatusSignal.value.value = {
+      estimatedGas: Number(estimatedGasDTO.data), // Convert bigint to number
+      gasLimit: preparedTransaction.network.gasLimit,
+      preparedTransaction: preparedTransaction,
+    };
+  }
+
+  const executedTransactionDTO = await web3Gateway.sendTransaction(
+    web3GatewayPreparedTransaction,
+    preparedTransaction,
+    thirdwebWallet,
+  );
+
   return executedTransactionDTO;
-};
+}

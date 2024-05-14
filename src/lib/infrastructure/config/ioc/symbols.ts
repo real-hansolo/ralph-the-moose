@@ -14,4 +14,12 @@ const GATEWAYS = {
     RALPH_RESERVOIR_GATEWAY: Symbol.for('RalphReservoirGateway'),
 }
 
-export { SIGNALS, GATEWAYS };
+const USECASE = {
+    MINTING_USECASE_FACTORY: Symbol.for('MintingUsecaseFactory'),
+}
+
+const CONTROLLER = {
+    MINTING_CONTROLLER: Symbol.for('MintingController'),
+
+}
+export { SIGNALS, GATEWAYS, USECASE, CONTROLLER };

@@ -1,4 +1,4 @@
-import { IconNetworkBase } from "@maany_shr/ralph-the-moose-ui-kit";
+import { IconElk, IconNetworkBase } from "@maany_shr/ralph-the-moose-ui-kit";
 import type { TNetwork } from "~/lib/core/entity/models";
 
 export const BASE: TNetwork = {
@@ -57,3 +57,30 @@ export const BASE_SEPOLIA: TNetwork = {
     },
 }
 
+export const AVALANCHE: TNetwork = {
+    chainId: 43114,
+    name: "Avalanche",
+    explorer: { 
+        name: "Avalanche Explorer",
+        url: "https://cchain.explorer.avax.network/" 
+    },
+    rpcProvider: "infura",
+    nativeCurrency: "AVAX",
+    gasLimit: 200000,
+    fee: { 
+        minting: 0.00123,
+        wrapping: 0.00123,
+        unwrapping: 0.00123,
+        bridging: 0
+    },
+    contracts: {
+        ralphReservoirAddress: "0x27e964E016B68EeFbe958Ace62174af0e1CeD053",
+        ralphTokenAddress: "0x05F1938646a897008e813fb03CE7C575eAE45738",
+        bridgeHeadAddress: "0x3fE823F666DC2C09F8FA86AFB0B0af5152d2c6ab"
+    },
+    icon: <IconElk size={4} />,
+    indexer: {
+        url: "http://162.244.82.115:8000", // TODO: move to env
+        secure: false
+    },
+}

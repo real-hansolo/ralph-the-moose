@@ -41,10 +41,10 @@ import type { UnWrappingInputPort } from "~/lib/core/ports/primary/unwrapping-pr
 import type { TUnwrappingViewModel } from "~/lib/core/view-models/unwrapping-view-model";
 import UnwrappingUsecase from "~/lib/core/usecase/unwrapping-usecase";
 import BridgingController from "../../controllers/bridging-controller";
-import { BridgingInputPort } from "~/lib/core/ports/primary/bridging-primary-ports";
-import { TBridgingViewModel } from "~/lib/core/view-models/bridging-view-model";
+import type { BridgingInputPort } from "~/lib/core/ports/primary/bridging-primary-ports";
+import type { TBridgingViewModel } from "~/lib/core/view-models/bridging-view-model";
 import BridgingPresenter from "../../presenters/bridging-presenter";
-import ElkBridgeHeadOutputPort from "~/lib/core/ports/secondary/elk-bridgehead-output-port";
+import type ElkBridgeHeadOutputPort from "~/lib/core/ports/secondary/elk-bridgehead-output-port";
 import ElkBridgeHeadGateway from "../../gateways/elk-bridge-head-gateway";
 import BridgingUsecase from "~/lib/core/usecase/bridging-usecase";
 

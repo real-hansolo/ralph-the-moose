@@ -4,6 +4,7 @@ import type { TBridgingViewModel } from "~/lib/core/view-models/bridging-view-mo
 import type { BridgingInputPort } from "~/lib/core/ports/primary/bridging-primary-ports";
 import { clientContainer } from "../config/ioc/container";
 import { USECASE } from "../config/ioc/symbols";
+import { injectable } from "inversify";
 
 export interface TBridgingControllerParameters {
     wallet: TWallet;
@@ -13,6 +14,7 @@ export interface TBridgingControllerParameters {
     response: TSignal<TBridgingViewModel>;
 }
 
+@injectable()
 export default class BridgingController {
     async execute(controllerParameters: TBridgingControllerParameters): Promise<void> {
         const bridgingRequest = {

@@ -37,7 +37,9 @@ export const MintingProgressResponseSchema = z.object({
     amount: z.number(),
     network: NetworkSchema,
     wallet: WalletSchema,
-    indexerBlockNumber: z.number()
+    indexerBlockNumber: z.number(),
+    intialIndexerBlockNumber: z.number(),
+    s_gas_status: z.any().optional()
 })
 
 export type TMintingProgressResponse = z.infer<typeof MintingProgressResponseSchema>

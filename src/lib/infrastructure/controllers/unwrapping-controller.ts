@@ -5,6 +5,7 @@ import { UnwrappingRequestSchema } from "~/lib/core/usecase-models/unwrapping-us
 import type { TUnwrappingViewModel } from "~/lib/core/view-models/unwrapping-view-model";
 import { clientContainer } from "../config/ioc/container";
 import { USECASE } from "../config/ioc/symbols";
+import { injectable } from "inversify";
 
 export interface TUnwrappingControllerParameters {
     wallet: TWallet;
@@ -13,6 +14,7 @@ export interface TUnwrappingControllerParameters {
     response: TSignal<TUnwrappingViewModel>;
 }
 
+@injectable()
 export default class UnwrappingController {
     async execute(controllerParameters: TUnwrappingControllerParameters): Promise<void> {
         const unwrappingRequest = UnwrappingRequestSchema.parse({

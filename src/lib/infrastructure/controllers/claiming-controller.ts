@@ -5,6 +5,7 @@ import { ClaimingRequestSchema } from "~/lib/core/usecase-models/claiming-usecas
 import type { TClaimingViewModel } from "~/lib/core/view-models/claiming-view-model";
 import { clientContainer } from "../config/ioc/container";
 import { USECASE } from "../config/ioc/symbols";
+import { injectable } from "inversify";
 
 export interface TClaimingControllerParameters {
   wallet: TWallet;
@@ -13,6 +14,7 @@ export interface TClaimingControllerParameters {
   response: TSignal<TClaimingViewModel>;
 }
 
+@injectable()
 export default class ClaimingController {
   async execute(controllerParameters: TClaimingControllerParameters): Promise<void> {
     const claimingRequest = ClaimingRequestSchema.parse({

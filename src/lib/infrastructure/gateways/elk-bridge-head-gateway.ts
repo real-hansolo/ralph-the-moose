@@ -5,6 +5,9 @@ import ElkBridgeHeadABI from "../config/abi/ElkBridgeHead.json";
 import { fromHumanReadableNumber } from "~/lib/utils/tokenUtils";
 import type { TSignal, TTransactionGasStatus } from "~/lib/core/entity/signals";
 import { callThirdWebContractUtil } from "~/lib/utils/transactionUtils";
+import { injectable } from "inversify";
+
+@injectable()
 export default class ElkBridgeHeadGateway implements ElkBridgeHeadOutputPort {
   __getContract(network: TNetwork): TContract {
     return {

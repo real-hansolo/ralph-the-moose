@@ -5,6 +5,7 @@ import { WrappingRequestSchema } from "~/lib/core/usecase-models/wrapping-usecas
 import type { WrappingInputPort } from "~/lib/core/ports/primary/wrapping-primary-ports";
 import { clientContainer } from "../config/ioc/container";
 import { USECASE } from "../config/ioc/symbols";
+import { injectable } from "inversify";
 
 export interface TWrappingControllerParameters {
   wallet: TWallet;
@@ -13,6 +14,7 @@ export interface TWrappingControllerParameters {
   response: TSignal<TWrappingViewModel>;
 }
 
+@injectable()
 export default class WrappingController {
   async execute(controllerParameters: TWrappingControllerParameters): Promise<void> {
     const wrappingRequest = WrappingRequestSchema.parse({

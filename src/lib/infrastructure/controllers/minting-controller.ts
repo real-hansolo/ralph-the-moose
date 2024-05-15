@@ -5,6 +5,7 @@ import type { TMintingViewModel } from "~/lib/core/view-models/minting-view-mode
 import { clientContainer } from "../config/ioc/container";
 import { USECASE } from "../config/ioc/symbols";
 import type { MintingInputPort } from "~/lib/core/ports/primary/minting-primary-ports";
+import { injectable } from "inversify";
 
 export interface TMintingControllerParameters {
   wallet: TWallet;
@@ -13,7 +14,7 @@ export interface TMintingControllerParameters {
   response: TSignal<TMintingViewModel>;
 }
 
-
+@injectable()
 export default class MintingController {
   async execute(controllerParameters: TMintingControllerParameters): Promise<void> {
     const mintingRequest = MintingRequestSchema.parse({

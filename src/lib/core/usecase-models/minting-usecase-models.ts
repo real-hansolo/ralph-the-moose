@@ -1,6 +1,5 @@
 import { z } from "zod";
 import { ExecutedTransactionSchema, NetworkSchema, WalletSchema } from "../entity/models";
-import { estimateGas } from "@maany_shr/thirdweb";
 
 export const MintingRequestSchema = z.object({
     network: NetworkSchema,

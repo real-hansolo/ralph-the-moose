@@ -1,5 +1,6 @@
 import { z } from "zod";
 import { ExecutedTransactionSchema, NetworkSchema, WalletSchema } from "../entity/models";
+import { wrap } from "module";
 
 export const WrappingRequestSchema = z.object({
     network: NetworkSchema,
@@ -27,6 +28,7 @@ export const WrappingErrorResponseSchema = z.object({
         wallet: WalletSchema,
         amount: z.number(),
         transaction: ExecutedTransactionSchema.optional(),
+        wrapFound: z.boolean()
     })
 })
 
@@ -37,7 +39,9 @@ export const WrappingProgressResponseSchema = z.object({
     amount: z.number(),
     network: NetworkSchema,
     wallet: WalletSchema,
-    s_gas_status: z.any().optional()
+    s_gas_status: z.any().optional(),
+    message: z.string(),
+    wrapFound: z.boolean().default(false)
 })
 
 export type TWrappingProgressResponse = z.infer<typeof WrappingProgressResponseSchema>

@@ -9,17 +9,18 @@ export const WrappingSuccessViewModelSchema = z.object({
     wrapTransaction: ExecutedTransactionSchema,
 })
 
-export const WrappingProgressViewModelSchema = z.object({
+export const WrappingNonSuccessViewModelSchema = z.object({
     status: z.enum(["error", "in-progress"]),
     message: z.string(),
     amount: z.number(),
-    wrapTransaction: ExecutedTransactionSchema,
+    wrapTransaction: ExecutedTransactionSchema.optional(),
     wrapFound: z.boolean(),
+    s_gas_status: z.any().optional(),
 })
 
 export const WrappingViewModelSchema = z.discriminatedUnion("status", [
     WrappingSuccessViewModelSchema,
-    WrappingProgressViewModelSchema
+    WrappingNonSuccessViewModelSchema
 ])
 
 export type TWrappingViewModel = z.infer<typeof WrappingViewModelSchema>

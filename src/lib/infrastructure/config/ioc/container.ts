@@ -26,8 +26,8 @@ import MintingPresenter from "../../presenters/minting-presenter";
 import type { TMintingViewModel } from "~/lib/core/view-models/minting-view-model";
 import MintingController from "../../controllers/minting-controller";
 import WrappingController from "../../controllers/wrapping-controller";
-import { WrappingInputPort } from "~/lib/core/ports/primary/wrapping-primary-ports";
-import { TWrappingViewModel } from "~/lib/core/view-models/wrapping-view-model";
+import { type WrappingInputPort } from "~/lib/core/ports/primary/wrapping-primary-ports";
+import { type TWrappingViewModel } from "~/lib/core/view-models/wrapping-view-model";
 import WrappingPresenter from "../../presenters/wrapping-presenter";
 import WrappingUsecase from "~/lib/core/usecase/wrapping-usecase";
 

@@ -84,7 +84,7 @@ export default class WrappingUsecase implements WrappingInputPort {
     });
 
     let wrapStatusDTO = await indexerGateway.getWrapStatus(wrapTransactionDTO.data.hash);
-    let attempt = 0;
+    let attempt = 1;
     while (!wrapStatusDTO.success) {
       wrapStatusDTO = await indexerGateway.getWrapStatus(wrapTransactionDTO.data.hash);
       this.presenter.presentProgress({

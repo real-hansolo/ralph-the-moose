@@ -42,8 +42,6 @@ export const BridgingProgressResponseSchema = z.object({
     network: NetworkSchema,
     wallet: WalletSchema,
     toNetwork: NetworkSchema,
-    indexerBlockNumber: z.number(),
-    intialIndexerBlockNumber: z.number(),
     estimateGas: z.number().optional(),
     message: z.string(),
 })

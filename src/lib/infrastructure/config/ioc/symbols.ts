@@ -12,6 +12,7 @@ const GATEWAYS = {
     WEB3_GATEWAY: Symbol.for('Web3Gateway'),
     RALPH_TOKEN_GATEWAY: Symbol.for('RalphTokenGateway'),
     RALPH_RESERVOIR_GATEWAY: Symbol.for('RalphReservoirGateway'),
+    ELK_BRIDGE_HEAD_GATEWAY: Symbol.for('ElkBridgeHeadGateway'),
 }
 
 const USECASE = {

@@ -3,10 +3,9 @@ import type { BridgingInputPort, BridgingOutputPort } from "../ports/primary/bri
 import type ElkBridgeHeadOutputPort from "../ports/secondary/elk-bridgehead-output-port";
 import type RalphTokenOutputPort from "../ports/secondary/ralph-token-output-port";
 import type { TBridgingRequest } from "../usecase-models/bridging-usecase-models";
-import type { TPreparedContractCall } from "../entity/models";
 import { clientContainer } from "~/lib/infrastructure/config/ioc/container";
 import { SIGNALS } from "~/lib/infrastructure/config/ioc/symbols";
-import { TSignal, TTransactionGasStatus } from "../entity/signals";
+import type { TSignal, TTransactionGasStatus } from "../entity/signals";
 import { effect } from "@preact/signals-react";
 
 export default class BridgingUsecase implements BridgingInputPort {

@@ -15,6 +15,7 @@ const GATEWAYS = {
 }
 
 const USECASE = {
+    BRIDGING_USECASE_FACTORY: Symbol.for('BridgingUsecaseFactory'),
     CLAIMING_USECASE_FACTORY: Symbol.for('ClaimingUsecaseFactory'),
     MINTING_USECASE_FACTORY: Symbol.for('MintingUsecaseFactory'),
     WRAPPING_USECASE_FACTORY: Symbol.for('WrappingUsecaseFactory'),
@@ -22,6 +23,7 @@ const USECASE = {
 }
 
 const CONTROLLER = {
+    BRIDGING_CONTROLLER: Symbol.for('BridgingController'),
     CLAIMING_CONTROLLER: Symbol.for('ClaimingController'),
     MINTING_CONTROLLER: Symbol.for('MintingController'),
     WRAPPING_CONTROLLER: Symbol.for('WrappingController'),

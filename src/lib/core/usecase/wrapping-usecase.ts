@@ -1,0 +1,109 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+import { clientContainer } from "~/lib/infrastructure/config/ioc/container";
+import type { WrappingInputPort, WrappingOutputPort } from "../ports/primary/wrapping-primary-ports";
+import type IndexerGatewayOutputPort from "../ports/secondary/indexer-gateway-output-port";
+import type Web3GatewayOutputPort from "../ports/secondary/web3-gateway-output-port";
+import type { TWrappingRequest } from "../usecase-models/wrapping-usecase-models";
+import { SIGNALS } from "~/lib/infrastructure/config/ioc/symbols";
+import type { TSignal, TTransactionGasStatus } from "../entity/signals";
+import { fromHumanReadableNumber } from "~/lib/utils/tokenUtils";
+import type { BigNumber } from "ethers";
+import { effect } from "@preact/signals-react";
+import type { TNetwork, TPreparedTransaction } from "../entity/models";
+import { sendThirdWebTransactionUtil } from "~/lib/utils/transactionUtils";
+
+export default class WrappingUsecase implements WrappingInputPort {
+  presenter: WrappingOutputPort<any>;
+  indexerGatewayFactory: (network: TNetwork) => IndexerGatewayOutputPort;
+  web3Gateway: Web3GatewayOutputPort<any, any, any>;
+  constructor(
+    presenter: WrappingOutputPort<any>,
+    indexerGatewayFactory: (network: TNetwork) => IndexerGatewayOutputPort,
+    web3Gateway: Web3GatewayOutputPort<any, any, any>,
+  ) {
+    this.presenter = presenter;
+    this.indexerGatewayFactory = indexerGatewayFactory;
+    this.web3Gateway = web3Gateway;
+  }
+
+  __generateHexFromWrapMessage = (amount: BigNumber, ralphReservoirAddress: string): string => {
+    const json = `{"p": "elkrc-404", "op": "transfer", "tick": "PR", "to": "${ralphReservoirAddress}", "amount": ${amount.toString()}}`;
+    const hex = Buffer.from(json, "utf8").toString("hex");
+    return hex;
+  };
+
+  async execute(request: TWrappingRequest): Promise<void> {
+    // Implement the wrapping usecase here
+    const { wallet, network, amount } = request;
+    const indexerGateway = this.indexerGatewayFactory(network);
+    const wrapAmount = fromHumanReadableNumber(amount);
+    const message = this.__generateHexFromWrapMessage(wrapAmount, network.contracts.ralphReservoirAddress);
+    const S_GAS_STATUS = clientContainer.get<TSignal<TTransactionGasStatus>>(SIGNALS.TRANSACTION_GAS_STATUS);
+    const s_gas_signal = S_GAS_STATUS.value;
+
+    effect(() => {
+      return this.presenter.presentEstimatedGas({
+        network: network,
+        wallet: wallet,
+        message: "Estimating gas for wrapping",
+        estimatedGas: s_gas_signal.value?.estimatedGas,
+        amount: amount,
+        wrapFound: false,
+      });
+    });
+
+    const preparedWrapTransaction: TPreparedTransaction = {
+      to: network.contracts.ralphReservoirAddress,
+      value: `${network.fee.wrapping}`,
+      data: `0x${message}`,
+      network: network,
+    };
+
+    const wrapTransactionDTO = await sendThirdWebTransactionUtil(wallet, preparedWrapTransaction, S_GAS_STATUS);
+
+    if (!wrapTransactionDTO.success) {
+      this.presenter.presentError({
+        status: "error",
+        message: "Error sending wrap transaction",
+        details: {
+          amount: amount,
+          network: network,
+          wallet: wallet,
+          wrapFound: false,
+        },
+      });
+      return;
+    }
+
+    this.presenter.presentProgress({
+      amount: amount,
+      network: network,
+      wallet: wallet,
+      message: "Transaction sent! Awaiting relayer confirmation!",
+      wrapFound: false,
+    });
+
+    let wrapStatusDTO = await indexerGateway.getWrapStatus(wrapTransactionDTO.data.hash);
+    let attempt = 0;
+    while (!wrapStatusDTO.success) {
+      wrapStatusDTO = await indexerGateway.getWrapStatus(wrapTransactionDTO.data.hash);
+      this.presenter.presentProgress({
+        amount: amount,
+        network: network,
+        wallet: wallet,
+        message: `Awaiting relayer confirmation! Attempt ${attempt}`,
+        wrapFound: false,
+      });
+      attempt++;
+      await new Promise((resolve) => setTimeout(resolve, 1000));
+    }
+
+    this.presenter.presentSuccess({
+      status: "success",
+      transaction: wrapTransactionDTO.data,
+      network: network,
+      wallet: wallet,
+      amount: amount,
+    });
+  }
+}

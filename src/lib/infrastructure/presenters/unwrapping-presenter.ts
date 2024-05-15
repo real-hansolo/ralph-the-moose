@@ -15,7 +15,7 @@ export default class UnwrappingPresenter implements UnWrappingOutputPort<TSignal
             message: progress.message,
             amount: progress.amount,
             unwrapTransaction: progress.transaction,
-
+            type: "progress",
         };
     }
 
@@ -29,7 +29,8 @@ export default class UnwrappingPresenter implements UnWrappingOutputPort<TSignal
                     amount: gasEstimation.amount,
                     network: gasEstimation.network,
                     wallet: gasEstimation.wallet,
-                    approvalError: false
+                    approvalError: false,
+                    verificationError: false,
                 },
             });
             return;
@@ -49,6 +50,7 @@ export default class UnwrappingPresenter implements UnWrappingOutputPort<TSignal
             message: error.message,
             amount: error.details.amount,
             unwrapTransaction: error.details.transaction,
+            type: error.details.approvalError ? "approval-error" : error.details.verificationError ? "verification-error" : "unknown",
             
         };
     }

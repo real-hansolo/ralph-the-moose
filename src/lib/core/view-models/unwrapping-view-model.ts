@@ -13,6 +13,7 @@ export const UnwrappingNonSuccessViewModelSchema = z.object({
     message: z.string(),
     amount: z.number(),
     unwrapTransaction: ExecutedTransactionSchema.optional(),
+    type: z.enum(["approval-error", "verification-error", "progress", "unknown"]).optional().default("unknown"),
 })
 
 export const UnwrappingTransactionGasStatusSchema = z.object({

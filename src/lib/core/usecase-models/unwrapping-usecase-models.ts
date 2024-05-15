@@ -27,12 +27,14 @@ export const UnwrappingErrorResponseSchema = z.object({
     amount: z.number(),
     transaction: ExecutedTransactionSchema.optional(),
     approvalError: z.boolean().default(false),
+    verificationError: z.boolean().default(false),
   }),
 });
 
 export type TUnwrappingErrorResponse = z.infer<typeof UnwrappingErrorResponseSchema>;
 
 export const UnwrappingProgressResponseSchema = z.object({
+  status: z.literal("in-progress"),
   transaction: ExecutedTransactionSchema.optional(),
   amount: z.number(),
   network: NetworkSchema,

@@ -17,7 +17,7 @@ type TMintingDisabled = {
     enabled: false;
     allocationAmount: number;
     reason: string;
-}
+} 
 
 export type TMintStatus = TMintingEnabled | TMintingDisabled;
 

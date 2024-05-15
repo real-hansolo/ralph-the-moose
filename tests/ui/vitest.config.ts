@@ -10,6 +10,7 @@ const config = mergeConfig(
       name: "ui",
       environment: "jsdom",
       include: ["**/*.test.tsx", "**/*.test.ts"],
+      globals: true,
       coverage: {
         provider: "v8",
         reporter: ["json", "json-summary", "html", "lcov", "text"],

@@ -35,6 +35,11 @@ import type { ClaimingInputPort } from "~/lib/core/ports/primary/claiming-primar
 import ClaimingUsecase from "~/lib/core/usecase/claiming-usecase";
 import type { TClaimingViewModel } from "~/lib/core/view-models/claiming-view-model";
 import ClaimingPresenter from "../../presenters/claiming-presenter";
+import UnwrappingController from "../../controllers/unwrapping-controller";
+import UnwrappingPresenter from "../../presenters/unwrapping-presenter";
+import type { UnWrappingInputPort } from "~/lib/core/ports/primary/unwrapping-primary-ports";
+import type { TUnwrappingViewModel } from "~/lib/core/view-models/unwrapping-view-model";
+import UnwrappingUsecase from "~/lib/core/usecase/unwrapping-usecase";
 
 const clientContainer = new Container();
 const signalsContainer = new Container();
@@ -98,6 +103,18 @@ clientContainer
     return new ClaimingUsecase(presenter, ralphTokenGateway, ralphReservoirGateway);
   });
 
+/**
+ * Feature: Unwrapping
+ */
+clientContainer.bind<UnwrappingController>(CONTROLLER.UNWRAPPING_CONTROLLER).to(UnwrappingController);
+clientContainer
+  .bind<interfaces.Factory<UnWrappingInputPort>>(USECASE.UNWRAPPING_USECASE_FACTORY)
+  .toFactory<UnWrappingInputPort, [TSignal<TUnwrappingViewModel>]>((context: interfaces.Context) => (response: TSignal<TUnwrappingViewModel>) => {
+    const presenter = new UnwrappingPresenter(response);
+    const ralphTokenGateway = context.container.get<RalphTokenOutputPort>(GATEWAYS.RALPH_TOKEN_GATEWAY);
+    const ralphReservoirGateway = context.container.get<RalphReservoirOutputPort>(GATEWAYS.RALPH_RESERVOIR_GATEWAY);
+    return new UnwrappingUsecase(presenter, ralphTokenGateway, ralphReservoirGateway);
+  });
 /*
 Client Side Static Signals
 */

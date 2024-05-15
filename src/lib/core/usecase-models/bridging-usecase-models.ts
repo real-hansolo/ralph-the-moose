@@ -45,7 +45,7 @@ export const BridgingProgressResponseSchema = z.object({
     indexerBlockNumber: z.number(),
     intialIndexerBlockNumber: z.number(),
     estimateGas: z.number().optional(),
-    message: z.string()
+    message: z.string(),
 })
 
 export type TBridgingProgressResponse = z.infer<typeof BridgingProgressResponseSchema>

@@ -12,13 +12,14 @@ export const BridgingSuccessViewModelSchema = z.object({
 });
 
 export const BridgingNonSuccessViewModelSchema = z.object({
-    status: z.enum(["error", "in-progress"]),
+    status: z.enum(["error", "in-progress", "estimate-gas"]),
     amount: z.number(),
     wallet: WalletSchema,
     network: NetworkSchema,
     toNetwork: NetworkSchema,
     message: z.string(),
     transaction: ExecutedTransactionSchema.optional(),
+    estimateGas: z.number().optional(),
 });
 
 export const BridgingViewModelSchema = z.discriminatedUnion("status", [

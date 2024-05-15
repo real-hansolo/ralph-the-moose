@@ -28,7 +28,6 @@ export const WrappingTransactionGasStatusSchema = z.object({
 export const WrappingViewModelSchema = z.discriminatedUnion("status", [
     WrappingSuccessViewModelSchema,
     WrappingNonSuccessViewModelSchema,
-    WrappingNonSuccessViewModelSchema,
     WrappingTransactionGasStatusSchema,
 ])
 

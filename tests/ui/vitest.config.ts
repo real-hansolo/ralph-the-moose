@@ -15,6 +15,7 @@ const config = mergeConfig(
         provider: "v8",
         reporter: ["json", "json-summary", "html", "lcov", "text"],
         reportOnFailure: true,
+        globals: true,
         // TODO: update coverage thresholds
         // thresholds: {
         //   statements: 10,

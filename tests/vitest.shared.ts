@@ -32,12 +32,12 @@ const sharedConfig = defineConfig({
     }
   },
   plugins: [
-    swc.vite({
-      tsconfigFile: "../tsconfig.json",
-    }),
-    react({
-      jsxRuntime: "classic",
-    }),
+    // swc.vite({
+    //   tsconfigFile: "../tsconfig.json",
+    // }),
+    // react({
+    //   jsxRuntime: "classic",
+    // }),
   ]
 })
 

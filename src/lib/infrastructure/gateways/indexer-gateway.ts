@@ -16,6 +16,8 @@ import {
   TotalMintedForAccountDTOSchema,
   type TAllMintedDTO,
   type TAllocationLimitDTO,
+  type TWrapStatusDTO,
+  WrapStatusDTOSchema,
 } from "~/lib/core/dto/indexer-gateway-dto";
 import { type TNetwork } from "~/lib/core/entity/models";
 import type IndexerGatewayOutputPort from "~/lib/core/ports/secondary/indexer-gateway-output-port";
@@ -39,14 +41,7 @@ export default class IndexerGateway implements IndexerGatewayOutputPort {
     }
   }
 
-  async __call<TDTO>(
-    endpoint: string,
-    schema: z.Schema<TDTO>,
-    numericFields: string[],
-    validate = true,
-    method = "GET",
-    body?: object,
-  ): Promise<TDTO> {
+  async __call<TDTO>(endpoint: string, schema: z.Schema<TDTO>, numericFields: string[], validate = true, method = "GET", body?: object): Promise<TDTO> {
     const response = await fetch(`${this.url}${endpoint}`, {
       method: method,
       headers: {
@@ -95,69 +90,46 @@ export default class IndexerGateway implements IndexerGatewayOutputPort {
   }
 
   async getAllMinted(): Promise<TAllMintedDTO> {
-    const response = await this.__call<TAllMintedDTO>(
-      "/all_minted",
-      AllMintedDTOSchema,
-      ["total_minted"],
-    );
+    const response = await this.__call<TAllMintedDTO>("/all_minted", AllMintedDTOSchema, ["total_minted"]);
     return response;
   }
 
   async getAllocationLimits(): Promise<TAllocationLimitDTO> {
-    const response = await this.__call<TAllocationLimitDTO>(
-      "/allocation_limits",
-      AllocationLimitDTOSchema,
-      ["total_mintable", "max_per_mint", "total_allocations", "address_count"],
-    );
+    const response = await this.__call<TAllocationLimitDTO>("/allocation_limits", AllocationLimitDTOSchema, [
+      "total_mintable",
+      "max_per_mint",
+      "total_allocations",
+      "address_count",
+    ]);
     return response;
   }
 
-  async getAllocationForAddress(
-    address: string,
-  ): Promise<TAllocationForAddressDTO> {
-    const response = await this.__call<TAllocationForAddressDTO>(
-        `/allocation/${address}`,
-        AllocationForAddressDTOSchema,
-        ["allocation_amount"]
-    );
+  async getAllocationForAddress(address: string): Promise<TAllocationForAddressDTO> {
+    const response = await this.__call<TAllocationForAddressDTO>(`/allocation/${address}`, AllocationForAddressDTOSchema, ["allocation_amount"]);
     return response;
   }
 
-
-  async getTotalMintedForAccount(
-    address: string,
-  ): Promise<TTotalMintedForAccountDTO> {
-    const response = await this.__call<TTotalMintedForAccountDTO>(
-        `/minted/${address}`,
-        TotalMintedForAccountDTOSchema,
-        ["minted"]
-    );
+  async getTotalMintedForAccount(address: string): Promise<TTotalMintedForAccountDTO> {
+    const response = await this.__call<TTotalMintedForAccountDTO>(`/minted/${address}`, TotalMintedForAccountDTOSchema, ["minted"]);
     return response;
   }
   async getInscriptionStatus(txHash: string): Promise<TInscriptionStatusDTO> {
-    const response = await this.__call<TInscriptionStatusDTO>(
-        `/inscriptions/${txHash}`,
-        InscriptionDTOSchema,
-        ["amount"]
-    );
+    const response = await this.__call<TInscriptionStatusDTO>(`/inscriptions/${txHash}`, InscriptionDTOSchema, ["amount"]);
     return response;
   }
 
   async getLatestBlock(): Promise<TIndexerLatestBlockDTO> {
-    const response = await this.__call<TIndexerLatestBlockDTO>(
-        "/latest_block",
-        IndexerLatestBlockDTOSchema,
-        []
-    );
+    const response = await this.__call<TIndexerLatestBlockDTO>("/latest_block", IndexerLatestBlockDTOSchema, []);
     return response;
   }
 
   async getBalanceForAccount(address: string): Promise<TAccountBalalnceDTO> {
-    const response = await this.__call<TAccountBalalnceDTO>(
-        `balances/${address}`,
-        AccountBalanceDTOSchema,
-        ["balance"]
-    );
+    const response = await this.__call<TAccountBalalnceDTO>(`balances/${address}`, AccountBalanceDTOSchema, ["balance"]);
+    return response;
+  }
+
+  async getWrapStatus(txHash: string): Promise<TWrapStatusDTO> {
+    const response = await this.__call<TWrapStatusDTO>(`/wraps/${txHash}`, WrapStatusDTOSchema, []);
     return response;
   }
 }

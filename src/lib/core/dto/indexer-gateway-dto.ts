@@ -80,3 +80,13 @@ export const TotalMintedForAccountDTOSchema = DTOSchemaFactory(
 )
 
 export type TTotalMintedForAccountDTO = z.infer<typeof TotalMintedForAccountDTOSchema>
+
+export const WrapStatusDTOSchema = DTOSchemaFactory(
+    z.object({
+        tx_hash: z.string(),
+        confirmation_tx_hash: z.string(),
+    }),
+    IndexerGatewayErrorSchema
+)
+
+export type TWrapStatusDTO = z.infer<typeof WrapStatusDTOSchema>

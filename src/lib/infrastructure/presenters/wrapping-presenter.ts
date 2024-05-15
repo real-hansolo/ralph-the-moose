@@ -16,7 +16,31 @@ export default class WrappingPresenter implements WrappingOutputPort<TSignal<TWr
       amount: progress.amount,
       wrapTransaction: progress.transaction,
       wrapFound: progress.wrapFound,
-      s_gas_status: progress.s_gas_status,
+    };
+  }
+
+  presentEstimatedGas(gasEstimation: TWrappingProgressResponse): void {
+    const estimatedGas = gasEstimation.estimatedGas;
+    if (estimatedGas === undefined) {
+      this.presentError({
+        status: "error",
+        message: "Error getting estimated gas",
+        details: {
+          amount: gasEstimation.amount,
+          network: gasEstimation.network,
+          wallet: gasEstimation.wallet,
+          wrapFound: false,
+        },
+      });
+      return;
+    }
+    this.response.value.value = {
+      status: "estimated-gas",
+      amount: gasEstimation.amount,
+      network: gasEstimation.network,
+      wallet: gasEstimation.wallet,
+      estimatedGas: estimatedGas,
+      gasLimit: gasEstimation.network.gasLimit,
     };
   }
 

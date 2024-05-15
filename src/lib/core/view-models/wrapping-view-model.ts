@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { ExecutedTransactionSchema } from "../entity/models";
+import { ExecutedTransactionSchema, NetworkSchema, WalletSchema } from "../entity/models";
 
 
 export const WrappingSuccessViewModelSchema = z.object({
@@ -15,12 +15,21 @@ export const WrappingNonSuccessViewModelSchema = z.object({
     amount: z.number(),
     wrapTransaction: ExecutedTransactionSchema.optional(),
     wrapFound: z.boolean(),
-    s_gas_status: z.any().optional(),
+})
+
+export const WrappingTransactionGasStatusSchema = z.object({
+    status: z.enum(["estimated-gas"]),
+    estimatedGas: z.number(),
+    amount: z.number(),
+    network: NetworkSchema,
+    wallet: WalletSchema,
 })
 
 export const WrappingViewModelSchema = z.discriminatedUnion("status", [
     WrappingSuccessViewModelSchema,
-    WrappingNonSuccessViewModelSchema
+    WrappingNonSuccessViewModelSchema,
+    WrappingNonSuccessViewModelSchema,
+    WrappingTransactionGasStatusSchema,
 ])
 
 export type TWrappingViewModel = z.infer<typeof WrappingViewModelSchema>

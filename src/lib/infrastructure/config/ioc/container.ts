@@ -25,6 +25,11 @@ import MintingUsecase from "~/lib/core/usecase/minting-usecase";
 import MintingPresenter from "../../presenters/minting-presenter";
 import type { TMintingViewModel } from "~/lib/core/view-models/minting-view-model";
 import MintingController from "../../controllers/minting-controller";
+import WrappingController from "../../controllers/wrapping-controller";
+import { WrappingInputPort } from "~/lib/core/ports/primary/wrapping-primary-ports";
+import { TWrappingViewModel } from "~/lib/core/view-models/wrapping-view-model";
+import WrappingPresenter from "../../presenters/wrapping-presenter";
+import WrappingUsecase from "~/lib/core/usecase/wrapping-usecase";
 
 const clientContainer = new Container();
 const signalsContainer = new Container();
@@ -56,11 +61,23 @@ clientContainer
   .bind<interfaces.Factory<MintingInputPort>>(USECASE.MINTING_USECASE_FACTORY)
   .toFactory<MintingInputPort, [TSignal<TMintingViewModel>]>((context: interfaces.Context) => (response: TSignal<TMintingViewModel>) => {
     const presenter = new MintingPresenter(response);
-    const indexerGateway = context.container.get<IndexerGatewayOutputPort>(GATEWAYS.INDEXER_GATEWAY_FACTORY);
+    const indexerGatewayFactory: (network: TNetwork) => IndexerGatewayOutputPort = context.container.get(GATEWAYS.INDEXER_GATEWAY_FACTORY);
     const web3Gateway = context.container.get<Web3GatewayOutputPort<any, any, any>>(GATEWAYS.WEB3_GATEWAY);
-    return new MintingUsecase(presenter, indexerGateway, web3Gateway);
+    return new MintingUsecase(presenter, indexerGatewayFactory, web3Gateway);
   });
 
+/**
+ * Feature: Wrapping
+ */
+clientContainer.bind<WrappingController>(CONTROLLER.WRAPPING_CONTROLLER).to(WrappingController);
+clientContainer
+  .bind<interfaces.Factory<WrappingInputPort>>(USECASE.WRAPPING_USECASE_FACTORY)
+  .toFactory<WrappingInputPort, [TSignal<TWrappingViewModel>]>((context: interfaces.Context) => (response: TSignal<TWrappingViewModel>) => {
+    const presenter = new WrappingPresenter(response);
+    const indexerGatewayFactory: (network: TNetwork) => IndexerGatewayOutputPort = context.container.get(GATEWAYS.INDEXER_GATEWAY_FACTORY);
+    const web3Gateway = context.container.get<Web3GatewayOutputPort<any, any, any>>(GATEWAYS.WEB3_GATEWAY);
+    return new WrappingUsecase(presenter, indexerGatewayFactory, web3Gateway);
+  });
 /*
 Client Side Static Signals
 */

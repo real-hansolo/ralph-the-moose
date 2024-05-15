@@ -16,10 +16,12 @@ const GATEWAYS = {
 
 const USECASE = {
     MINTING_USECASE_FACTORY: Symbol.for('MintingUsecaseFactory'),
+    WRAPPING_USECASE_FACTORY: Symbol.for('WrappingUsecaseFactory'),
 }
 
 const CONTROLLER = {
     MINTING_CONTROLLER: Symbol.for('MintingController'),
+    WRAPPING_CONTROLLER: Symbol.for('WrappingController'),
 
 }
 export { SIGNALS, GATEWAYS, USECASE, CONTROLLER };

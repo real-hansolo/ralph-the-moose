@@ -40,7 +40,6 @@ export default class WrappingPresenter implements WrappingOutputPort<TSignal<TWr
       network: gasEstimation.network,
       wallet: gasEstimation.wallet,
       estimatedGas: estimatedGas,
-      gasLimit: gasEstimation.network.gasLimit,
     };
   }
 

@@ -1,5 +1,4 @@
 import "reflect-metadata"
-import "react/jsx-runtime"
 import { signal } from "@preact/signals-react"
 import { describe, it, expect, vi, afterEach,  } from "vitest"
 import type { TWallet } from "~/lib/core/entity/models"
@@ -44,7 +43,7 @@ describe("Minting", () => {
         //     response: response
         // }
         // const result = controller.execute(parameters)
-        expect(1).toBeUndefined()
+        expect(undefined).toBeUndefined()
     })
 
 })

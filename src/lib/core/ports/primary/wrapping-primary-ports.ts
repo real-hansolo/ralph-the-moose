@@ -11,4 +11,5 @@ export interface WrappingOutputPort<TResponse> {
     presentProgress(progress: TWrappingProgressResponse): void
     presentSuccess(error: TWrappingSuccessResponse): void
     presentError(response: TWrappingErrorResponse): void
+    presentEstimatedGas(response: TWrappingProgressResponse): void
 }

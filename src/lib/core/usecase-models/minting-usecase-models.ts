@@ -1,5 +1,6 @@
 import { z } from "zod";
 import { ExecutedTransactionSchema, NetworkSchema, WalletSchema } from "../entity/models";
+import { estimateGas } from "@maany_shr/thirdweb";
 
 export const MintingRequestSchema = z.object({
     network: NetworkSchema,
@@ -39,7 +40,8 @@ export const MintingProgressResponseSchema = z.object({
     wallet: WalletSchema,
     indexerBlockNumber: z.number(),
     intialIndexerBlockNumber: z.number(),
-    s_gas_status: z.any().optional()
+    estimateGas: z.number().optional(),
+    message: z.string()
 })
 
 export type TMintingProgressResponse = z.infer<typeof MintingProgressResponseSchema>

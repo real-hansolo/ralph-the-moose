@@ -16,31 +16,41 @@ export default class MintingPresenter
   }
 
   presentProgress(progress: TMintingProgressResponse): void {
-    const mintTransaction = progress.transaction;
-    if (!mintTransaction) {
+    this.response.value.value = {
+      ...this.response.value.value,
+      status: "in-progress",
+      amount: progress.amount,
+      mintTransaction: progress.transaction,
+      indexerBlockNumber: progress.indexerBlockNumber,
+      initialIndexerBlockNumber: progress.intialIndexerBlockNumber,
+      message: progress.message,
+    };
+  }
+
+  presentEstimatedGas(gasEstimation: TMintingProgressResponse): void {
+    const estimatedGas = gasEstimation.estimateGas;
+    if (estimatedGas === undefined) {
       this.presentError({
         status: "error",
-        message: "Minting transaction not found",
+        message: "Error getting estimated gas",
         details: {
-          network: progress.network,
-          wallet: progress.wallet,
-          amount: progress.amount,
-          indexerBlockNumber: progress.indexerBlockNumber,
+          amount: gasEstimation.amount,
+          network: gasEstimation.network,
+          wallet: gasEstimation.wallet,
+          indexerBlockNumber: 0,
         },
       });
       return;
     }
     this.response.value.value = {
       ...this.response.value.value,
-      status: "in-progress",
-      amount: progress.amount,
-      mintTransaction: mintTransaction,
-      indexerBlockNumber: progress.indexerBlockNumber,
-      initialIndexerBlockNumber: progress.intialIndexerBlockNumber,
-      message: "Waiting for indexer to confirm transaction",
+      status: "estimated-gas",
+      amount: gasEstimation.amount,
+      network: gasEstimation.network,
+      wallet: gasEstimation.wallet,
+      estimatedGas: estimatedGas,
     };
   }
-
   presentError(error: TMintingErrorResponse): void {
     this.response.value.value = {
       status: "error",

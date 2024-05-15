@@ -1,6 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-
-import type RalphReservoirGateway from "~/lib/infrastructure/gateways/ralph-reservoir-gateway";
+import type RalphReservoirOutputPort from "~/lib/core/ports/secondary/ralph-reservoir-output-port";
 import type { ClaimingInputPort, ClaimingOutputPort } from "../ports/primary/claiming-primary-ports";
 import type RalphTokenOutputPort from "../ports/secondary/ralph-token-output-port";
 import type { TClaimingRequest } from "../usecase-models/claiming-usecase-models";
@@ -11,9 +10,9 @@ import type { TSignal, TTransactionGasStatus } from "../entity/signals";
 export default class ClaimingUsecase implements ClaimingInputPort {
   presenter: ClaimingOutputPort<any>;
   ralphTokenGateway: RalphTokenOutputPort;
-  ralphReservoirGateway: RalphReservoirGateway;
+  ralphReservoirGateway: RalphReservoirOutputPort;
 
-  constructor(presenter: ClaimingOutputPort<any>, ralphTokenGateway: RalphTokenOutputPort, ralphReservoirGateway: RalphReservoirGateway) {
+  constructor(presenter: ClaimingOutputPort<any>, ralphTokenGateway: RalphTokenOutputPort, ralphReservoirGateway: RalphReservoirOutputPort) {
     this.presenter = presenter;
     this.ralphTokenGateway = ralphTokenGateway;
     this.ralphReservoirGateway = ralphReservoirGateway;

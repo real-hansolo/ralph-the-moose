@@ -30,6 +30,11 @@ import { type WrappingInputPort } from "~/lib/core/ports/primary/wrapping-primar
 import { type TWrappingViewModel } from "~/lib/core/view-models/wrapping-view-model";
 import WrappingPresenter from "../../presenters/wrapping-presenter";
 import WrappingUsecase from "~/lib/core/usecase/wrapping-usecase";
+import ClaimingController from "../../controllers/claiming-controller";
+import type { ClaimingInputPort } from "~/lib/core/ports/primary/claiming-primary-ports";
+import ClaimingUsecase from "~/lib/core/usecase/claiming-usecase";
+import type { TClaimingViewModel } from "~/lib/core/view-models/claiming-view-model";
+import ClaimingPresenter from "../../presenters/claiming-presenter";
 
 const clientContainer = new Container();
 const signalsContainer = new Container();
@@ -78,6 +83,21 @@ clientContainer
     const web3Gateway = context.container.get<Web3GatewayOutputPort<any, any, any>>(GATEWAYS.WEB3_GATEWAY);
     return new WrappingUsecase(presenter, indexerGatewayFactory, web3Gateway);
   });
+
+
+/**
+ * Feature: Claiming
+ */
+clientContainer.bind<ClaimingController>(CONTROLLER.CLAIMING_CONTROLLER).to(ClaimingController);
+clientContainer
+  .bind<interfaces.Factory<ClaimingInputPort>>(USECASE.CLAIMING_USECASE_FACTORY)
+  .toFactory<ClaimingInputPort, [TSignal<TClaimingViewModel>]>((context: interfaces.Context) => (response: TSignal<TClaimingViewModel>) => {
+    const presenter = new ClaimingPresenter(response);
+    const ralphTokenGateway = context.container.get<RalphTokenOutputPort>(GATEWAYS.RALPH_TOKEN_GATEWAY);
+    const ralphReservoirGateway = context.container.get<RalphReservoirOutputPort>(GATEWAYS.RALPH_RESERVOIR_GATEWAY);
+    return new ClaimingUsecase(presenter, ralphTokenGateway, ralphReservoirGateway);
+  });
+
 /*
 Client Side Static Signals
 */

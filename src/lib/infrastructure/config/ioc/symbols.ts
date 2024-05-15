@@ -21,6 +21,7 @@ const USECASE = {
 }
 
 const CONTROLLER = {
+    CLAIMING_CONTROLLER: Symbol.for('ClaimingController'),
     MINTING_CONTROLLER: Symbol.for('MintingController'),
     WRAPPING_CONTROLLER: Symbol.for('WrappingController'),
 

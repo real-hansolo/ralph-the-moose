@@ -15,6 +15,7 @@ const GATEWAYS = {
 }
 
 const USECASE = {
+    CLAIMING_USECASE_FACTORY: Symbol.for('ClaimingUsecaseFactory'),
     MINTING_USECASE_FACTORY: Symbol.for('MintingUsecaseFactory'),
     WRAPPING_USECASE_FACTORY: Symbol.for('WrappingUsecaseFactory'),
 }

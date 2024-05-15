@@ -36,6 +36,7 @@ export default class MintingPresenter
       amount: progress.amount,
       mintTransaction: mintTransaction,
       indexerBlockNumber: progress.indexerBlockNumber,
+      initialIndexerBlockNumber: progress.intialIndexerBlockNumber,
       message: "Waiting for indexer to confirm transaction",
     };
   }
@@ -47,6 +48,7 @@ export default class MintingPresenter
       amount: error.details.amount,
       mintTransaction: error.details.transaction,
       indexerBlockNumber: error.details.indexerBlockNumber,
+      initialIndexerBlockNumber: 0, // Replace 0 with the appropriate value
     };
   }
   presentSuccess(response: TMintingSuccessResponse): void {

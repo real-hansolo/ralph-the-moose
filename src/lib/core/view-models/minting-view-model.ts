@@ -14,6 +14,7 @@ export const MintingNonSuccessViewModelSchema = z.object({
     amount: z.number(),
     mintTransaction: ExecutedTransactionSchema.optional(),
     indexerBlockNumber: z.number(),
+    initialIndexerBlockNumber: z.number(),
     estimatedGas: z.number().optional(),
 })
 

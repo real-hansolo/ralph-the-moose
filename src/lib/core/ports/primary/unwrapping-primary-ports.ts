@@ -1,4 +1,4 @@
-import type { TUnwrappingErrorResponse, TUnwrappingProgressResponse, TUnwrappingRequest, TUnwrappingSuccessResponse, TUnwrappingTransactionGasStatus } from "../../usecase-models/unwrapping-usecase-models"
+import type { TUnwrappingErrorResponse, TUnwrappingProgressResponse, TUnwrappingRequest, TUnwrappingSuccessResponse } from "../../usecase-models/unwrapping-usecase-models"
 
 export interface UnWrappingInputPort {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -11,6 +11,6 @@ export interface UnWrappingOutputPort<TResponse> {
     presentProgress(progress: TUnwrappingProgressResponse): void
     presentSuccess(error: TUnwrappingSuccessResponse): void
     presentError(response: TUnwrappingErrorResponse): void
-    presentEstimatedGas(response: TUnwrappingTransactionGasStatus): void
+    presentEstimatedGas(response: TUnwrappingProgressResponse): void
 }
 

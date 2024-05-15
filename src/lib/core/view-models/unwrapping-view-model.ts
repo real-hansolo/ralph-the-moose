@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { ExecutedTransactionSchema } from "../entity/models";
+import { ExecutedTransactionSchema, NetworkSchema, WalletSchema } from "../entity/models";
 
 export const UnwrappingSuccessViewModelSchema = z.object({
     status: z.literal("success"),
@@ -13,11 +13,12 @@ export const UnwrappingNonSuccessViewModelSchema = z.object({
     message: z.string(),
     amount: z.number(),
     unwrapTransaction: ExecutedTransactionSchema.optional(),
-    unwrapFound: z.boolean(),
 })
 
 export const UnwrappingTransactionGasStatusSchema = z.object({
     status: z.literal("estimated-gas"),
+    network: NetworkSchema,
+    wallet: WalletSchema,
     estimatedGas: z.number(),
     amount: z.number(),
 })

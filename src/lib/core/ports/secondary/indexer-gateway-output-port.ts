@@ -6,6 +6,7 @@ import type {
   TInscriptionStatusDTO,
   TIndexerLatestBlockDTO,
   TTotalMintedForAccountDTO,
+  TWrapStatusDTO,
 } from "../../dto/indexer-gateway-dto";
 
 export default interface IndexerGatewayOutputPort {
@@ -16,4 +17,5 @@ export default interface IndexerGatewayOutputPort {
   getInscriptionStatus(txHash: string): Promise<TInscriptionStatusDTO>;
   getLatestBlock(): Promise<TIndexerLatestBlockDTO>;
   getBalanceForAccount(address: string): Promise<TAccountBalalnceDTO>;
+  getWrapStatus(txHash: string): Promise<TWrapStatusDTO>;
 }

@@ -40,6 +40,13 @@ import UnwrappingPresenter from "../../presenters/unwrapping-presenter";
 import type { UnWrappingInputPort } from "~/lib/core/ports/primary/unwrapping-primary-ports";
 import type { TUnwrappingViewModel } from "~/lib/core/view-models/unwrapping-view-model";
 import UnwrappingUsecase from "~/lib/core/usecase/unwrapping-usecase";
+import BridgingController from "../../controllers/bridging-controller";
+import { BridgingInputPort } from "~/lib/core/ports/primary/bridging-primary-ports";
+import { TBridgingViewModel } from "~/lib/core/view-models/bridging-view-model";
+import BridgingPresenter from "../../presenters/bridging-presenter";
+import ElkBridgeHeadOutputPort from "~/lib/core/ports/secondary/elk-bridgehead-output-port";
+import ElkBridgeHeadGateway from "../../gateways/elk-bridge-head-gateway";
+import BridgingUsecase from "~/lib/core/usecase/bridging-usecase";
 
 const clientContainer = new Container();
 const signalsContainer = new Container();
@@ -53,7 +60,7 @@ clientContainer.bind<WalletProviderOutputPort<unknown>>(GATEWAYS.WALLET_PROVIDER
 clientContainer.bind<Web3GatewayOutputPort<any, any, any>>(GATEWAYS.WEB3_GATEWAY).to(ThirdwebWeb3Gateway);
 clientContainer.bind<RalphTokenOutputPort>(GATEWAYS.RALPH_TOKEN_GATEWAY).to(RalphTokenGateway);
 clientContainer.bind<RalphReservoirOutputPort>(GATEWAYS.RALPH_RESERVOIR_GATEWAY).to(RalphReservoirGateway);
-
+clientContainer.bind<ElkBridgeHeadOutputPort>(GATEWAYS.ELK_BRIDGE_HEAD_GATEWAY).to(ElkBridgeHeadGateway);
 /**
  * Indexer Factory
  */
@@ -89,7 +96,6 @@ clientContainer
     return new WrappingUsecase(presenter, indexerGatewayFactory, web3Gateway);
   });
 
-
 /**
  * Feature: Claiming
  */
@@ -114,6 +120,19 @@ clientContainer
     const ralphTokenGateway = context.container.get<RalphTokenOutputPort>(GATEWAYS.RALPH_TOKEN_GATEWAY);
     const ralphReservoirGateway = context.container.get<RalphReservoirOutputPort>(GATEWAYS.RALPH_RESERVOIR_GATEWAY);
     return new UnwrappingUsecase(presenter, ralphTokenGateway, ralphReservoirGateway);
+  });
+
+/**
+ * Feature: Bridging
+ */
+clientContainer.bind<BridgingController>(CONTROLLER.BRIDGING_CONTROLLER).to(BridgingController);
+clientContainer
+  .bind<interfaces.Factory<BridgingInputPort>>(USECASE.BRIDGING_USECASE_FACTORY)
+  .toFactory<BridgingInputPort, [TSignal<TBridgingViewModel>]>((context: interfaces.Context) => (response: TSignal<TBridgingViewModel>) => {
+    const presenter = new BridgingPresenter(response);
+    const ralphTokenGateway = context.container.get<RalphTokenOutputPort>(GATEWAYS.RALPH_TOKEN_GATEWAY);
+    const bridgeHeadGateway = context.container.get<ElkBridgeHeadOutputPort>(GATEWAYS.ELK_BRIDGE_HEAD_GATEWAY);
+    return new BridgingUsecase(presenter, bridgeHeadGateway, ralphTokenGateway);
   });
 /*
 Client Side Static Signals

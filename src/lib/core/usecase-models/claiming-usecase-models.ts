@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { NetworkSchema, WalletSchema } from "../entity/models";
+import { ExecutedTransactionSchema, NetworkSchema, WalletSchema } from "../entity/models";
 
 export const ClaimingRequestSchema = z.object({
     network: NetworkSchema,
@@ -14,7 +14,8 @@ export const ClaimingSuccessResponseSchema = z.object({
     network: NetworkSchema,
     wallet: WalletSchema,
     amount: z.number(),
-    message: z.string()
+    message: z.string(),
+    transaction: ExecutedTransactionSchema 
 })
 
 export type TClaimingSuccessResponse = z.infer<typeof ClaimingSuccessResponseSchema>
@@ -35,7 +36,8 @@ export const ClaimingProgressResponseSchema = z.object({
     amount: z.number(),
     network: NetworkSchema,
     wallet: WalletSchema,
-    message: z.string()
+    message: z.string(),
+    transaction: ExecutedTransactionSchema.optional()
 })
 
 export type TClaimingProgressResponse = z.infer<typeof ClaimingProgressResponseSchema>

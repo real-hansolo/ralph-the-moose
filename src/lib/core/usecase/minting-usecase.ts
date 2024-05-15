@@ -9,6 +9,9 @@ import { env } from "~/env";
 import { type BigNumber } from "ethers";
 import { fromHumanReadableNumber } from "~/lib/utils/tokenUtils";
 import type { TMintingRequest } from "../usecase-models/minting-usecase-models";
+import { clientContainer } from "~/lib/infrastructure/config/ioc/container";
+import type { TSignal, TTransactionGasStatus } from "../entity/signals";
+import { SIGNALS } from "~/lib/infrastructure/config/ioc/symbols";
 
 export default class MintingUsecase implements MintingInputPort {
   presenter: MintingOutputPort<any>;
@@ -41,7 +44,32 @@ export default class MintingUsecase implements MintingInputPort {
     };
     // present progress
     // gas signal
-    const mintTransactionDTO: TExecutedTransactionDTO = await sendThirdWebTransactionUtil(wallet, preparedMintTransaction);
+    const S_GAS_STATUS = clientContainer.get<TSignal<TTransactionGasStatus>>(SIGNALS.TRANSACTION_GAS_STATUS);
+    const intialIndexerBlockNumberDTO = await this.indexerGateway.getLatestBlock();
+    if (!intialIndexerBlockNumberDTO.success) {
+      this.presenter.presentError({
+        status: "error",
+        message: "Error getting latest block number from indexer.",
+        details: {
+          amount: amount,
+          indexerBlockNumber: 0,
+          wallet: wallet,
+          network: network,
+        },
+      });
+      return;
+    }
+    const intialIndexerBlockNumber = intialIndexerBlockNumberDTO.data.latest_block;
+
+    this.presenter.presentProgress({
+        amount: amount,
+        network: network,
+        wallet: wallet,
+        indexerBlockNumber: 0,
+        s_gas_status: S_GAS_STATUS,
+        intialIndexerBlockNumber: intialIndexerBlockNumber,
+    });
+    const mintTransactionDTO: TExecutedTransactionDTO = await sendThirdWebTransactionUtil(wallet, preparedMintTransaction, S_GAS_STATUS);
     if (!mintTransactionDTO.success) {
       this.presenter.presentError({
         status: "error",
@@ -80,6 +108,7 @@ export default class MintingUsecase implements MintingInputPort {
         wallet: wallet,
         amount: amount,
         indexerBlockNumber: latestIndexerBlockNumber,
+        intialIndexerBlockNumber: intialIndexerBlockNumber,
       });
     } while (latestIndexerBlockNumber < transactionBlockNumber);
 

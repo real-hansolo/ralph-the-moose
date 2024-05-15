@@ -18,12 +18,14 @@ const USECASE = {
     CLAIMING_USECASE_FACTORY: Symbol.for('ClaimingUsecaseFactory'),
     MINTING_USECASE_FACTORY: Symbol.for('MintingUsecaseFactory'),
     WRAPPING_USECASE_FACTORY: Symbol.for('WrappingUsecaseFactory'),
+    UNWRAPPING_USECASE_FACTORY: Symbol.for('UnwrappingUsecaseFactory'),
 }
 
 const CONTROLLER = {
     CLAIMING_CONTROLLER: Symbol.for('ClaimingController'),
     MINTING_CONTROLLER: Symbol.for('MintingController'),
     WRAPPING_CONTROLLER: Symbol.for('WrappingController'),
+    UNWRAPPING_CONTROLLER: Symbol.for('UnwrappingController'),
 
 }
 export { SIGNALS, GATEWAYS, USECASE, CONTROLLER };

@@ -20,7 +20,7 @@ export const BASE: TNetwork = {
     contracts: {
         ralphReservoirAddress: "0x27e964E016B68EeFbe958Ace62174af0e1CeD053",
         ralphTokenAddress: "0x05F1938646a897008e813fb03CE7C575eAE45738",
-        bridgeHeadAddress: "0x7b3f7f3"
+        bridgeHeadAddress: "0x3fE823F666DC2C09F8FA86AFB0B0af5152d2c6ab"
     },
     icon: <IconNetworkBase />,
     indexer: {
@@ -48,7 +48,7 @@ export const BASE_SEPOLIA: TNetwork = {
     contracts: {
         ralphReservoirAddress: "0x296271298780966bC0550a6B10c8e5BE60fE282f",
         ralphTokenAddress: "0xA415b2Df73D9E1D0415de58f012E2cB3E059F2E1",
-        bridgeHeadAddress: "0x7b3f7f3"
+        bridgeHeadAddress: "0x3fE823F666DC2C09F8FA86AFB0B0af5152d2c6ab"
     },
     icon: <IconNetworkBase />,
     indexer: {

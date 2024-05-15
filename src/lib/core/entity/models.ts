@@ -15,10 +15,12 @@ export const NetworkSchema = z.object({
     minting: z.number(),
     wrapping: z.number(),
     unwrapping: z.number(),
+    bridging: z.number(),
   }),
   contracts: z.object({
     ralphReservoirAddress: z.string(),
     ralphTokenAddress: z.string(),
+    bridgeHeadAddress: z.string(),
   }),
   indexer: z.object({
     url: z.string().url(),
@@ -91,7 +93,7 @@ export const PreparedContractCallSchema = z.object({
     stateMutability: z.any(),
     type: z.any(),
   }),
-  params: z.array(z.string().or(z.bigint()).or(z.boolean())),
+  params: z.array(z.string().or(z.bigint()).or(z.boolean()).or(z.number())),
   value: z.string(),
   data: z.string().optional(),
 });

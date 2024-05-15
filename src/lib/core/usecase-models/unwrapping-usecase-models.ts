@@ -42,3 +42,11 @@ export const UnwrappingProgressResponseSchema = z.object({
 })
 
 export type TUnwrappingProgressResponse = z.infer<typeof UnwrappingProgressResponseSchema>
+
+export const UnwrappingTransactionGasStatusSchema = z.object({
+    status: z.literal("estimated-gas"),
+    estimatedGas: z.number(),
+    amount: z.number(),
+})
+
+export type TUnwrappingTransactionGasStatus = z.infer<typeof UnwrappingTransactionGasStatusSchema>

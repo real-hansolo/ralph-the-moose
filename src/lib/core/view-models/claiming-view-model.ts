@@ -7,7 +7,7 @@ export const ClaimingSuccessViewModelSchema = z.object({
     wallet: WalletSchema,
     network: NetworkSchema,
     message: z.string(),
-    contractCall: ExecutedTransactionSchema,
+    transaction: ExecutedTransactionSchema,
 });
 
 export const ClaimingNonSuccessViewModelSchema = z.object({
@@ -16,7 +16,7 @@ export const ClaimingNonSuccessViewModelSchema = z.object({
     wallet: WalletSchema,
     network: NetworkSchema,
     message: z.string(),
-    contractCall: ExecutedTransactionSchema.optional(),
+    transaction: ExecutedTransactionSchema.optional(),
 });
 
 export const ClaimingViewModelSchema = z.discriminatedUnion("status", [

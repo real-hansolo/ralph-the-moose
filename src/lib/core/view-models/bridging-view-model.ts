@@ -1,5 +1,6 @@
 import { z } from "zod";
 import { WalletSchema, NetworkSchema, ExecutedTransactionSchema } from "../entity/models";
+import { BaseViewModelRequestSchema } from "~/sdk/view-model";
 
 export const BridgingSuccessViewModelSchema = z.object({
     status: z.enum(["success"]),
@@ -25,6 +26,7 @@ export const BridgingNonSuccessViewModelSchema = z.object({
 export const BridgingViewModelSchema = z.discriminatedUnion("status", [
     BridgingSuccessViewModelSchema,
     BridgingNonSuccessViewModelSchema,
+    BaseViewModelRequestSchema,
 ]);
 
 export type TBridgingViewModel = z.infer<typeof BridgingViewModelSchema>;

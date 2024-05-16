@@ -3,7 +3,7 @@ import type NetworkGatewayOutputPort from "~/lib/core/ports/secondary/network-ga
 import { type Signal, signal } from "@preact/signals-react";
 import { type TNetwork } from "~/lib/core/entity/models";
 import type { TListNetworkDTO, TNetworkDTO, TNetworkSwitchDTO } from "~/lib/core/dto/network-dto";
-import { BASE, BASE_SEPOLIA } from "../config/network-config";
+import { AVALANCHE, BASE, BASE_SEPOLIA } from "../config/network-config";
 import { env } from "~/env";
 
 @injectable()
@@ -31,7 +31,7 @@ export default class NetworkGateway implements NetworkGatewayOutputPort {
   getSupportedNetworks(): TListNetworkDTO {
     return {
       success: true,
-      data: [BASE, BASE_SEPOLIA],
+      data: [BASE, BASE_SEPOLIA, AVALANCHE],
     };
   }
 

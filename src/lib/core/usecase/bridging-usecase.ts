@@ -3,10 +3,11 @@ import type { BridgingInputPort, BridgingOutputPort } from "../ports/primary/bri
 import type ElkBridgeHeadOutputPort from "../ports/secondary/elk-bridgehead-output-port";
 import type RalphTokenOutputPort from "../ports/secondary/ralph-token-output-port";
 import type { TBridgingRequest } from "../usecase-models/bridging-usecase-models";
-import { clientContainer } from "~/lib/infrastructure/config/ioc/container";
+import { signalsContainer } from "~/lib/infrastructure/config/ioc/container";
 import { SIGNALS } from "~/lib/infrastructure/config/ioc/symbols";
-import type { TSignal, TTransactionGasStatus } from "../entity/signals";
+import { type TSignal, type TTransactionGasStatus } from "../entity/signals";
 import { effect } from "@preact/signals-react";
+// import { effect } from "@preact/signals-react";
 
 export default class BridgingUsecase implements BridgingInputPort {
   presenter: BridgingOutputPort<any>;
@@ -24,7 +25,7 @@ export default class BridgingUsecase implements BridgingInputPort {
     if (!balanceDTO.success) {
       this.presenter.presentError({
         status: "error",
-        message: "Error getting PR token balance",
+        message: "Error getting PR token balance KHAFASDFHK",
         details: {
           amount: amount,
           network: network,
@@ -56,19 +57,9 @@ export default class BridgingUsecase implements BridgingInputPort {
       message: "Bridging in progress...",
     });
 
-    const S_GAS_SIGNAL = clientContainer.get<TSignal<TTransactionGasStatus>>(SIGNALS.TRANSACTION_GAS_STATUS);
-    const s_gas_signal = S_GAS_SIGNAL.value;
-    effect(() => {
-      return this.presenter.presentEstimatedGas({
-        amount: amount,
-        network: network,
-        wallet: wallet,
-        toNetwork: toNetwork,
-        estimateGas: s_gas_signal.value.estimatedGas,
-        message: "Estimating gas...",
-      });
-    });
-    const bridgeTokensDTO = await this.elkBridgeHead.bridgeTokens(wallet, network, amount, toNetwork, S_GAS_SIGNAL);
+    // TODO: check approval for reservoir
+   
+    const bridgeTokensDTO = await this.elkBridgeHead.bridgeTokens(wallet, network, amount, toNetwork);
     if (!bridgeTokensDTO.success) {
       this.presenter.presentError({
         status: "error",

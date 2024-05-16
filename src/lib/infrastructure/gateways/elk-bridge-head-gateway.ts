@@ -22,7 +22,7 @@ export default class ElkBridgeHeadGateway implements ElkBridgeHeadOutputPort {
     network: TNetwork,
     amount: number,
     toNetwork: TNetwork,
-    gasStatusSignal: TSignal<TTransactionGasStatus>,
+    gasStatusSignal?: TSignal<TTransactionGasStatus>,
   ): Promise<TBridgeTokensDTO> {
     const contract = this.__getContract(network);
     const bridgeAmount = fromHumanReadableNumber(amount);

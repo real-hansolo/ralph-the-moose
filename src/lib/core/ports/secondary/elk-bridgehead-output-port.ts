@@ -8,6 +8,6 @@ export default interface ElkBridgeHeadOutputPort {
     network: TNetwork,
     amount: number,
     toNetwork: TNetwork,
-    gasStatusSignal: TSignal<TTransactionGasStatus>,
+    gasStatusSignal?: TSignal<TTransactionGasStatus>,
   ): Promise<TBridgeTokensDTO>;
 }

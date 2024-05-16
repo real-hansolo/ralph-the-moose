@@ -14,14 +14,9 @@ export const callThirdWebContractUtil = async (
   preparedContractCall: TPreparedContractCall,
   gasStatusSignal?: TSignal<TTransactionGasStatus>,
 ): Promise<TExecutedTransactionDTO> => {
-  const web3Gateway = clientContainer.get<
-    Web3GatewayOutputPort<Wallet, PreparedTransaction, PreparedTransaction>
-  >(GATEWAYS.WEB3_GATEWAY);
-  const walletProvider = clientContainer.get<WalletProviderOutputPort<Wallet>>(
-    GATEWAYS.WALLET_PROVIDER,
-  );
-  const activeWalletDTO: ActiveWalletDTO<Wallet> =
-    walletProvider.getActiveWallet();
+  const web3Gateway = clientContainer.get<Web3GatewayOutputPort<Wallet, PreparedTransaction, PreparedTransaction>>(GATEWAYS.WEB3_GATEWAY);
+  const walletProvider = clientContainer.get<WalletProviderOutputPort<Wallet>>(GATEWAYS.WALLET_PROVIDER);
+  const activeWalletDTO: ActiveWalletDTO<Wallet> = walletProvider.getActiveWallet();
   if (!activeWalletDTO.success) {
     return {
       success: false,
@@ -83,8 +78,7 @@ export const callThirdWebContractUtil = async (
     };
   }
 
-  const preparedTransactionDTO =
-    web3Gateway.prepareContractCall(preparedContractCall);
+  const preparedTransactionDTO = web3Gateway.prepareContractCall(preparedContractCall);
   if (!preparedTransactionDTO.success) {
     return {
       success: false,
@@ -99,8 +93,7 @@ export const callThirdWebContractUtil = async (
       },
     };
   }
-  const web3GatewayPreparedContractCall =
-    preparedTransactionDTO.preparedContractCall;
+  const web3GatewayPreparedContractCall = preparedTransactionDTO.preparedContractCall;
 
   if (!web3GatewayPreparedContractCall) {
     return {
@@ -116,22 +109,18 @@ export const callThirdWebContractUtil = async (
       },
     };
   }
-  const estimatedGasDTO = await web3Gateway.estimateGas(
-    web3GatewayPreparedContractCall,
-  );
-  if (estimatedGasDTO.success && gasStatusSignal) {
-    gasStatusSignal.value.value = {
-      estimatedGas: Number(estimatedGasDTO.data), // Convert bigint to number
-      gasLimit: preparedContractCall.contract.network.gasLimit,
-      preparedTransaction: preparedContractCall,
-    };
+  if (gasStatusSignal) {
+    const estimatedGasDTO = await web3Gateway.estimateGas(web3GatewayPreparedContractCall);
+    if (estimatedGasDTO.success) {
+      gasStatusSignal.value.value = {
+        estimatedGas: Number(estimatedGasDTO.data), // Convert bigint to number
+        gasLimit: preparedContractCall.contract.network.gasLimit,
+        preparedTransaction: preparedContractCall,
+      };
+    }
   }
 
-  const executedTransactionDTO = await web3Gateway.callContract(
-    web3GatewayPreparedContractCall,
-    preparedContractCall,
-    thirdwebWallet,
-  );
+  const executedTransactionDTO = await web3Gateway.callContract(web3GatewayPreparedContractCall, preparedContractCall, thirdwebWallet);
 
   return executedTransactionDTO;
 };
@@ -141,14 +130,9 @@ export const sendThirdWebTransactionUtil = async (
   preparedTransaction: TPreparedTransaction,
   gasStatusSignal?: TSignal<TTransactionGasStatus>,
 ): Promise<TExecutedTransactionDTO> => {
-  const web3Gateway = clientContainer.get<
-    Web3GatewayOutputPort<Wallet, PreparedTransaction, PreparedTransaction>
-  >(GATEWAYS.WEB3_GATEWAY);
-  const walletProvider = clientContainer.get<WalletProviderOutputPort<Wallet>>(
-    GATEWAYS.WALLET_PROVIDER,
-  );
-  const activeWalletDTO: ActiveWalletDTO<Wallet> =
-    walletProvider.getActiveWallet();
+  const web3Gateway = clientContainer.get<Web3GatewayOutputPort<Wallet, PreparedTransaction, PreparedTransaction>>(GATEWAYS.WEB3_GATEWAY);
+  const walletProvider = clientContainer.get<WalletProviderOutputPort<Wallet>>(GATEWAYS.WALLET_PROVIDER);
+  const activeWalletDTO: ActiveWalletDTO<Wallet> = walletProvider.getActiveWallet();
   if (!activeWalletDTO.success) {
     return {
       success: false,
@@ -226,7 +210,7 @@ export const sendThirdWebTransactionUtil = async (
     };
   }
   const web3GatewayPreparedTransaction = preparedTransactionDTO.preparedTransaction;
-  
+
   if (!web3GatewayPreparedTransaction) {
     return {
       success: false,
@@ -242,20 +226,18 @@ export const sendThirdWebTransactionUtil = async (
     };
   }
 
-  const estimatedGasDTO = await web3Gateway.estimateGas(web3GatewayPreparedTransaction);
-  if (estimatedGasDTO.success && gasStatusSignal) {
-    gasStatusSignal.value.value = {
-      estimatedGas: Number(estimatedGasDTO.data), // Convert bigint to number
-      gasLimit: preparedTransaction.network.gasLimit,
-      preparedTransaction: preparedTransaction,
-    };
+  if (gasStatusSignal) {
+    const estimatedGasDTO = await web3Gateway.estimateGas(web3GatewayPreparedTransaction);
+    if (estimatedGasDTO.success) {
+      gasStatusSignal.value.value = {
+        estimatedGas: Number(estimatedGasDTO.data), // Convert bigint to number
+        gasLimit: preparedTransaction.network.gasLimit,
+        preparedTransaction: preparedTransaction,
+      };
+    }
   }
 
-  const executedTransactionDTO = await web3Gateway.sendTransaction(
-    web3GatewayPreparedTransaction,
-    preparedTransaction,
-    thirdwebWallet,
-  );
+  const executedTransactionDTO = await web3Gateway.sendTransaction(web3GatewayPreparedTransaction, preparedTransaction, thirdwebWallet);
 
   return executedTransactionDTO;
-}
+};

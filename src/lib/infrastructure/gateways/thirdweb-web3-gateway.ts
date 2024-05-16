@@ -5,7 +5,7 @@ import {
   prepareTransaction,
   prepareContractCall,
   getContract,
-  estimateGas,
+  estimateGas as thirdWebEsimtateGas,
   sendTransaction,
   type PreparedTransaction,
 } from "@maany_shr/thirdweb";
@@ -23,8 +23,8 @@ import type {
   TPreparedTransaction,
 } from "~/lib/core/entity/models";
 import type Web3GatewayOutputPort from "~/lib/core/ports/secondary/web3-gateway-output-port";
-import { api } from "~/lib/infrastructure/trpc/react";
 import { injectable } from "inversify";
+import { client } from "../trpc/vanilla";
 
 @injectable()
 export default class ThirdwebWeb3Gateway
@@ -97,18 +97,13 @@ export default class ThirdwebWeb3Gateway
     const explorerLink = `${transactionDetails.network.explorer.url}/tx/${transactionHash}`;
     const timestamp = new Date().toLocaleDateString();
 
-    const txDetailsDTOQuery = api.rpc.getTransaction.useQuery({
+    const txDetailsDTOQuery = await client.rpc.getTransaction.query({
       hash: transactionHash,
       networkId: transactionDetails.network.chainId,
     });
-    const txDetailsDTO = txDetailsDTOQuery.data;
     if (
-      txDetailsDTOQuery.error ??
-      !txDetailsDTO ??
-      !txDetailsDTO.success ??
-      !txDetailsDTO.data
-    ) {
-      return {
+      !txDetailsDTOQuery.success) {
+      return { 
         success: true,
         data: {
           status: "partial",
@@ -124,7 +119,9 @@ export default class ThirdwebWeb3Gateway
         },
       };
     }
-    const blockNumber = txDetailsDTO.data.blockNumber;
+    const txDetails = txDetailsDTOQuery.data;
+    const blockNumber = txDetails.blockNumber;
+
     return {
       success: true,
       data: {
@@ -176,6 +173,7 @@ export default class ThirdwebWeb3Gateway
           stateMutability: preparedContractCall.method.stateMutability,
         },
         params: preparedContractCall.params,
+        value: toWei(preparedContractCall.value),
       });
       return {
         success: true,
@@ -206,7 +204,7 @@ export default class ThirdwebWeb3Gateway
   async estimateGas(
     preparedTransaction: PreparedTransaction,
   ): Promise<TEstimateGasDTO> {
-    const estimatedGas = await estimateGas({
+    const estimatedGas = await thirdWebEsimtateGas({
       transaction: preparedTransaction,
     });
     return {

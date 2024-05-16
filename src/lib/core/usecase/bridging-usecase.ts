@@ -17,6 +17,13 @@ export default class BridgingUsecase implements BridgingInputPort {
 
   async execute(request: TBridgingRequest): Promise<void> {
     const { wallet, network, amount, toNetwork } = request;
+    this.presenter.presentProgress({
+      amount: amount,
+      network: network,
+      wallet: wallet,
+      toNetwork: toNetwork,
+      message: "Checking balance before bridging...",
+    });
     const balanceDTO = await this.ralphTokenGateway.getBalance(wallet.activeAccount, network);
     if (!balanceDTO.success) {
       this.presenter.presentError({

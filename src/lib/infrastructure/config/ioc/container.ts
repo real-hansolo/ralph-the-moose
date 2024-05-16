@@ -40,13 +40,14 @@ import UnwrappingPresenter from "../../presenters/unwrapping-presenter";
 import type { UnWrappingInputPort } from "~/lib/core/ports/primary/unwrapping-primary-ports";
 import type { TUnwrappingViewModel } from "~/lib/core/view-models/unwrapping-view-model";
 import UnwrappingUsecase from "~/lib/core/usecase/unwrapping-usecase";
-import BridgingController from "../../controllers/bridging-controller";
+import type BridgingController from "../../controllers/thidweb-bridging-controller";
 import type { BridgingInputPort } from "~/lib/core/ports/primary/bridging-primary-ports";
 import type { TBridgingViewModel } from "~/lib/core/view-models/bridging-view-model";
 import BridgingPresenter from "../../presenters/bridging-presenter";
 import type ElkBridgeHeadOutputPort from "~/lib/core/ports/secondary/elk-bridgehead-output-port";
 import ElkBridgeHeadGateway from "../../gateways/elk-bridge-head-gateway";
 import BridgingUsecase from "~/lib/core/usecase/bridging-usecase";
+import ThirdwebBridgingController from "../../controllers/thidweb-bridging-controller";
 
 const clientContainer = new Container();
 const signalsContainer = new Container();
@@ -125,7 +126,7 @@ clientContainer
 /**
  * Feature: Bridging
  */
-clientContainer.bind<BridgingController>(CONTROLLER.BRIDGING_CONTROLLER).to(BridgingController);
+clientContainer.bind<BridgingController>(CONTROLLER.BRIDGING_CONTROLLER).to(ThirdwebBridgingController);
 clientContainer
   .bind<interfaces.Factory<BridgingInputPort>>(USECASE.BRIDGING_USECASE_FACTORY)
   .toFactory<BridgingInputPort, [TSignal<TBridgingViewModel>]>((context: interfaces.Context) => (response: TSignal<TBridgingViewModel>) => {

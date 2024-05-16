@@ -11,22 +11,24 @@ import type {
 import type RalphTokenOutputPort from "~/lib/core/ports/secondary/ralph-token-output-port";
 import RalphABI from "../config/abi/Ralph.json";
 import { callThirdWebContractUtil } from "~/lib/utils/transactionUtils";
-import { api } from "../trpc/react";
+import { client } from "../trpc/vanilla";
 import { BigNumber, ethers } from "ethers";
 import { toHumanReadableNumber } from "~/lib/utils/tokenUtils";
+import { injectable } from "inversify";
 
+@injectable()
 export default class RalphTokenGateway implements RalphTokenOutputPort {
-  __getEthContract(network: TNetwork): ethers.Contract {
-    const rpcUrlQuery = api.rpc.getRpcProvider.useQuery({
+  async __getEthContract(network: TNetwork): Promise<ethers.Contract> {
+    const rpcUrlQuery = await client.rpc.getRpcProvider.query({
       networkId: network.chainId,
     });
-    if (rpcUrlQuery.error ?? !rpcUrlQuery.data ?? !rpcUrlQuery.data.success) {
-      throw new Error("Error fetching rpc provider");
+    if(!rpcUrlQuery.success) {
+      return Promise.reject(`Error fetching rpc provider for ${network.name}`);
     }
-    const rpcUrl = rpcUrlQuery.data.data.url;
+    const rpcUrl = rpcUrlQuery.data.url;
     const provider = new ethers.providers.JsonRpcProvider(rpcUrl);
     return new ethers.Contract(
-      network.contracts.ralphReservoirAddress,
+      network.contracts.ralphTokenAddress,
       RalphABI,
       provider,
     );
@@ -35,7 +37,7 @@ export default class RalphTokenGateway implements RalphTokenOutputPort {
   __getContract(network: TNetwork): TContract {
     return {
       name: "Ralph Token",
-      address: network.contracts.ralphReservoirAddress,
+      address: network.contracts.ralphTokenAddress,
       abi: RalphABI,
       network: network,
     };
@@ -94,7 +96,7 @@ export default class RalphTokenGateway implements RalphTokenOutputPort {
     walletAddress: string,
     network: TNetwork,
   ): Promise<BalanceDTO> {
-    const contract = this.__getEthContract(network);
+    const contract = await this.__getEthContract(network);
     try {
       // eslint-disable-next-line @typescript-eslint/no-unsafe-call
       const balance = await contract.balanceOf(walletAddress);

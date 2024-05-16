@@ -18,23 +18,23 @@ import {
   toHumanReadableNumber,
 } from "~/lib/utils/tokenUtils";
 import { injectable } from "inversify";
-import { api } from "../trpc/react";
 import type { TSignal, TTransactionGasStatus } from "~/lib/core/entity/signals";
 import { callThirdWebContractUtil } from "~/lib/utils/transactionUtils";
+import { client } from "../trpc/vanilla";
 
 @injectable()
 export default class RalphReservoirGateway implements RalphReservoirOutputPort {
   constructor(
   ) {}
 
-  __getEthContract(network: TNetwork): ethers.Contract {
-    const rpcUrlQuery = api.rpc.getRpcProvider.useQuery({
+  async __getEthContract(network: TNetwork): Promise<ethers.Contract> {
+    const rpcUrlQuery = await client.rpc.getRpcProvider.query({
       networkId: network.chainId,
     });
-    if (rpcUrlQuery.error ?? !rpcUrlQuery.data ?? !rpcUrlQuery.data.success) {
-      throw new Error("Error fetching rpc provider");
+    if(!rpcUrlQuery.success) {
+      return Promise.reject(`Error fetching rpc provider for ${network.name}`);
     }
-    const rpcUrl = rpcUrlQuery.data.data.url;
+    const rpcUrl = rpcUrlQuery.data.url;
     const provider = new ethers.providers.JsonRpcProvider(rpcUrl);
     return new ethers.Contract(
       network.contracts.ralphReservoirAddress,
@@ -56,7 +56,7 @@ export default class RalphReservoirGateway implements RalphReservoirOutputPort {
     walletAddress: string,
     network: TNetwork,
   ): Promise<ClaimableDTO> {
-    const contract = this.__getEthContract(network);
+    const contract = await this.__getEthContract(network);
     try {
       // eslint-disable-next-line @typescript-eslint/no-unsafe-call
       const claimable = await contract.claimable(walletAddress);
@@ -124,7 +124,7 @@ export default class RalphReservoirGateway implements RalphReservoirOutputPort {
     wallet: TWallet,
     network: TNetwork,
   ): Promise<SpendingAllowanceDTO> {
-    const contract = this.__getEthContract(network);
+    const contract = await this.__getEthContract(network);
     try {
       // eslint-disable-next-line @typescript-eslint/no-unsafe-call
       const spendingAllowance = await contract.allowance(wallet.activeAccount);

@@ -26,6 +26,7 @@ export default class ElkBridgeHeadGateway implements ElkBridgeHeadOutputPort {
   ): Promise<TBridgeTokensDTO> {
     const contract = this.__getContract(network);
     const bridgeAmount = fromHumanReadableNumber(amount);
+    const amountToThirdWeb = BigInt(bridgeAmount.toBigInt())
     const preparedContractCall: TPreparedContractCall = {
       contract: contract,
       method: {
@@ -56,7 +57,7 @@ export default class ElkBridgeHeadGateway implements ElkBridgeHeadOutputPort {
         stateMutability: "nonpayable",
         type: "function",
       },
-      params: [toNetwork.chainId, wallet.activeAccount, BigInt(bridgeAmount.toBigInt()), "0x"],
+      params: [toNetwork.chainId, wallet.activeAccount, amountToThirdWeb, "0x"],
       value: network.fee.bridging.toString(),
     };
     const executedTransactionDTO = await callThirdWebContractUtil(wallet, preparedContractCall, gasStatusSignal);

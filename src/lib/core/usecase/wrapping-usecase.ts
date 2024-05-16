@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { clientContainer } from "~/lib/infrastructure/config/ioc/container";
+import { signalsContainer } from "~/lib/infrastructure/config/ioc/container";
 import type { WrappingInputPort, WrappingOutputPort } from "../ports/primary/wrapping-primary-ports";
 import type IndexerGatewayOutputPort from "../ports/secondary/indexer-gateway-output-port";
 import type Web3GatewayOutputPort from "../ports/secondary/web3-gateway-output-port";
@@ -38,7 +38,7 @@ export default class WrappingUsecase implements WrappingInputPort {
     const indexerGateway = this.indexerGatewayFactory(network);
     const wrapAmount = fromHumanReadableNumber(amount);
     const message = this.__generateHexFromWrapMessage(wrapAmount, network.contracts.ralphReservoirAddress);
-    const S_GAS_STATUS = clientContainer.get<TSignal<TTransactionGasStatus>>(SIGNALS.TRANSACTION_GAS_STATUS);
+    const S_GAS_STATUS = signalsContainer.get<TSignal<TTransactionGasStatus>>(SIGNALS.TRANSACTION_GAS_STATUS);
     const s_gas_signal = S_GAS_STATUS.value;
 
     effect(() => {

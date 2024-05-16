@@ -28,20 +28,6 @@ export const ClaimDTOSchema = DTOSchemaFactory(
 export type ClaimDTO = z.infer<typeof ClaimDTOSchema>;
 
 
-export const SpendingAllowanceDTOSchema = DTOSchemaFactory(
-    z.object({
-        allowance: z.number()
-    }),
-    z.object({
-        walletAddress: z.string(),
-        network: z.string(),
-        message: z.string(),
-    }),
-);
-
-export type SpendingAllowanceDTO = z.infer<typeof SpendingAllowanceDTOSchema>;
-
-
 export const UnwrapDTOSchema = DTOSchemaFactory(
     ExecutedTransactionSchema,
     z.object({

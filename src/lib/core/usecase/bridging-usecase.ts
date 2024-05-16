@@ -1,13 +1,9 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
+import { aproveRalphReservoir } from "~/lib/utils/transactionUtils";
 import type { BridgingInputPort, BridgingOutputPort } from "../ports/primary/bridging-primary-ports";
 import type ElkBridgeHeadOutputPort from "../ports/secondary/elk-bridgehead-output-port";
 import type RalphTokenOutputPort from "../ports/secondary/ralph-token-output-port";
 import type { TBridgingRequest } from "../usecase-models/bridging-usecase-models";
-import { signalsContainer } from "~/lib/infrastructure/config/ioc/container";
-import { SIGNALS } from "~/lib/infrastructure/config/ioc/symbols";
-import { type TSignal, type TTransactionGasStatus } from "../entity/signals";
-import { effect } from "@preact/signals-react";
-// import { effect } from "@preact/signals-react";
 
 export default class BridgingUsecase implements BridgingInputPort {
   presenter: BridgingOutputPort<any>;
@@ -57,8 +53,21 @@ export default class BridgingUsecase implements BridgingInputPort {
       message: "Bridging in progress...",
     });
 
-    // TODO: check approval for reservoir
-   
+    const approvalRessult = await aproveRalphReservoir(amount, wallet, network);
+    if (approvalRessult && !approvalRessult.success) {
+      this.presenter.presentError({
+        status: "error",
+        message: "Error approving reservoir for bridging",
+        details: {
+          amount: amount,
+          network: network,
+          wallet: wallet,
+          toNetwork: toNetwork,
+        },
+      });
+      return;
+    }
+    
     const bridgeTokensDTO = await this.elkBridgeHead.bridgeTokens(wallet, network, amount, toNetwork);
     if (!bridgeTokensDTO.success) {
       this.presenter.presentError({

@@ -8,6 +8,7 @@ import type { TSignal, TTransactionGasStatus } from "../entity/signals";
 import { signalsContainer } from "~/lib/infrastructure/config/ioc/container";
 import { SIGNALS } from "~/lib/infrastructure/config/ioc/symbols";
 import { effect } from "@preact/signals-react";
+import { aproveRalphReservoir } from "~/lib/utils/transactionUtils";
 
 export default class UnwrappingUsecase implements UnWrappingInputPort {
   presenter: UnWrappingOutputPort<any>;
@@ -40,30 +41,20 @@ export default class UnwrappingUsecase implements UnWrappingInputPort {
       return;
     }
     const initialBalance = balanceDTO.data.balance;
-    const allowanceDTO = await this.ralphReservoirGateway.getSpendingAllowance(wallet, network);
-    if (!allowanceDTO.success) {
-      this.presenter.presentProgress({
-        status: "in-progress",
-        message: "Approving spending allowance",
-        amount: amount,
-        network: network,
-        wallet: wallet,
+    const approvalResult  = await aproveRalphReservoir(amount, wallet, network);
+    if(approvalResult && !approvalResult.success) {
+      this.presenter.presentError({
+        status: "error",
+        message: `Error approving reservoir for unwrapping`,
+        details: {
+          amount: amount,
+          network: network,
+          wallet: wallet,
+          approvalError: true,
+          verificationError: false,
+        },
       });
-      const approvalDTO = await this.ralphTokenGateway.approveReservoir(wallet, network);
-      if (!approvalDTO.success) {
-        this.presenter.presentError({
-          status: "error",
-          message: "Couldn't approve Ralph Reservoir to unwrap your PR Tokens",
-          details: {
-            amount: amount,
-            network: network,
-            wallet: wallet,
-            approvalError: true,
-            verificationError: false,
-          },
-        });
-        return;
-      }
+      return;
     }
 
     effect(() => {

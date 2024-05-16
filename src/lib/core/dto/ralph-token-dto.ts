@@ -26,3 +26,17 @@ export const BalanceDTOSchema = DTOSchemaFactory(
 );
 
 export type BalanceDTO = z.infer<typeof BalanceDTOSchema>;
+
+
+export const SpendingAllowanceDTOSchema = DTOSchemaFactory(
+    z.object({
+        allowance: z.number()
+    }),
+    z.object({
+        walletAddress: z.string(),
+        network: z.string(),
+        message: z.string(),
+    }),
+);
+
+export type SpendingAllowanceDTO = z.infer<typeof SpendingAllowanceDTOSchema>;

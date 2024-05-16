@@ -1,6 +1,6 @@
 import { type Wallet } from "@maany_shr/thirdweb/wallets";
 import type { TExecutedTransactionDTO } from "../core/dto/web3-gateway-dto";
-import type { TWallet, TPreparedContractCall, TPreparedTransaction } from "../core/entity/models";
+import type { TWallet, TPreparedContractCall, TPreparedTransaction, TNetwork } from "../core/entity/models";
 import type { TSignal, TTransactionGasStatus } from "../core/entity/signals";
 import type Web3GatewayOutputPort from "../core/ports/secondary/web3-gateway-output-port";
 import { type PreparedTransaction } from "@maany_shr/thirdweb";
@@ -8,6 +8,8 @@ import { clientContainer } from "../infrastructure/config/ioc/container";
 import { GATEWAYS } from "../infrastructure/config/ioc/symbols";
 import type WalletProviderOutputPort from "../core/ports/secondary/wallet-provider-output-port";
 import type { ActiveWalletDTO } from "../core/dto/wallet-provider-dto";
+import type RalphTokenOutputPort from "../core/ports/secondary/ralph-token-output-port";
+import type { ApproveReservoirDTO } from "../core/dto/ralph-token-dto";
 
 export const callThirdWebContractUtil = async (
   wallet: TWallet,
@@ -240,4 +242,25 @@ export const sendThirdWebTransactionUtil = async (
   const executedTransactionDTO = await web3Gateway.sendTransaction(web3GatewayPreparedTransaction, preparedTransaction, thirdwebWallet);
 
   return executedTransactionDTO;
+};
+
+export const aproveRalphReservoir = async (amount: number, wallet: TWallet, network: TNetwork): Promise<ApproveReservoirDTO | undefined> => {
+  const ralphTokenGateway = clientContainer.get<RalphTokenOutputPort>(GATEWAYS.RALPH_TOKEN_GATEWAY);
+  const spendingAllowance = await ralphTokenGateway.getSpendingAllowance(wallet, network);
+  if (!spendingAllowance.success) {
+    return {
+      success: false,
+      data: {
+        walletAddress: spendingAllowance.data.message,
+        network: spendingAllowance.data.network,
+        message: spendingAllowance.data.message,
+      },
+    };
+  }
+  if (spendingAllowance.data.allowance < amount) {
+    const approveDTO = await ralphTokenGateway.approveReservoir(wallet, network);
+    return approveDTO;
+  }
+  // already approved
+  return undefined;
 };

@@ -1,13 +1,5 @@
-import type {
-  ApproveReservoirDTO,
-  BalanceDTO,
-} from "~/lib/core/dto/ralph-token-dto";
-import type {
-  TContract,
-  TNetwork,
-  TPreparedContractCall,
-  TWallet,
-} from "~/lib/core/entity/models";
+import type { ApproveReservoirDTO, BalanceDTO, SpendingAllowanceDTO } from "~/lib/core/dto/ralph-token-dto";
+import type { TContract, TNetwork, TPreparedContractCall, TWallet } from "~/lib/core/entity/models";
 import type RalphTokenOutputPort from "~/lib/core/ports/secondary/ralph-token-output-port";
 import RalphABI from "../config/abi/Ralph.json";
 import { callThirdWebContractUtil } from "~/lib/utils/transactionUtils";
@@ -22,16 +14,12 @@ export default class RalphTokenGateway implements RalphTokenOutputPort {
     const rpcUrlQuery = await client.rpc.getRpcProvider.query({
       networkId: network.chainId,
     });
-    if(!rpcUrlQuery.success) {
+    if (!rpcUrlQuery.success) {
       return Promise.reject(`Error fetching rpc provider for ${network.name}`);
     }
     const rpcUrl = rpcUrlQuery.data.url;
     const provider = new ethers.providers.JsonRpcProvider(rpcUrl);
-    return new ethers.Contract(
-      network.contracts.ralphTokenAddress,
-      RalphABI,
-      provider,
-    );
+    return new ethers.Contract(network.contracts.ralphTokenAddress, RalphABI, provider);
   }
 
   __getContract(network: TNetwork): TContract {
@@ -43,14 +31,8 @@ export default class RalphTokenGateway implements RalphTokenOutputPort {
     };
   }
 
-  async approveReservoir(
-    wallet: TWallet,
-    network: TNetwork,
-    amount?: number,
-  ): Promise<ApproveReservoirDTO> {
-    const bigAmount =
-      amount ??
-      `115792089237316195423570985008687907853269984665640564039457584007913129639935`;
+  async approveReservoir(wallet: TWallet, network: TNetwork, amount?: number): Promise<ApproveReservoirDTO> {
+    const bigAmount = amount ?? `115792089237316195423570985008687907853269984665640564039457584007913129639935`;
     const contract = this.__getContract(network);
     const preparedContractCall: TPreparedContractCall = {
       contract: contract,
@@ -76,10 +58,7 @@ export default class RalphTokenGateway implements RalphTokenOutputPort {
       value: "0",
     };
 
-    const executedTransactionDTO = await callThirdWebContractUtil(
-      wallet,
-      preparedContractCall,
-    );
+    const executedTransactionDTO = await callThirdWebContractUtil(wallet, preparedContractCall);
     if (!executedTransactionDTO.success) {
       return {
         success: false,
@@ -92,10 +71,32 @@ export default class RalphTokenGateway implements RalphTokenOutputPort {
     }
     return executedTransactionDTO;
   }
-  async getBalance(
-    walletAddress: string,
-    network: TNetwork,
-  ): Promise<BalanceDTO> {
+
+  async getSpendingAllowance(wallet: TWallet, network: TNetwork): Promise<SpendingAllowanceDTO> {
+    const contract = await this.__getEthContract(network);
+    try {
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-call
+      const spendingAllowance = await contract.allowance(wallet.activeAccount, network.contracts.ralphReservoirAddress);
+      return {
+        success: true,
+        data: {
+          allowance: toHumanReadableNumber(BigNumber.from(spendingAllowance)),
+        },
+      };
+    } catch (e) {
+      console.error(e as Error);
+      return {
+        success: false,
+        data: {
+          message: `Error fetching spending allowance. ${(e as Error).message}`,
+          walletAddress: wallet.activeAccount,
+          network: network.name,
+        },
+      };
+    }
+  }
+
+  async getBalance(walletAddress: string, network: TNetwork): Promise<BalanceDTO> {
     const contract = await this.__getEthContract(network);
     try {
       // eslint-disable-next-line @typescript-eslint/no-unsafe-call

@@ -8,7 +8,6 @@ import type {
 import type {
   ClaimDTO,
   ClaimableDTO,
-  SpendingAllowanceDTO,
   UnwrapDTO,
 } from "~/lib/core/dto/ralph-reservoir-dto";
 import RalphReservoirABI from "../config/abi/RalphReservoir.json";
@@ -118,33 +117,6 @@ export default class RalphReservoirGateway implements RalphReservoirOutputPort {
       };
     }
     return executedTransactionDTO;
-  }
-
-  async getSpendingAllowance(
-    wallet: TWallet,
-    network: TNetwork,
-  ): Promise<SpendingAllowanceDTO> {
-    const contract = await this.__getEthContract(network);
-    try {
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-call
-      const spendingAllowance = await contract.allowance(wallet.activeAccount);
-      return {
-        success: true,
-        data: {
-          allowance: toHumanReadableNumber(BigNumber.from(spendingAllowance)),
-        },
-      };
-    } catch (e) {
-      console.error(e as Error);
-      return {
-        success: false,
-        data: {
-          message: `Error fetching spending allowance. ${(e as Error).message}`,
-          walletAddress: wallet.activeAccount,
-          network: network.name,
-        },
-      };
-    }
   }
 
   async unwrap(

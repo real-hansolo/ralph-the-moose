@@ -62,15 +62,15 @@ export const AVALANCHE: TNetwork = {
     name: "Avalanche",
     explorer: { 
         name: "Avalanche Explorer",
-        url: "https://cchain.explorer.avax.network/" 
+        url: "https://snowtrace.io/" 
     },
     rpcProvider: "infura",
     nativeCurrency: "AVAX",
     gasLimit: 200000,
     fee: { 
-        minting: 0.00123,
-        wrapping: 0.00123,
-        unwrapping: 0.00123,
+        minting: 0.0572523,
+        wrapping: 0.0572523,
+        unwrapping: 0.0572523,
         bridging: 0
     },
     contracts: {
@@ -80,7 +80,7 @@ export const AVALANCHE: TNetwork = {
     },
     icon: <IconElk size={4} />,
     indexer: {
-        url: "http://162.244.82.115:8000", // TODO: move to env
+        url: "http://162.244.82.115:8001", // TODO: move to env
         secure: false
     },
 }

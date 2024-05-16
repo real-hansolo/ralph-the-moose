@@ -9,7 +9,7 @@ import { env } from "~/env";
 import { type BigNumber } from "ethers";
 import { fromHumanReadableNumber } from "~/lib/utils/tokenUtils";
 import type { TMintingRequest } from "../usecase-models/minting-usecase-models";
-import { clientContainer } from "~/lib/infrastructure/config/ioc/container";
+import { signalsContainer } from "~/lib/infrastructure/config/ioc/container";
 import type { TSignal, TTransactionGasStatus } from "../entity/signals";
 import { SIGNALS } from "~/lib/infrastructure/config/ioc/symbols";
 import { effect } from "@preact/signals-react";
@@ -46,7 +46,7 @@ export default class MintingUsecase implements MintingInputPort {
     };
     // present progress
     // gas signal
-    const S_GAS_STATUS = clientContainer.get<TSignal<TTransactionGasStatus>>(SIGNALS.TRANSACTION_GAS_STATUS);
+    const S_GAS_STATUS = signalsContainer.get<TSignal<TTransactionGasStatus>>(SIGNALS.TRANSACTION_GAS_STATUS);
     const s_gas_signal = S_GAS_STATUS.value;
 
     effect(() => {

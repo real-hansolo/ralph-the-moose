@@ -3,7 +3,7 @@ import type RalphReservoirOutputPort from "~/lib/core/ports/secondary/ralph-rese
 import type { ClaimingInputPort, ClaimingOutputPort } from "../ports/primary/claiming-primary-ports";
 import type RalphTokenOutputPort from "../ports/secondary/ralph-token-output-port";
 import type { TClaimingRequest } from "../usecase-models/claiming-usecase-models";
-import { clientContainer } from "~/lib/infrastructure/config/ioc/container";
+import { signalsContainer } from "~/lib/infrastructure/config/ioc/container";
 import { SIGNALS } from "~/lib/infrastructure/config/ioc/symbols";
 import type { TSignal, TTransactionGasStatus } from "../entity/signals";
 
@@ -62,7 +62,7 @@ export default class ClaimingUsecase implements ClaimingInputPort {
     const intitialBalance = initialBalanceDTO.data.balance;
     const expectedBalance = intitialBalance + amount;
 
-    const S_GAS_SIGNAL = clientContainer.get<TSignal<TTransactionGasStatus>>(SIGNALS.TRANSACTION_GAS_STATUS);
+    const S_GAS_SIGNAL = signalsContainer.get<TSignal<TTransactionGasStatus>>(SIGNALS.TRANSACTION_GAS_STATUS);
     this.presenter.presentProgress({
       amount: amount,
       network: network,

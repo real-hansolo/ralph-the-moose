@@ -33,7 +33,7 @@ export const Menu = () => {
        <NavLink
         variant="medium"
         label="ElkDex"
-        url="https://app.elk.finance/swap/8453/ETH/PR"
+        url="https://app.elk.finance/swap/43114/AVAX/PR"
         // icon={<IconElk size={4} />}
         className="text-text-inverted"
       />

@@ -48,7 +48,7 @@ export const AVALANCHE: TChainConfig = {
   explorerName: "Snowtrace",
   gasLimit: 200000,
   icon: <IconNetworkAvax />,
-  networkCurrency: "Avax",
+  networkCurrency: "AVAX",
   mintingFee: 0.123,
   wrappingFee: 0.123,
   unwrappingFee: 0.123,

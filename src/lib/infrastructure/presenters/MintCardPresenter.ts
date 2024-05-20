@@ -53,8 +53,8 @@ export default class MintCardPresenter {
       } as MintCardViewModel;
     } else {
       this.mintLimit.value = allocationLimits.data.total_mintable; // TODO: check if this is the correct value
-      // this.DEFAULT_ALLOCATION.value =
-      // allocationLimits.data.max_per_mint; // TODO: enable later
+      this.DEFAULT_ALLOCATION.value =
+      allocationLimits.data.max_per_mint; // TODO: enable later
     }
   }
 

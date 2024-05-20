@@ -1,8 +1,8 @@
 import { env } from "~/env";
-import { IconNetworkBase } from "~/lib/components";
+import { IconNetworkAvax, IconNetworkBase } from "~/lib/components";
 import { type Chain } from "thirdweb";
-import { base, baseSepolia } from "thirdweb/chains";
-import {  Base, BaseSepoliaTestnet } from "@thirdweb-dev/chains";
+import { avalanche, base, baseSepolia } from "thirdweb/chains";
+import {  Base, BaseSepoliaTestnet, Avalanche } from "@thirdweb-dev/chains";
 export type TChainConfig = {
   chainId: number;
   name: string;
@@ -37,6 +37,24 @@ export const BASE_MAINNET: TChainConfig = {
   ralphReservoirAddress: "0x27e964E016B68EeFbe958Ace62174af0e1CeD053",
   ralphTokenAddress: "0x05F1938646a897008e813fb03CE7C575eAE45738",
   thirdWeb: base,
+};
+
+export const AVALANCHE: TChainConfig = {
+  chainId: Avalanche.chainId,
+  name: "Avax",
+  rpcUrl: "https://mainnet.base.org",
+  jsonRpcProvider: "https://avalanche-mainnet.infura.io/v3/438477dd32fe4e338bce7da100cc34dd",
+  explorerUrl: "https://snowtrace.io/",
+  explorerName: "Snowtrace",
+  gasLimit: 200000,
+  icon: <IconNetworkAvax />,
+  networkCurrency: "Avax",
+  mintingFee: 0.0572523,
+  wrappingFee: 0.0572523,
+  unwrappingFee: 0.0572523,
+  ralphReservoirAddress: "0x27e964E016B68EeFbe958Ace62174af0e1CeD053",
+  ralphTokenAddress: "0x05F1938646a897008e813fb03CE7C575eAE45738",
+  thirdWeb: avalanche,
 };
 
 export const BASE_SEPOLIA_TESTNET: TChainConfig = {
@@ -77,7 +95,7 @@ export const getDefaultChain = () => {
   if (env.NEXT_PUBLIC_ENABLE_TESTNETS) {
     return BASE_SEPOLIA_TESTNET;
   }
-  return BASE_MAINNET;
+  return AVALANCHE;
 };
 
 export const DEFAULT_CHAIN: TChainConfig = getDefaultChain();

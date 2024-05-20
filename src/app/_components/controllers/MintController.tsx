@@ -59,7 +59,6 @@ export const mint = async (
   tokenShortName: string,
   statusFrame: Signal<React.ReactNode>,
 ): Promise<MintResponseModel> => {
- 
   const mintResponseDTO: MintResponseDTO = await web3Gateway.sendMintTransaction(
     amount, // TODO: cleanup
     chain,
@@ -67,7 +66,7 @@ export const mint = async (
     connectedAccount,
     SStatusMessage,
   );
-
+  console.log(`[Mint Response]: ${JSON.stringify(mintResponseDTO)}`);
   if (!mintResponseDTO.success) {
     return Promise.reject({
       status: 'error',

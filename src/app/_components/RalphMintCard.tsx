@@ -105,7 +105,7 @@ export const RalphMintCard = ({
       SdisableMinting.value = true;
       return;
     }
-    return true;
+    return;
   });
 
   // Effect to update/disable the MintEnabledStatusFrame

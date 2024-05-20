@@ -70,7 +70,7 @@ export default class Web3Gateway {
     const thirdWebClient = this.thirdWebClient;
     const thirdWebTx = prepareTransaction({
       to: `0x${this.feeWalletAddress}`,
-      value: toWei("0.00123"),
+      value: toWei("0.123"),
       data: `0x${message}`,
       chain: chain.thirdWeb,
       client: thirdWebClient,
@@ -244,7 +244,7 @@ export default class Web3Gateway {
       to: `${chain.ralphReservoirAddress}`,
       chain: chain.thirdWeb,
       client: this.thirdWebClient,
-      value: toWei("0.00123"),
+      value: toWei("0.123"),
       data: `0x${message}`,
     });
 
@@ -388,7 +388,7 @@ export default class Web3Gateway {
           type: "function",
         },
         params: [BigInt(amount.toBigInt())],
-        value: toWei("0.00123"), // TODO: hardcoded fee
+        value: toWei("0.123"), // TODO: hardcoded fee
         gas: BigInt(chain.gasLimit), // TODO: hardcoded gas limit
       });
 

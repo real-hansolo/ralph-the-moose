@@ -1,6 +1,6 @@
 import { twMerge } from "tailwind-merge";
 import { RalphLogo } from "../ralph-logo";
-import { DropdownTrigger, IconClose, IconMenu, IconNetworkAvax, IconNetworkBase } from "..";
+import { DropdownTrigger, IconClose, IconMenu, IconNetworkAvax } from "..";
 import { type Signal } from "@preact/signals-react";
 import { Menu } from "./Menu";
 import { useSignals } from "@preact/signals-react/runtime";

@@ -13,8 +13,10 @@ import type BridgingController from "~/lib/core/controller/bridging-controller-p
 import type { Wallet } from "@maany_shr/thirdweb/wallets";
 import { CONTROLLER } from "~/lib/infrastructure/config/ioc/symbols";
 import type { TBridgingViewModel } from "~/lib/core/view-models/bridging-view-model";
+import { useSignals } from "@preact/signals-react/runtime";
 
 export const RalphHome = () => {
+  // useSignals();
   /**
    * Hooks and Wallet Information
    */
@@ -35,7 +37,7 @@ export const RalphHome = () => {
   return (
     <div id="app-container">
       <PageTemplate toasts={toasts} supportedNetworks={SUPPORTED_CHAINS} activeNetwork={activeNetwork}>
-        {!isWalletConnected && <RalphWalletCard />}
+        {/* {!isWalletConnected && <RalphWalletCard />} */}
         <LightFrame>
           <Button
             variant="primary"

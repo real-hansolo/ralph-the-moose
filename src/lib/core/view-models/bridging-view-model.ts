@@ -11,9 +11,21 @@ export const BridgingSuccessViewModelSchema = z.object({
     message: z.string(),
     transaction: ExecutedTransactionSchema,
 });
+export const BridgingProgressViewModelSchema = z.object({
+    status: z.literal("in-progress"),
+    type: z.enum(["awaiting-verification", "awaiting-approval", "sending-transaction", "gas", "update"]),
+    amount: z.number(),
+    wallet: WalletSchema,
+    network: NetworkSchema,
+    toNetwork: NetworkSchema,
+    message: z.string(),
+    estimateGas: z.number(),
+    transaction: ExecutedTransactionSchema.optional(),
+})
 
-export const BridgingNonSuccessViewModelSchema = z.object({
-    status: z.enum(["error", "in-progress", "estimate-gas"]),
+export const BridgingErrorViewModelSchema = z.object({
+    status: z.enum(["error"]),
+    type: z.enum(["balance-error", "approval-error", "transaction-error", "verification-error"]),
     amount: z.number(),
     wallet: WalletSchema,
     network: NetworkSchema,
@@ -25,7 +37,8 @@ export const BridgingNonSuccessViewModelSchema = z.object({
 
 export const BridgingViewModelSchema = z.discriminatedUnion("status", [
     BridgingSuccessViewModelSchema,
-    BridgingNonSuccessViewModelSchema,
+    BridgingErrorViewModelSchema,
+    BridgingProgressViewModelSchema,
     BaseViewModelRequestSchema,
 ]);
 

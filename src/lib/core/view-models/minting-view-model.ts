@@ -8,19 +8,35 @@ export const MintingSuccessViewModelSchema = z.object({
     mintTransaction: ExecutedTransactionSchema,
     indexerBlockNumber: z.number(),
 })
-export const MintingNonSuccessViewModelSchema = z.object({
-    status: z.enum(["error", "in-progress"]),
+
+export const MintingErrorViewModelSchema = z.object({
+    status: z.enum(["error"]),
+    type: z.enum(["indexer-error", "transaction-error", "verification-error"]),
     message: z.string(),
+    network: NetworkSchema,
+    wallet: WalletSchema,
     amount: z.number(),
-    mintTransaction: ExecutedTransactionSchema.optional(),
+    transaction: ExecutedTransactionSchema.optional(),
     indexerBlockNumber: z.number(),
     initialIndexerBlockNumber: z.number(),
-    estimatedGas: z.number().optional(),
+})
+
+export const MintingProgressViewModelSchema = z.object({
+    status: z.enum(["in-progress"]),
+    type: z.enum(["awaiting-transaction", "awaiting-indexer", "awaiting-verification"]),
+    transaction: ExecutedTransactionSchema.optional(),
+    amount: z.number(),
+    network: NetworkSchema,
+    wallet: WalletSchema,
+    indexerBlockNumber: z.number(),
+    initialIndexerBlockNumber: z.number(),
+    message: z.string()
 })
 
 export const MintingTransactionGasStatusSchema = z.object({
     status: z.enum(["estimated-gas"]),
     estimatedGas: z.number(),
+    gasLimit: z.number(),
     amount: z.number(),
     network: NetworkSchema,
     wallet: WalletSchema,
@@ -28,8 +44,11 @@ export const MintingTransactionGasStatusSchema = z.object({
 
 export const MintingViewModelSchema = z.discriminatedUnion("status", [
     MintingSuccessViewModelSchema,
-    MintingNonSuccessViewModelSchema,
+    MintingErrorViewModelSchema,
+    MintingProgressViewModelSchema,
     MintingTransactionGasStatusSchema,
 ])
+
+
 
 export type TMintingViewModel = z.infer<typeof MintingViewModelSchema>

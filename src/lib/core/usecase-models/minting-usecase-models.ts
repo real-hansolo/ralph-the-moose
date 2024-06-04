@@ -24,6 +24,7 @@ export const MintingErrorResponseSchema = z.object({
     message: z.string(),
     details: z.object({
         network: NetworkSchema,
+        type: z.enum(["indexer-error", "transaction-error", "verification-error"]),
         wallet: WalletSchema,
         amount: z.number(),
         transaction: ExecutedTransactionSchema.optional(),
@@ -34,13 +35,23 @@ export type TMintingErrorResponse = z.infer<typeof MintingErrorResponseSchema>
 
 export const MintingProgressResponseSchema = z.object({
     transaction: ExecutedTransactionSchema.optional(),
+    type: z.enum(["awaiting-transaction", "awaiting-indexer", "awaiting-verification"]),
     amount: z.number(),
     network: NetworkSchema,
     wallet: WalletSchema,
     indexerBlockNumber: z.number(),
-    intialIndexerBlockNumber: z.number(),
-    estimateGas: z.number().optional(),
+    initialIndexerBlockNumber: z.number(),
     message: z.string()
 })
 
 export type TMintingProgressResponse = z.infer<typeof MintingProgressResponseSchema>
+
+export const MintingGasEstimationResponseSchema = z.object({
+    estimateGas: z.number(),
+    gasLimit: z.number(),
+    amount: z.number(),
+    network: NetworkSchema,
+    wallet: WalletSchema,
+})
+
+export type TMintingGasEstimationResponse = z.infer<typeof MintingGasEstimationResponseSchema>

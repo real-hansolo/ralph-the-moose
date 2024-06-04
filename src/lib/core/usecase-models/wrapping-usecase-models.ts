@@ -34,6 +34,7 @@ export const WrappingErrorResponseSchema = z.object({
 export type TWrappingErrorResponse = z.infer<typeof WrappingErrorResponseSchema>
 
 export const WrappingProgressResponseSchema = z.object({
+    type: z.enum(["awaiting-transaction", "verifying"]),
     transaction: ExecutedTransactionSchema.optional(),
     amount: z.number(),
     network: NetworkSchema,

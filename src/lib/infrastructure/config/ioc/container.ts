@@ -80,8 +80,7 @@ clientContainer
   .toFactory<MintingInputPort, [TSignal<TMintingViewModel>]>((context: interfaces.Context) => (response: TSignal<TMintingViewModel>) => {
     const presenter = new MintingPresenter(response);
     const indexerGatewayFactory: (network: TNetwork) => IndexerGatewayOutputPort = context.container.get(GATEWAYS.INDEXER_GATEWAY_FACTORY);
-    const web3Gateway = context.container.get<Web3GatewayOutputPort<any, any, any>>(GATEWAYS.WEB3_GATEWAY);
-    return new MintingUsecase(presenter, indexerGatewayFactory, web3Gateway);
+    return new MintingUsecase(presenter, indexerGatewayFactory);
   });
 
 /**

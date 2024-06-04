@@ -11,7 +11,7 @@ export default class WrappingPresenter implements WrappingOutputPort<TSignal<TWr
 
   presentProgress(progress: TWrappingProgressResponse): void {
     this.response.value.value = {
-      status: "in-progress",
+      status: progress.type,
       message: progress.message,
       amount: progress.amount,
       wrapTransaction: progress.transaction,

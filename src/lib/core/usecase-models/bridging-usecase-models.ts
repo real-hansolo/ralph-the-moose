@@ -26,6 +26,7 @@ export const BridgingErrorResponseSchema = z.object({
     status: z.literal("error"),
     message: z.string(),
     details: z.object({
+        type: z.enum(["approval-error", "transaction-error", "verification-error", "balance-error"]),
         network: NetworkSchema,
         wallet: WalletSchema,
         amount: z.number(),
@@ -38,6 +39,7 @@ export type TBridgingErrorResponse = z.infer<typeof BridgingErrorResponseSchema>
 
 export const BridgingProgressResponseSchema = z.object({
     transaction: ExecutedTransactionSchema.optional(),
+    type: z.enum(["awaiting-verification", "awaiting-approval", "sending-transaction", "gas", "update"]),
     amount: z.number(),
     network: NetworkSchema,
     wallet: WalletSchema,

@@ -43,6 +43,7 @@ export default class WrappingUsecase implements WrappingInputPort {
 
     effect(() => {
       return this.presenter.presentEstimatedGas({
+        type: "awaiting-transaction",
         network: network,
         wallet: wallet,
         message: "Estimating gas for wrapping",
@@ -75,19 +76,12 @@ export default class WrappingUsecase implements WrappingInputPort {
       return;
     }
 
-    this.presenter.presentProgress({
-      amount: amount,
-      network: network,
-      wallet: wallet,
-      message: "Transaction sent! Awaiting relayer confirmation!",
-      wrapFound: false,
-    });
-
     let wrapStatusDTO = await indexerGateway.getWrapStatus(wrapTransactionDTO.data.hash);
     let attempt = 1;
     while (!wrapStatusDTO.success) {
       wrapStatusDTO = await indexerGateway.getWrapStatus(wrapTransactionDTO.data.hash);
       this.presenter.presentProgress({
+        type: "verifying",
         amount: amount,
         network: network,
         wallet: wallet,

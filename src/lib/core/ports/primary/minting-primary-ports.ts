@@ -1,4 +1,4 @@
-import type { TMintingErrorResponse, TMintingProgressResponse, TMintingRequest, TMintingSuccessResponse } from "../../usecase-models/minting-usecase-models"
+import type { TMintingErrorResponse, TMintingGasEstimationResponse, TMintingProgressResponse, TMintingRequest, TMintingSuccessResponse } from "../../usecase-models/minting-usecase-models"
 
 export interface MintingInputPort {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -11,4 +11,5 @@ export interface MintingOutputPort<TResponse> {
     presentProgress(progress: TMintingProgressResponse): void
     presentSuccess(error: TMintingSuccessResponse): void
     presentError(response: TMintingErrorResponse): void
+    presentEstimatedGas(response: TMintingGasEstimationResponse): void
 }

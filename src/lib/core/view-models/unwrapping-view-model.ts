@@ -15,7 +15,6 @@ export const UnwrappingNonSuccessViewModelSchema = z.object({
     unwrapTransaction: ExecutedTransactionSchema.optional(),
     type: z.enum(["approval-error", "verification-error", "progress", "unknown"]).optional().default("unknown"),
 })
-
 export const UnwrappingTransactionGasStatusSchema = z.object({
     status: z.literal("estimated-gas"),
     network: NetworkSchema,

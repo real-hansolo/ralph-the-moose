@@ -10,7 +10,7 @@ export const WrappingSuccessViewModelSchema = z.object({
 })
 
 export const WrappingNonSuccessViewModelSchema = z.object({
-    status: z.enum(["error", "in-progress"]),
+    status: z.enum(["error", "awaiting-transaction", "verifying"]),
     message: z.string(),
     amount: z.number(),
     wrapTransaction: ExecutedTransactionSchema.optional(),

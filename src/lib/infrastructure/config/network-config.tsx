@@ -27,6 +27,12 @@ export const BASE: TNetwork = {
         url: "http://162.244.82.115:8000", // TODO: move to env
         secure: false,
     },
+    urls: {
+        elkdex: "https://app.elk.finance/swap/8453/ETH/PR",
+        uniswap: "https://app.uniswap.org/swap",
+        farm: "https://app.elk.finance/farms/all/"
+    },
+    disablePublicMint: false
 }
 
 export const BASE_SEPOLIA: TNetwork = {
@@ -55,6 +61,12 @@ export const BASE_SEPOLIA: TNetwork = {
         url: "http://162.244.82.115:8000",
         secure: false,
     },
+    urls: {
+        elkdex: "https://app.elk.finance/swap/84532/ETH/PR",
+        uniswap: "https://app.uniswap.org/swap",
+        farm: "https://app.elk.finance/farms/all/"
+    },
+    disablePublicMint: false
 }
 
 export const AVALANCHE: TNetwork = {
@@ -83,4 +95,10 @@ export const AVALANCHE: TNetwork = {
         url: "http://162.244.82.115:8001", // TODO: move to env
         secure: false
     },
+    urls: {
+        elkdex: "https://app.elk.finance/swap/43114/AVAX/PR",
+        uniswap: "https://app.uniswap.org/swap",
+        farm: "https://app.elk.finance/farms/all/"
+    },
+    disablePublicMint: false
 }

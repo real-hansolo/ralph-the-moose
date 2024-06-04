@@ -25,7 +25,13 @@ export const NetworkSchema = z.object({
   indexer: z.object({
     url: z.string().url(),
     secure: z.boolean(),
-  })
+  }),
+  urls: z.object({
+    elkdex: z.string().url(),
+    uniswap: z.string().url(),
+    farm: z.string().url(),
+  }),
+  disablePublicMint: z.boolean(),
 });
 
 export type TNetwork = z.infer<typeof NetworkSchema>;

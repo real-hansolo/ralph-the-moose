@@ -143,6 +143,15 @@ signalsContainer.bind<TSignal<boolean>>(SIGNALS.MINTING_ENABLED).toConstantValue
   value: signal<boolean>(false),
 });
 
+const networkGateway = clientContainer.get<NetworkGatewayOutputPort>(GATEWAYS.NETWORK_GATEWAY);
+const defaultNetworkDTO = networkGateway.getDefaultNetwork();
+if (defaultNetworkDTO.success) {
+  signalsContainer.bind<TSignal<TNetwork>>(SIGNALS.ACTIVE_NETWORK).toConstantValue({
+    name: "Default Network Signal",
+    description: "Signal to set the default network",
+    value: signal<TNetwork>(defaultNetworkDTO.data)
+  });
+}
 /*
 Client Side Dynamic Signals
 */

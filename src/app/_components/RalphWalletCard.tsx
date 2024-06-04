@@ -1,20 +1,24 @@
-import { type Chain, createThirdwebClient } from "@maany_shr/thirdweb";
+import { createThirdwebClient } from "@maany_shr/thirdweb";
 import { ConnectButton, type Theme } from "@maany_shr/thirdweb/react";
 import { type Wallet } from "@maany_shr/thirdweb/wallets";
 import { env } from "~/env";
 import { TextButton, WalletCard } from "@maany_shr/ralph-the-moose-ui-kit";
-
 import { RALPH_PUBLIC_ICON_URL } from "~/lib/infrastructure/config/ralph_public_assets";
 import { SUPPORTED_WALLETS } from "~/lib/infrastructure/config/wallets";
-import { clientContainer, signalsContainer } from "~/lib/infrastructure/config/ioc/container";
+import { clientContainer } from "~/lib/infrastructure/config/ioc/container";
 import type WalletProviderOutputPort from "~/lib/core/ports/secondary/wallet-provider-output-port";
-import { GATEWAYS, SIGNALS } from "~/lib/infrastructure/config/ioc/symbols";
+import { GATEWAYS } from "~/lib/infrastructure/config/ioc/symbols";
 
 
 /**
  * Wraps the WalletCard component with the ThirdWeb ConnectWallet component
  */
 export const RalphWalletCard = () => {
+  const log = (message: string) => {
+    const timestamp = new Date().toISOString();
+    return `[RalphWalletCard] [${timestamp}] ${message}`;
+  }
+
   const walletProvider = clientContainer.get<WalletProviderOutputPort<Wallet>>(
     GATEWAYS.WALLET_PROVIDER,
   );
@@ -47,10 +51,6 @@ export const RalphWalletCard = () => {
     }
   }
 
-  const log = (message: string) => {
-    const timestamp = new Date().toISOString();
-    return `[RalphWalletCard] [${timestamp}] ${message}`;
-  }
 
   const walletInstance = getActiveWalletInstance();
   const isWalletConnected = walletInstance !== undefined;

@@ -6,10 +6,11 @@ import { RalphMenu } from "../_components/RalphMenu";
 import { useActiveWallet } from "@maany_shr/thirdweb/react";
 import { RalphNetworkSelector } from "../_components/NetworkSelector";
 import { RalphMintCard } from "../_components/RalphMintCard";
+import { useState } from "react";
 
 export const RalphHome = () => {
   useSignals();
-
+  const [isMintingModalOpen, setIsMintingModalOpen] = useState<boolean>(false);
   const log = (message: string) => {
     const timestamp = new Date().toISOString();
     return `[RalphHome] [${timestamp}] ${message}`;
@@ -27,9 +28,13 @@ export const RalphHome = () => {
 
   return (
     <div id="app-container">
-      <PageTemplate menu={<RalphMenu />} networkSelector={<RalphNetworkSelector/>} footerContent={""}>
+      <PageTemplate menu={<RalphMenu />} networkSelector={<RalphNetworkSelector />} footerContent={""}>
         {!isWalletConnected && <RalphWalletCard />}
-        <RalphMintCard />
+        <RalphMintCard
+          showMintingModal={() => {
+            setIsMintingModalOpen(true);
+          }}
+        />
         {isWalletConnected && <RalphWalletCard />}
       </PageTemplate>
     </div>

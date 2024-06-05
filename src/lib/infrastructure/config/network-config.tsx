@@ -1,4 +1,4 @@
-import { IconElk, IconNetworkAvax, IconNetworkBase } from "@maany_shr/ralph-the-moose-ui-kit";
+import { IconNetworkAvax, IconNetworkBase } from "@maany_shr/ralph-the-moose-ui-kit";
 import type { TNetwork } from "~/lib/core/entity/models";
 
 export const BASE: TNetwork = {

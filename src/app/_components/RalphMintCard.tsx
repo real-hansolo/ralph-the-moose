@@ -10,12 +10,12 @@ import type { TMintingStatsViewModel } from "~/lib/core/view-models/minting-stat
 import { useSignals } from "@preact/signals-react/runtime";
 import type MintingStatsController from "~/lib/infrastructure/controllers/minting-stats-controller";
 
-export const RalphMintCard = () => {
+export const RalphMintCard = ({ showMintingModal }: { showMintingModal: () => void }) => {
   useSignals();
   const log = (message: string) => {
     const timestamp = new Date().toISOString();
     return `[RalphMintCard] [${timestamp}] ${message}`;
-  }
+  };
   // Signals
   const S_ACTIVE_NETWORK = signalsContainer.get<TSignal<TNetwork>>(SIGNALS.ACTIVE_NETWORK);
   const S_IS_MINTING = signalsContainer.get<TSignal<boolean>>(SIGNALS.IS_MINTING);
@@ -48,7 +48,6 @@ export const RalphMintCard = () => {
         response: S_Minting_Stats,
       });
       return S_Minting_Stats.value.value;
-      // Add your logic here to fetch the minting stats
     },
     refetchInterval: 10,
   });
@@ -76,11 +75,11 @@ export const RalphMintCard = () => {
     if (data.status === "success") {
       return data;
     } else {
-      console.log(log(`Error in minting stats response: ${data.message}`))
+      console.log(log(`Error in minting stats response: ${data.message}`));
       return defaultData;
     }
   }, [data, isError, isLoading, S_ACTIVE_NETWORK.value.value]);
-  
+
   return (
     <MintCard
       stats={{
@@ -97,7 +96,9 @@ export const RalphMintCard = () => {
         shortName: "PR", // TODO: hardcoded value
       }}
       callbacks={{
-        onMint: () => {},
+        onMint: () => {
+          showMintingModal();
+        },
       }}
       network={S_ACTIVE_NETWORK.value.value}
     ></MintCard>

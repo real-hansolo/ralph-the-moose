@@ -48,6 +48,11 @@ import type ElkBridgeHeadOutputPort from "~/lib/core/ports/secondary/elk-bridgeh
 import ElkBridgeHeadGateway from "../../gateways/elk-bridge-head-gateway";
 import BridgingUsecase from "~/lib/core/usecase/bridging-usecase";
 import ThirdwebBridgingController from "../../controllers/thidweb-bridging-controller";
+import MintingStatsController from "../../controllers/minting-stats-controller";
+import type { MintingStatsInputPort } from "~/lib/core/ports/primary/minting-stats-primary-ports";
+import type { TMintingStatsViewModel } from "~/lib/core/view-models/minting-stats-view-model";
+import MintingStatsPresenter from "../../presenters/minting-stats-presenter";
+import MintingStatsUsecase from "~/lib/core/usecase/minting-stats-usecase";
 
 const clientContainer = new Container();
 const signalsContainer = new Container();
@@ -134,12 +139,25 @@ clientContainer
     const bridgeHeadGateway = context.container.get<ElkBridgeHeadOutputPort>(GATEWAYS.ELK_BRIDGE_HEAD_GATEWAY);
     return new BridgingUsecase(presenter, bridgeHeadGateway, ralphTokenGateway);
   });
+
+/**
+ * Feature: Minting Stats
+ */
+clientContainer.bind<MintingStatsController>(CONTROLLER.MINTING_STATS_CONTROLLER).to(MintingStatsController);
+clientContainer
+  .bind<interfaces.Factory<MintingStatsInputPort>>(USECASE.MINTING_STATS_USECASE_FACTORY)
+  .toFactory<MintingStatsInputPort, [TSignal<TMintingStatsViewModel>]>((context: interfaces.Context) => (response: TSignal<TMintingStatsViewModel>) => {
+    const presenter = new MintingStatsPresenter(response);
+    const indexerGatewayFactory: (network: TNetwork) => IndexerGatewayOutputPort = context.container.get(GATEWAYS.INDEXER_GATEWAY_FACTORY);
+    return new MintingStatsUsecase(presenter, indexerGatewayFactory);
+  });
+
 /*
 Client Side Static Signals
 */
-signalsContainer.bind<TSignal<boolean>>(SIGNALS.MINTING_ENABLED).toConstantValue({
-  name: "Minting Enabled Signal",
-  description: "Signal to enable minting",
+signalsContainer.bind<TSignal<boolean>>(SIGNALS.IS_MINTING).toConstantValue({
+  name: "Minting in progress Signal",
+  description: "Signal is true if minting is in progress",
   value: signal<boolean>(false),
 });
 
@@ -149,7 +167,7 @@ if (defaultNetworkDTO.success) {
   signalsContainer.bind<TSignal<TNetwork>>(SIGNALS.ACTIVE_NETWORK).toConstantValue({
     name: "Default Network Signal",
     description: "Signal to set the default network",
-    value: signal<TNetwork>(defaultNetworkDTO.data)
+    value: signal<TNetwork>(defaultNetworkDTO.data),
   });
 }
 /*
@@ -158,7 +176,16 @@ Client Side Dynamic Signals
 signalsContainer.bind<TSignal<TTransactionGasStatus>>(SIGNALS.TRANSACTION_GAS_STATUS).toDynamicValue((context: interfaces.Context) => {
   return new S_TransactionGasStatus();
 });
-
+signalsContainer.bind<TSignal<TMintingStatsViewModel>>(SIGNALS.MINTING_STATS).toDynamicValue((context: interfaces.Context) => {
+  return {
+    name: `Minting Stats ${new Date().getTime()}`,
+    description: "Signal to show minting stats",
+    value: signal<TMintingStatsViewModel>({
+      status: "error",
+      message: "Minting stats signal not initialized",
+    }),
+  };
+});
 /*
 Server Side Gateways
 */

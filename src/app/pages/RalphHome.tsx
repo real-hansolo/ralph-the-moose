@@ -4,6 +4,8 @@ import { PageTemplate } from "@maany_shr/ralph-the-moose-ui-kit";
 import { useSignals } from "@preact/signals-react/runtime";
 import { RalphMenu } from "../_components/RalphMenu";
 import { useActiveWallet } from "@maany_shr/thirdweb/react";
+import { RalphNetworkSelector } from "../_components/NetworkSelector";
+import { RalphMintCard } from "../_components/RalphMintCard";
 
 export const RalphHome = () => {
   useSignals();
@@ -25,8 +27,9 @@ export const RalphHome = () => {
 
   return (
     <div id="app-container">
-      <PageTemplate menu={<RalphMenu />} networkSelector={<></>} footerContent={""}>
+      <PageTemplate menu={<RalphMenu />} networkSelector={<RalphNetworkSelector/>} footerContent={""}>
         {!isWalletConnected && <RalphWalletCard />}
+        <RalphMintCard />
         {isWalletConnected && <RalphWalletCard />}
       </PageTemplate>
     </div>

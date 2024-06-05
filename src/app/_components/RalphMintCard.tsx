@@ -1,290 +1,105 @@
-import { type Signal, useSignal, effect } from "@preact/signals-react";
-import { useMemo } from "react";
-import {
-  InProgressStatusFrame,
-  MintCard,
-  MintCompletedStatusFrame,
-  MintEnabledStatusFrame,
-  MintErrorStatusFrame,
-  MintWarningStatusFrame,
-  type ToastProps,
-} from "@maany_shr/ralph-the-moose-ui-kit";
-import type MintCardViewModel from "~/lib/infrastructure/view-models/MintCardViewModel";
-import Web3Gateway from "~/lib/infrastructure/gateways/web3";
-import MintCardPresenter from "~/lib/infrastructure/presenters/MintCardPresenter";
+import { useMemo, useState } from "react";
+import { MintCard } from "@maany_shr/ralph-the-moose-ui-kit";
+import { clientContainer, signalsContainer } from "~/lib/infrastructure/config/ioc/container";
+import { CONTROLLER, SIGNALS } from "~/lib/infrastructure/config/ioc/symbols";
+import type { TSignal } from "~/lib/core/entity/signals";
+import type { TNetwork } from "~/lib/core/entity/models";
+import { effect } from "@preact/signals-react";
 import { useQuery } from "@tanstack/react-query";
-import { env } from "~/env";
-import IndexerGateway from "~/lib/infrastructure/gateways/indexer";
-import { type TChainConfig } from "~/lib/infrastructure/config/chains";
-import { type Chain } from "@maany_shr/thirdweb";
-import { formatNumber } from "~/lib/utils/tokenUtils";
-import { type Account, type Wallet } from "@maany_shr/thirdweb/wallets";
-import { type MintResponseModel, mint } from "./controllers/MintController";
-import { signalsContainer } from "~/lib/infrastructure/config/ioc/container";
-import { SIGNALS } from "~/lib/infrastructure/config/ioc/symbols";
+import type { TMintingStatsViewModel } from "~/lib/core/view-models/minting-stats-view-model";
+import { useSignals } from "@preact/signals-react/runtime";
+import type MintingStatsController from "~/lib/infrastructure/controllers/minting-stats-controller";
 
-export const RalphMintCard = ({
-  toasts,
-  activeNetwork,
-  connectedWallet,
-  connectedAccount,
-  connectedWalletNetwork: connectedWalletNetwork,
-}: {
-  activeNetwork: Signal<TChainConfig>;
-  toasts: Signal<ToastProps[]>;
-  /**
-   * The connected wallet
-   */
-  connectedWallet?: Wallet;
-  /**
-   * The connected account
-   */
-  connectedAccount?: Account;
-  /**
-   * Connected Wallet's Network
-   */
-  connectedWalletNetwork: Chain | undefined;
-}) => {
-  // Signals
-  const S_MINTING_ENABLED = signalsContainer.get<Signal<boolean>>(SIGNALS.MINTING_ENABLED);
-
-  const SdisableMinting = S_MINTING_ENABLED;
-  const SisMinting = useSignal<boolean>(false);
-  const SStatusMessage = useSignal<string>("");
-  if (!connectedWallet || !connectedAccount || !connectedWalletNetwork) {
-    SdisableMinting.value = true;
+export const RalphMintCard = () => {
+  useSignals();
+  const log = (message: string) => {
+    const timestamp = new Date().toISOString();
+    return `[RalphMintCard] [${timestamp}] ${message}`;
   }
+  // Signals
+  const S_ACTIVE_NETWORK = signalsContainer.get<TSignal<TNetwork>>(SIGNALS.ACTIVE_NETWORK);
+  const S_IS_MINTING = signalsContainer.get<TSignal<boolean>>(SIGNALS.IS_MINTING);
 
-  const indexerHost = env.NEXT_PUBLIC_INDEXER_URL;
-  const indexerGateway = new IndexerGateway(indexerHost);
-  const web3Gateway = new Web3Gateway();
-  const mintCardPresenter = new MintCardPresenter(
-    indexerGateway,
-    connectedAccount?.address,
-  );
-  const { data, isLoading, isError } = useQuery<MintCardViewModel>({
-    queryKey: ["MintCard"],
+  // State
+  const [networkMintingEnabled, setNetworkMintingEnabled] = useState<boolean>(S_ACTIVE_NETWORK.value.value.publicMint.enabled);
+  const [publicMintAmount, setPublicMintAmount] = useState<number>(S_ACTIVE_NETWORK.value.value.publicMint.amount);
+  const [isMinting, setIsMinting] = useState<boolean>(S_IS_MINTING.value.value);
+
+  effect(() => {
+    if (S_ACTIVE_NETWORK.value.value.publicMint.enabled !== networkMintingEnabled) {
+      setNetworkMintingEnabled(S_ACTIVE_NETWORK.value.value.publicMint.enabled);
+    }
+    if (S_ACTIVE_NETWORK.value.value.publicMint.amount !== publicMintAmount) {
+      setPublicMintAmount(S_ACTIVE_NETWORK.value.value.publicMint.amount);
+    }
+    if (S_IS_MINTING.value.value !== isMinting) {
+      setIsMinting(S_IS_MINTING.value.value);
+    }
+  });
+
+  const S_Minting_Stats = signalsContainer.get<TSignal<TMintingStatsViewModel>>(SIGNALS.MINTING_STATS);
+
+  const { data, isLoading, isError } = useQuery<TMintingStatsViewModel>({
+    queryKey: ["MintStats"],
     queryFn: async () => {
-      const viewModel = await mintCardPresenter.present();
-      return viewModel;
-    },
-    refetchInterval: 500,
-  });
+      const mintingStatsController = clientContainer.get<MintingStatsController>(CONTROLLER.MINTING_STATS_CONTROLLER);
 
-  // Status Frame Content Signals
-  const statusFrame = useSignal<React.ReactNode>(<></>);
-  const mintEnabledStatusFrame = useSignal<React.ReactNode>(<></>);
-
-  // Effect to enable or disable minting
-  effect(() => {
-    if (!connectedWallet || !connectedAccount || !connectedWalletNetwork) {
-      SdisableMinting.value = true;
-      return;
-    }
-    if (!data || isLoading) {
-      SdisableMinting.value = true;
-      return;
-    }
-    if (isError) {
-      SdisableMinting.value = true;
-      return;
-    }
-    if (!data.status) {
-      SdisableMinting.value = true;
-      return;
-    }
-    if (data.status === "success") {
-      if(data.data.mintedPercentage.value >=100) {
-        SdisableMinting.value = true;
-        return;
-      }
-      if(data.data.allocation.value === 0) {
-        SdisableMinting.value = true;
-        return;
-      }
-      SdisableMinting.value = false;
-      return;
-    }
-    if (SisMinting.value) {
-      SdisableMinting.value = true;
-      return;
-    }
-    return true;
-  });
-
-  // Effect to update/disable the MintEnabledStatusFrame
-  effect(() => {
-    if (!data || isLoading) {
-      mintEnabledStatusFrame.value = <></>;
-      return;
-    }
-    if (data?.status !== "success") {
-      mintEnabledStatusFrame.value = <></>;
-      return;
-    }
-    if (SisMinting.value) {
-      mintEnabledStatusFrame.value = <></>;
-      return;
-    }
-    if (SdisableMinting.value) {
-      mintEnabledStatusFrame.value = <></>;
-      return;
-    }
-    if(data.data.allocation.value === 0) {
-      mintEnabledStatusFrame.value = <></>;
-      // SdisableMinting.value = true; // TODO: remove this line later
-      return;
-    }
-    mintEnabledStatusFrame.value = (
-      <MintEnabledStatusFrame
-        eligibleAmount={data.data.allocation.value}
-        expectedReturn={data.data.allocation.value}
-        fee={activeNetwork.value.mintingFee}
-        feeCurrency={activeNetwork.value.networkCurrency}
-        tokenShortName="PR" // TODO: hardcoded value
-      />
-    );
-  });
-  
-  const onMint = () => {
-    if (!data || data.status !== "success") {
-      SdisableMinting.value = true;
-      return;
-    }
-    const amount = data.data.allocation.value;
-    if (!amount) {
-      SdisableMinting.value = true;
-
-      return;
-    }
-    if (!connectedWalletNetwork || !connectedAccount || !connectedWallet) {
-      SdisableMinting.value = true;
-      statusFrame.value = (
-        <MintErrorStatusFrame
-          error={`Oh Snap!`}
-          message={`Couldn't detect a connected wallet`} // TODO: Please use one of the recommended wallets.
-        />
-      );
-      return;
-    }
-    if (connectedWalletNetwork?.id !== activeNetwork.value.chainId) {
-      SdisableMinting.value = true;
-      statusFrame.value = (
-        <MintErrorStatusFrame
-          error={`Oh Snap!`}
-          message={`You are on the wrong network pal. wallet: ${connectedWalletNetwork?.id} !== network: ${activeNetwork.value.chainId}`} // TODO: Please use one of the recommended wallets.
-        />
-      );
-      return;
-    }
-    SdisableMinting.value = true;
-    SisMinting.value = true;
-
-    const formattedIsMintingAmount = formatNumber(amount);
-    const token = "PR"; // TODO: This is a hardcoded value. This should be dynamic
-
-    statusFrame.value = (
-      <InProgressStatusFrame
-        message={SStatusMessage.value}
-        title={`${formattedIsMintingAmount} ${token} are being minted!`}
-      />
-    );
-    mint(
-      amount,
-      SStatusMessage,
-      activeNetwork.value,
-      web3Gateway,
-      indexerGateway,
-      connectedWallet,
-      connectedAccount,
-      token,
-      statusFrame,
-    )
-      .then(async (response: MintResponseModel) => {
-        console.log(`[Mint Status]: ${JSON.stringify(response)}`);
-        if (response.status === "success") {
-          statusFrame.value = (
-            <MintCompletedStatusFrame
-              tokenShortName={token}
-              amountMinted={response.amountMinted ?? data.data.allocation.value}
-              explorerLink={`${response.explorerLink}`}
-              timestamp={`${response.timestamp}`}
-            />
-          );
-        } else if (response.status === "warning") {
-          statusFrame.value = (
-            <MintWarningStatusFrame message={response.message} error={""} />
-          );
-        }
-      })
-      .catch((error: MintResponseModel) => {
-        console.log(
-          `[Mint Status]: Error minting ${formattedIsMintingAmount} ${token}. ${JSON.stringify(error)}`,
-        );
-        statusFrame.value = (
-          <MintErrorStatusFrame
-            error={`Oh Snap!`}
-            message={`Couldn't mint ${formattedIsMintingAmount} ${token}`} // TODO: Please use one of the recommended wallets.
-          />
-        );
-      })
-      .finally(() => {
-        SisMinting.value = false;
+      await mintingStatsController.execute({
+        response: S_Minting_Stats,
       });
-  };
+      return S_Minting_Stats.value.value;
+      // Add your logic here to fetch the minting stats
+    },
+    refetchInterval: 10,
+  });
 
-  const mintCardViewModel: {
-    mintedPercentage: number;
-    mintLimit: number;
-    totalSupply: number;
-    totalMinted: number;
-  } = useMemo(() => {
+  const mintingStatsViewModel = useMemo(() => {
     const defaultData = {
-      mintedPercentage: 0,
-      mintLimit: 0,
+      status: "success",
       totalSupply: 0,
       totalMinted: 0,
+      percentage: 0,
+      limit: 0,
+      allocation: 0,
+      network: S_ACTIVE_NETWORK.value.value,
     };
 
     // Add your logic here to create the MintCardViewModel object
     if (!data || isLoading) {
-      // TODO: add a toast here
+      console.info(log(`Querying for minting statistics for ${S_ACTIVE_NETWORK.value.value.name}`));
       return defaultData;
     }
     if (isError) {
-      // TODO: add error card
-      return defaultData;
-    }
-    if (!data.status) {
-      // TODO: add a toast here
+      console.error(log(`Error querying minting statistics for ${S_ACTIVE_NETWORK.value.value.name}`));
       return defaultData;
     }
     if (data.status === "success") {
-      return {
-        mintedPercentage: data.data.mintedPercentage.value ?? 0,
-        mintLimit: data.data.mintLimit.value ?? 0,
-        totalSupply: data.data.totalSupply.value ?? 0,
-        totalMinted: data.data.totalMinted.value ?? 0,
-      };
+      return data;
     } else {
-      // add error card
+      console.log(log(`Error in minting stats response: ${data.message}`))
       return defaultData;
     }
-  }, [data, isError, isLoading]);
+  }, [data, isError, isLoading, S_ACTIVE_NETWORK.value.value]);
+  
   return (
     <MintCard
-      mintedPercentage={mintCardViewModel.mintedPercentage}
-      mintLimit={mintCardViewModel.mintLimit}
-      totalSupply={mintCardViewModel.totalSupply}
-      totalMinted={mintCardViewModel.totalMinted}
-      mintingFee={10} // TODO: add the minting fee
-      mintingDisabled={SdisableMinting.value}
-      tokenShortName="PR" // TODO: hardcoded
-      isMinting={SisMinting}
-      onMint={onMint}
-    >
-      {statusFrame.value}
-      {mintEnabledStatusFrame.value}
-    </MintCard>
+      stats={{
+        mintedPercentage: mintingStatsViewModel.percentage,
+        mintLimit: mintingStatsViewModel.limit,
+        totalSupply: mintingStatsViewModel.totalSupply,
+        totalMinted: mintingStatsViewModel.totalMinted,
+      }}
+      disabled={!networkMintingEnabled}
+      isMinting={S_IS_MINTING.value.value}
+      fee={S_ACTIVE_NETWORK.value.value.fee.minting}
+      allocation={mintingStatsViewModel.allocation}
+      token={{
+        shortName: "PR", // TODO: hardcoded value
+      }}
+      callbacks={{
+        onMint: () => {},
+      }}
+      network={S_ACTIVE_NETWORK.value.value}
+    ></MintCard>
   );
 };

@@ -1,4 +1,4 @@
-import { IconElk, IconNetworkBase } from "@maany_shr/ralph-the-moose-ui-kit";
+import { IconElk, IconNetworkAvax, IconNetworkBase } from "@maany_shr/ralph-the-moose-ui-kit";
 import type { TNetwork } from "~/lib/core/entity/models";
 
 export const BASE: TNetwork = {
@@ -32,7 +32,10 @@ export const BASE: TNetwork = {
         uniswap: "https://app.uniswap.org/swap",
         farm: "https://app.elk.finance/farms/all/"
     },
-    disablePublicMint: false
+    publicMint: {
+        enabled: false,
+        amount: 10
+    }
 }
 
 export const BASE_SEPOLIA: TNetwork = {
@@ -66,12 +69,15 @@ export const BASE_SEPOLIA: TNetwork = {
         uniswap: "https://app.uniswap.org/swap",
         farm: "https://app.elk.finance/farms/all/"
     },
-    disablePublicMint: false
+    publicMint: {
+        enabled: false,
+        amount: 10
+    }
 }
 
 export const AVALANCHE: TNetwork = {
     chainId: 43114,
-    name: "Avalanche",
+    name: "Avax",
     explorer: { 
         name: "Avalanche Explorer",
         url: "https://snowtrace.io/" 
@@ -90,7 +96,7 @@ export const AVALANCHE: TNetwork = {
         ralphTokenAddress: "0x05F1938646a897008e813fb03CE7C575eAE45738",
         bridgeHeadAddress: "0x3fE823F666DC2C09F8FA86AFB0B0af5152d2c6ab"
     },
-    icon: <IconElk size={4} />,
+    icon: <IconNetworkAvax />,
     indexer: {
         url: "http://162.244.82.115:8001", // TODO: move to env
         secure: false
@@ -100,5 +106,8 @@ export const AVALANCHE: TNetwork = {
         uniswap: "https://app.uniswap.org/swap",
         farm: "https://app.elk.finance/farms/all/"
     },
-    disablePublicMint: false
+    publicMint: {
+        enabled: true,
+        amount: 10
+    }
 }

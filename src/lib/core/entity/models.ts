@@ -31,7 +31,10 @@ export const NetworkSchema = z.object({
     uniswap: z.string().url(),
     farm: z.string().url(),
   }),
-  disablePublicMint: z.boolean(),
+  publicMint: z.object({
+    enabled: z.boolean(),
+    amount: z.number(),
+  }),
 });
 
 export type TNetwork = z.infer<typeof NetworkSchema>;

@@ -1,7 +1,8 @@
 const SIGNALS = {
     ACTIVE_NETWORK: Symbol.for('ActiveNetwork'),
     TRANSACTION_GAS_STATUS: Symbol.for('TransactionGasStatus'),
-    MINTING_ENABLED: Symbol.for('MintingEnabled'),
+    IS_MINTING: Symbol.for('IsMinting'),
+    MINTING_STATS: Symbol.for('MintingStats'),
 }
 
 const GATEWAYS = {
@@ -19,6 +20,7 @@ const USECASE = {
     BRIDGING_USECASE_FACTORY: Symbol.for('BridgingUsecaseFactory'),
     CLAIMING_USECASE_FACTORY: Symbol.for('ClaimingUsecaseFactory'),
     MINTING_USECASE_FACTORY: Symbol.for('MintingUsecaseFactory'),
+    MINTING_STATS_USECASE_FACTORY: Symbol.for('MintingStatsUsecaseFactory'),
     WRAPPING_USECASE_FACTORY: Symbol.for('WrappingUsecaseFactory'),
     UNWRAPPING_USECASE_FACTORY: Symbol.for('UnwrappingUsecaseFactory'),
 }
@@ -27,6 +29,7 @@ const CONTROLLER = {
     BRIDGING_CONTROLLER: Symbol.for('BridgingController'),
     CLAIMING_CONTROLLER: Symbol.for('ClaimingController'),
     MINTING_CONTROLLER: Symbol.for('MintingController'),
+    MINTING_STATS_CONTROLLER: Symbol.for('MintingStatsController'),
     WRAPPING_CONTROLLER: Symbol.for('WrappingController'),
     UNWRAPPING_CONTROLLER: Symbol.for('UnwrappingController'),
 

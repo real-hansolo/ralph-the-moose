@@ -4,10 +4,9 @@ import type NetworkGatewayOutputPort from "~/lib/core/ports/secondary/network-ga
 import { type TNetwork } from "~/lib/core/entity/models";
 import { type TSignal } from "~/lib/core/entity/signals";
 import { NetworkSelector } from "@maany_shr/ralph-the-moose-ui-kit";
-import { effect } from "@preact/signals-react";
 import { useEffect, useState } from "react";
-import WalletProviderOutputPort from "~/lib/core/ports/secondary/wallet-provider-output-port";
-import { Wallet } from "@maany_shr/thirdweb/wallets";
+import type WalletProviderOutputPort from "~/lib/core/ports/secondary/wallet-provider-output-port";
+import type { Wallet } from "@maany_shr/thirdweb/wallets";
 import { useToast } from "@maany_shr/ralph-the-moose-ui-kit";
 
 export const RalphNetworkSelector = () => {

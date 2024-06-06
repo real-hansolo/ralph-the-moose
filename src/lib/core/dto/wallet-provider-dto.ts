@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { type TWallet, WalletSchema, TNetwork } from "~/lib/core/entity/models";
+import { type TWallet, WalletSchema, type TNetwork } from "~/lib/core/entity/models";
 import { DTOSchemaFactory } from "~/sdk/dto";
 
 const ActiveWalletDTOSchema = DTOSchemaFactory(

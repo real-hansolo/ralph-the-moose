@@ -1,17 +1,16 @@
 import { MintingModal } from "@maany_shr/ralph-the-moose-ui-kit";
-import { Wallet } from "@maany_shr/thirdweb/wallets";
-import { useSignal, effect } from "@preact/signals-react";
+import type { Wallet } from "@maany_shr/thirdweb/wallets";
+import { useSignal } from "@preact/signals-react";
 import { useSignals } from "@preact/signals-react/runtime";
-import { all } from "axios";
 import React, { useEffect, useState } from "react";
 import { TNetwork, TWallet } from "~/lib/core/entity/models";
 import type { TSignal } from "~/lib/core/entity/signals";
-import WalletProviderOutputPort from "~/lib/core/ports/secondary/wallet-provider-output-port";
+import type WalletProviderOutputPort from "~/lib/core/ports/secondary/wallet-provider-output-port";
 import type { TMintingStatsViewModel } from "~/lib/core/view-models/minting-stats-view-model";
 import type { TMintingViewModel } from "~/lib/core/view-models/minting-view-model";
 import { clientContainer, signalsContainer } from "~/lib/infrastructure/config/ioc/container";
 import { CONTROLLER, GATEWAYS, SIGNALS } from "~/lib/infrastructure/config/ioc/symbols";
-import MintingController from "~/lib/infrastructure/controllers/minting-controller";
+import type MintingController from "~/lib/infrastructure/controllers/minting-controller";
 import type MintingStatsController from "~/lib/infrastructure/controllers/minting-stats-controller";
 
 export interface RalphMintingModalProps {

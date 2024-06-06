@@ -88,23 +88,23 @@ export const RalphBalaceCard = ({
   const SUnwrapEndedStatusFrame = useSignal<React.ReactNode>(<></>);
   const onUnwrap = () => {
     if (!connectedAccount || !connectedWallet || !connectedWalletNetwork) {
-      toasts.value.push({
-        message: "Please connect your wallet",
-        title: "Wall-E.T.",
-        status: "error",
-      });
+      // toasts.value.push({
+      //   message: "Please connect your wallet",
+      //   title: "Wall-E.T.",
+      //   status: "error",
+      // });
       return;
     }
     if (
       toHex(activeNetwork.value.chainId) !== toHex(connectedWalletNetwork.id)
     ) {
-      toasts.value = [
-        {
-          message: "Please connect to the correct network",
-          title: "Network Error",
-          status: "error",
-        },
-      ];
+      // toasts.value = [
+      //   {
+      //     message: "Please connect to the correct network",
+      //     title: "Network Error",
+      //     status: "error",
+      //   },
+      // ];
       return;
     }
     if (
@@ -114,19 +114,19 @@ export const RalphBalaceCard = ({
       !data.status ||
       data.status !== "success"
     ) {
-      toasts.value.push({
-        message: "Tryin' to unwrap, but something went wrong!",
-        title: "Try again later",
-        status: "error",
-      });
+      // toasts.value.push({
+      //   message: "Tryin' to unwrap, but something went wrong!",
+      //   title: "Try again later",
+      //   status: "error",
+      // });
       return;
     }
     if (data.data.wrappedBalance.value === 0) {
-      toasts.value.push({
-        message: "You have no PR to unwrap",
-        title: "No PR",
-        status: "error",
-      });
+      // toasts.value.push({
+      //   message: "You have no PR to unwrap",
+      //   title: "No PR",
+      //   status: "error",
+      // });
       return;
     }
     SUnwrapCardView.value = "unwrapping";
@@ -164,11 +164,11 @@ export const RalphBalaceCard = ({
       .catch(async (error) => {
         console.error("[UNWRAP] Unwrap failed", error);
         SUnwrapStatusMessage.value = error;
-        toasts.value.push({
-          message: `Get in touch. We can work this out!`,
-          title: "Unwrap failed!",
-          status: "error",
-        });
+        // toasts.value.push({
+        //   message: `Get in touch. We can work this out!`,
+        //   title: "Unwrap failed!",
+        //   status: "error",
+        // });
         await new Promise((resolve) => setTimeout(resolve, 2000));
       })
       .finally(() => {
@@ -178,23 +178,23 @@ export const RalphBalaceCard = ({
 
   const onClaim = () => {
     if (!connectedAccount || !connectedWallet || !connectedWalletNetwork) {
-      toasts.value.push({
-        message: "Please connect your wallet",
-        title: "Wall-E.T.",
-        status: "error",
-      });
+      // toasts.value.push({
+      //   message: "Please connect your wallet",
+      //   title: "Wall-E.T.",
+      //   status: "error",
+      // });
       return;
     }
     if (
       toHex(activeNetwork.value.chainId) !== toHex(connectedWalletNetwork.id)
     ) {
-      toasts.value = [
-        {
-          message: "Please connect to the correct network",
-          title: "Network Error",
-          status: "error",
-        },
-      ];
+      // toasts.value = [
+      //   {
+      //     message: "Please connect to the correct network",
+      //     title: "Network Error",
+      //     status: "error",
+      //   },
+      // ];
       return;
     }
     if (
@@ -204,20 +204,20 @@ export const RalphBalaceCard = ({
       !data.status ||
       data.status !== "success"
     ) {
-      toasts.value.push({
-        message: "Tryin' to claim, but something went wrong!",
-        title: "Try again later",
-        status: "error",
-      });
+      // toasts.value.push({
+      //   message: "Tryin' to claim, but something went wrong!",
+      //   title: "Try again later",
+      //   status: "error",
+      // });
       return;
     }
 
     if (data.data.claimableInscriptions.value === 0) {
-      toasts.value.push({
-        message: "You have no PR to claim",
-        title: "No PR",
-        status: "error",
-      });
+      // toasts.value.push({
+      //   message: "You have no PR to claim",
+      //   title: "No PR",
+      //   status: "error",
+      // });
       return;
     }
 
@@ -236,21 +236,21 @@ export const RalphBalaceCard = ({
           SWrapStatusMessage.value = "All's good in the hood!";
           // wait 2 seconds
           await new Promise((resolve) => setTimeout(resolve, 2000));
-          toasts.value.push({
-            message: `You claimed' ${data.data.claimableInscriptions.value} PR!`,
-            title: "You own it!",
-            status: "success",
-          });
+          // toasts.value.push({
+          //   message: `You claimed' ${data.data.claimableInscriptions.value} PR!`,
+          //   title: "You own it!",
+          //   status: "success",
+          // });
         }
       })
       .catch(async (error) => {
         console.error("[CLAIM] Claim failed", error);
         SWrapStatusMessage.value = error;
-        toasts.value.push({
-          message: `Get in touch and we can work this out!`,
-          title: "Claim failed!",
-          status: "error",
-        });
+        // toasts.value.push({
+        //   message: `Get in touch and we can work this out!`,
+        //   title: "Claim failed!",
+        //   status: "error",
+        // });
         await new Promise((resolve) => setTimeout(resolve, 2000));
       })
       .finally(() => {
@@ -262,23 +262,23 @@ export const RalphBalaceCard = ({
     SWrapCardView.value = "wrapping";
     // check wallet
     if (!connectedAccount || !connectedWallet || !connectedWalletNetwork) {
-      toasts.value.push({
-        message: "Please connect your wallet",
-        title: "Wall-E.T.",
-        status: "error",
-      });
+      // toasts.value.push({
+      //   message: "Please connect your wallet",
+      //   title: "Wall-E.T.",
+      //   status: "error",
+      // });
       return;
     }
     if (
       toHex(activeNetwork.value.chainId) !== toHex(connectedWalletNetwork.id)
     ) {
-      toasts.value = [
-        {
-          message: "Please connect to the correct network",
-          title: "Network Error",
-          status: "error",
-        },
-      ];
+      // toasts.value = [
+      //   {
+      //     message: "Please connect to the correct network",
+      //     title: "Network Error",
+      //     status: "error",
+      //   },
+      // ];
       return;
     }
     wrap(
@@ -295,22 +295,22 @@ export const RalphBalaceCard = ({
             "Looking good! Come back later to claim your PRs!";
           // wait 2 seconds
           await new Promise((resolve) => setTimeout(resolve, 2000));
-          toasts.value.push({
-            message: `You wrapd' ${amountToWrap.value} PR, like its hot!`,
-            title: "It's a wrap!",
-            status: "success",
-          });
+          // toasts.value.push({
+          //   message: `You wrapd' ${amountToWrap.value} PR, like its hot!`,
+          //   title: "It's a wrap!",
+          //   status: "success",
+          // });
         }
       })
       .catch(async (error) => {
         console.error("[WRAP] Wrap failed", error);
         SWrapStatusMessage.value = "Shit happens! Try again later";
         await new Promise((resolve) => setTimeout(resolve, 2000));
-        toasts.value.push({
-          message: `You wrapd' ${amountToWrap.value} PR, like its hot!`,
-          title: "It's a wrap!",
-          status: "error",
-        });
+        // toasts.value.push({
+        //   message: `You wrapd' ${amountToWrap.value} PR, like its hot!`,
+        //   title: "It's a wrap!",
+        //   status: "error",
+        // });
       })
       .finally(() => {
         SWrapCardView.value = "default";
@@ -357,26 +357,26 @@ export const RalphBalaceCard = ({
     return defaultData;
   }, [data, isLoading, isError]);
   
-  return (
-    <BalanceCard
-      inscriptionBalance={balanceCardViewModel.inscriptionBalance}
-      wrappedBalance={balanceCardViewModel.wrappedBalance}
-      claimableAmount={balanceCardViewModel.claimableInscriptions}
-      fee={activeNetwork.value.wrappingFee} // TODO: split into wrapping and unwrapping fee
-      networkCurrency={activeNetwork.value.networkCurrency}
-      tokenShortName={balanceCardViewModel.tokenShortName}
-      icon={balanceCardViewModel.icon}
-      onWrap={onWrap}
-      onUnwrap={onUnwrap}
-      onClaim={onClaim}
-      amountToWrap={amountToWrap}
-      amountToUnwrap={amountToUnwrap}
-      SWrapStatusMessage={SWrapStatusMessage}
-      SWrapCardView={SWrapCardView}
-      SClaimStatusMessage={SClaimStatusMessage}
-      SUnwrapStatusMessage={SUnwrapStatusMessage}
-      SUnwrapCardView={SUnwrapCardView}
-      SUnwrapEndedStatusFrame={SUnwrapEndedStatusFrame}
-    />
+  return ( <div></div>
+    // <BalanceCard
+    //   inscriptionBalance={balanceCardViewModel.inscriptionBalance}
+    //   wrappedBalance={balanceCardViewModel.wrappedBalance}
+    //   claimableAmount={balanceCardViewModel.claimableInscriptions}
+    //   fee={activeNetwork.value.wrappingFee} // TODO: split into wrapping and unwrapping fee
+    //   networkCurrency={activeNetwork.value.networkCurrency}
+    //   tokenShortName={balanceCardViewModel.tokenShortName}
+    //   icon={balanceCardViewModel.icon}
+    //   onWrap={onWrap}
+    //   onUnwrap={onUnwrap}
+    //   onClaim={onClaim}
+    //   amountToWrap={amountToWrap}
+    //   amountToUnwrap={amountToUnwrap}
+    //   SWrapStatusMessage={SWrapStatusMessage}
+    //   SWrapCardView={SWrapCardView}
+    //   SClaimStatusMessage={SClaimStatusMessage}
+    //   SUnwrapStatusMessage={SUnwrapStatusMessage}
+    //   SUnwrapCardView={SUnwrapCardView}
+    //   SUnwrapEndedStatusFrame={SUnwrapEndedStatusFrame}
+    // />
   );
 };

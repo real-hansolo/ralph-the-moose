@@ -29,12 +29,16 @@ export default class MintingStatsUsecase implements MintingStatsInputPort {
     let allocation = 0;
     if (request.walletAddress) {
       const allocationBasedOffIndexer = await this.__getAllocationForAddress(indexerGateway, request.walletAddress);
-      if (allocationBasedOffIndexer) {
+      if (allocationBasedOffIndexer !== undefined && allocationBasedOffIndexer > 0) {
         allocation = allocationBasedOffIndexer;
       } else {
         if (network.publicMint.enabled) {
           allocation = network.publicMint.amount;
         }
+      }
+    } else {
+      if (network.publicMint.enabled) {
+        allocation = network.publicMint.amount;
       }
     }
     const mintPercentage = this.__getMintPercentage(totalMinted, mintLimit);

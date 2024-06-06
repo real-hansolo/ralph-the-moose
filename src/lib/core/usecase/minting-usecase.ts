@@ -72,7 +72,7 @@ export default class MintingUsecase implements MintingInputPort {
     if (!intialIndexerBlockNumberDTO.success) {
       this.presenter.presentError({
         status: "error",
-        message: "Error getting latest block number from indexer.",
+        message: "Error getting latest block number from indexer." + intialIndexerBlockNumberDTO.data.message,
         details: {
           type: "indexer-error",
           amount: amount,

@@ -1,36 +1,32 @@
 import { type Wallet } from "@maany_shr/thirdweb/wallets";
 import { connectionManager } from "@maany_shr/thirdweb/react";
-import { type TWallet } from "~/lib/core/entity/models";
+import { TNetwork, type TWallet } from "~/lib/core/entity/models";
 import type WalletProviderOutputPort from "~/lib/core/ports/secondary/wallet-provider-output-port";
 import type {
   ActiveWalletDTO,
   ConnectedWalletsDTO,
   DisconnectWalletDTO,
   FromWalletInstanceDTO,
+  GetActiveWalletNetworkDTO,
   GetWalletInstanceDTO,
   SupportedWalletsDTO,
+  SwitchActiveWalletNetworkDTO,
 } from "~/lib/core/dto/wallet-provider-dto";
 import { inject, injectable } from "inversify";
 import { GATEWAYS } from "~/lib/infrastructure/config/ioc/symbols";
 import NetworkGateway from "~/lib/infrastructure/gateways/network-gateway";
-import { getNetworkFromThirdwebChain } from "~/lib/utils/networkUtils";
+import { getNetworkFromThirdwebChain, getThirdWebChain } from "~/lib/utils/networkUtils";
 
 @injectable()
-export class ThirdwebWalletProvider
-  implements WalletProviderOutputPort<Wallet>
-{
-  constructor(
-    @inject(GATEWAYS.NETWORK_GATEWAY) private networkGateway: NetworkGateway,
-  ) {}
+export class ThirdwebWalletProvider implements WalletProviderOutputPort<Wallet> {
+  constructor(@inject(GATEWAYS.NETWORK_GATEWAY) private networkGateway: NetworkGateway) {}
   getName(): string {
     return "thirdweb";
   }
 
   getWalletInstance(wallet: TWallet): GetWalletInstanceDTO<Wallet> {
     const thirdwebWallet = connectionManager.connectedWallets.getValue();
-    const walletInstance = thirdwebWallet.find(
-      (connectedWallet) => connectedWallet.id === wallet.id,
-    );
+    const walletInstance = thirdwebWallet.find((connectedWallet) => connectedWallet.id === wallet.id);
     if (walletInstance === undefined) {
       return {
         success: false,
@@ -58,7 +54,7 @@ export class ThirdwebWalletProvider
         },
       };
     }
-    if(activeAccount === undefined) {
+    if (activeAccount === undefined) {
       return {
         success: false,
         data: {
@@ -144,12 +140,14 @@ export class ThirdwebWalletProvider
         },
       };
     }
-    const transformedWallets = connectedWallets.map((wallet) => {
-      const dto = this.fromWalletInstance(wallet);
-      if (dto.success && dto.data.activeAccount !== undefined) {
-        return dto.data;
-      }
-    }).filter((wallet) => wallet?.activeAccount !== undefined);
+    const transformedWallets = connectedWallets
+      .map((wallet) => {
+        const dto = this.fromWalletInstance(wallet);
+        if (dto.success && dto.data.activeAccount !== undefined) {
+          return dto.data;
+        }
+      })
+      .filter((wallet) => wallet?.activeAccount !== undefined);
 
     return {
       success: true,
@@ -179,6 +177,56 @@ export class ThirdwebWalletProvider
         success: false,
         // eslint-disable-next-line @typescript-eslint/no-unsafe-call
         data: { error: error.toString() },
+      };
+    }
+  }
+
+  async switchActiveWalletNetwork(network: TNetwork): Promise<SwitchActiveWalletNetworkDTO> {
+    const switchChain = connectionManager.switchActiveWalletChain;
+    try {
+      const thirdwebNetwork = getThirdWebChain(network.name);
+      await switchChain(thirdwebNetwork);
+      return {
+        success: true,
+      };
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    } catch (error: any) {
+      return {
+        success: false,
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-call
+        data: {
+          type: "wallet_provider_error",
+          message: (error as Error).message,
+        },
+      };
+    }
+  }
+
+  getActiveWalletNetwork(): GetActiveWalletNetworkDTO {
+    const store = connectionManager.activeWalletChainStore;
+    const activeChain = store.getValue();
+    if (activeChain === undefined) {
+      return {
+        success: false,
+        data: {
+          type: "wallet_provider_error",
+          message: "No active thirdweb chain found!",
+        },
+      };
+    }
+    try {
+      const network = getNetworkFromThirdwebChain(activeChain);
+      return {
+        success: true,
+        data: network,
+      };
+    } catch (error) {
+      return {
+        success: false,
+        data: {
+          type: "wallet_provider_error",
+          message: (error as Error).message,
+        },
       };
     }
   }

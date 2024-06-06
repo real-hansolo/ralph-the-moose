@@ -119,12 +119,15 @@ export default class IndexerGateway implements IndexerGatewayOutputPort {
   }
 
   async getLatestBlock(): Promise<TIndexerLatestBlockDTO> {
-    const response = await this.__call<TIndexerLatestBlockDTO>("/latest_block", IndexerLatestBlockDTOSchema, []);
+    const response = await this.__call<TIndexerLatestBlockDTO>("/latest_block", IndexerLatestBlockDTOSchema, [], false);
+    if(response.success) {
+      response.data.latest_block = parseInt(response.data.latest_block.toString())
+    }
     return response;
   }
 
   async getBalanceForAccount(address: string): Promise<TAccountBalalnceDTO> {
-    const response = await this.__call<TAccountBalalnceDTO>(`balances/${address}`, AccountBalanceDTOSchema, ["balance"]);
+    const response = await this.__call<TAccountBalalnceDTO>(`/balances/${address}`, AccountBalanceDTOSchema, ["balance"]);
     return response;
   }
 

@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { type TWallet, WalletSchema } from "~/lib/core/entity/models";
+import { type TWallet, WalletSchema, TNetwork } from "~/lib/core/entity/models";
 import { DTOSchemaFactory } from "~/sdk/dto";
 
 const ActiveWalletDTOSchema = DTOSchemaFactory(
@@ -72,6 +72,28 @@ export type GetWalletInstanceDTO<TWalletInstance> = {
 export type FromWalletInstanceDTO = {
   success: true;
   data: TWallet;
+} | {
+  success: false;
+  data: {
+    type: "wallet_provider_error";
+    message: string;
+  };
+};
+
+export type SwitchActiveWalletNetworkDTO = {
+  success: true;
+} | {
+  success: false;
+  data: {
+    type: "wallet_provider_error";
+    message: string;
+  };
+};
+
+
+export type GetActiveWalletNetworkDTO = {
+  success: true;
+  data: TNetwork;
 } | {
   success: false;
   data: {

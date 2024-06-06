@@ -1,6 +1,5 @@
 import { type Signal } from "@preact/signals-react";
 import { type Account, type Wallet } from "@maany_shr/thirdweb/wallets";
-import { InProgressStatusFrame, MintWarningStatusFrame } from "@maany_shr/ralph-the-moose-ui-kit";
 import { type TChainConfig } from "~/lib/infrastructure/config/chains";
 import { type MintResponseDTO } from "~/lib/infrastructure/dto/web3-dto";
 import type IndexerGateway from "~/lib/infrastructure/gateways/indexer";
@@ -25,10 +24,7 @@ export const pollIndexer = async (
     }
     const formattedIsMintingAmount = formatNumber(mintingAmount);
     statusFrame.value = (
-      <InProgressStatusFrame
-        message={`Looking for your transaction. Attempt ${i}/${numAttempts}.`}
-        title={`${formattedIsMintingAmount} ${tokenShortName} are being minted!`}
-      />
+      <div></div>
     );
     // Wait for 0.5 second
     await new Promise((resolve) => setTimeout(resolve, 1000));
@@ -87,11 +83,9 @@ export const mint = async (
     );
     if (!inscriptionStatusDTO.success) {
       statusFrame.value = (
-        <MintWarningStatusFrame
-          error="Come back later!"
-          message={`Ralph is still looking for your transaction.`}
-          explorerLink={mintResponseDTO.data.explorerLink}
-        />
+        <div>
+          Error
+        </div>
       );
       return Promise.reject({
         status: 'warning',

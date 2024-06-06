@@ -48,6 +48,7 @@ export default class ThirdwebWeb3Gateway
       const thirdWebTx = prepareTransaction({
         to: transactionDetails.to,
         value: toWei(transactionDetails.value),
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         data: `${transactionDetails.data}` as any,
         chain: chain,
         client: this.thirdWebClient,

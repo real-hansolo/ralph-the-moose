@@ -31,7 +31,6 @@ export const RalphMintCard = ({ showMintingModal }: { showMintingModal: () => vo
   const walletProvider = clientContainer.get<WalletProviderOutputPort<Wallet>>(GATEWAYS.WALLET_PROVIDER);
   const activeWalletDTO = walletProvider.getActiveWallet();
   const isWalletConnected = activeWalletDTO.success;
-  console.log(log(`Wallet connected: ${isWalletConnected}`));
 
   effect(() => {
     if (S_ACTIVE_NETWORK.value.value.publicMint.enabled !== networkMintingEnabled) {

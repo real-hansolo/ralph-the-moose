@@ -5,8 +5,9 @@ import { useSignals } from "@preact/signals-react/runtime";
 import { RalphMenu } from "../_components/RalphMenu";
 import { useActiveWallet } from "@maany_shr/thirdweb/react";
 import { RalphNetworkSelector } from "../_components/NetworkSelector";
-import { RalphMintCard } from "../_components/RalphMintCard";
+import { RalphMintCard } from "../_components/mint/RalphMintCard";
 import { useState } from "react";
+import RalphMintingModal from "../_components/mint/RalphMintingModal";
 
 export const RalphHome = () => {
   useSignals();
@@ -35,6 +36,7 @@ export const RalphHome = () => {
             setIsMintingModalOpen(true);
           }}
         />
+        <RalphMintingModal isOpen={isMintingModalOpen} onClose={() => setIsMintingModalOpen(false)} />
         {isWalletConnected && <RalphWalletCard />}
       </PageTemplate>
     </div>

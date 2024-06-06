@@ -5,10 +5,16 @@ import { type TNetwork } from "~/lib/core/entity/models";
 import { type TSignal } from "~/lib/core/entity/signals";
 import { NetworkSelector } from "@maany_shr/ralph-the-moose-ui-kit";
 import { effect } from "@preact/signals-react";
+import { useEffect, useState } from "react";
+import WalletProviderOutputPort from "~/lib/core/ports/secondary/wallet-provider-output-port";
+import { Wallet } from "@maany_shr/thirdweb/wallets";
+import { useToast } from "@maany_shr/ralph-the-moose-ui-kit";
 
 export const RalphNetworkSelector = () => {
   const networkGateway = clientContainer.get<NetworkGatewayOutputPort>(GATEWAYS.NETWORK_GATEWAY);
   const S_ActiveNetwork = signalsContainer.get<TSignal<TNetwork>>(SIGNALS.ACTIVE_NETWORK);
+  const [activeNetwork, setActiveNetwork] = useState<TNetwork>(S_ActiveNetwork.value.value);
+  const toastService = useToast();
   const getSupportedNetworks = () => {
     const supportedNetworksDTO = networkGateway.getSupportedNetworks();
     if (!supportedNetworksDTO.success) {
@@ -31,10 +37,13 @@ export const RalphNetworkSelector = () => {
     return `[NetworkSelector] [${timestamp}] ${message}`;
   };
 
-  effect(() => {});
+  useEffect(() => {
+    setActiveNetwork(S_ActiveNetwork.value.value);
+  }, [S_ActiveNetwork.value.value]);
 
-  const handleNetworkChange = (network: {chainId: number, name: string}) => {
+  const handleNetworkChange = (network: { chainId: number; name: string }) => {
     const activeNetworkDTO = networkGateway.getNetwork(network.chainId);
+    const walletProvider = clientContainer.get<WalletProviderOutputPort<Wallet>>(GATEWAYS.WALLET_PROVIDER);
     if (!activeNetworkDTO.success) {
       console.error(log(`Failed to get network configuration for ${network.name} ${network.chainId}`));
       return;
@@ -44,15 +53,59 @@ export const RalphNetworkSelector = () => {
       console.error(log(`Failed to set active network to ${network.name} ${network.chainId}`));
       return;
     }
-    S_ActiveNetwork.value.value = activeNetworkDTO.data,
-    console.warn(log(`App Network Change: ${network.name} ${network.chainId}`));
+    (S_ActiveNetwork.value.value = activeNetworkDTO.data), console.warn(log(`App Network Change: ${network.name} ${network.chainId}`));
+    walletProvider
+      .switchActiveWalletNetwork(activeNetworkDTO.data)
+      .then((switchWalletNetworkDTO) => {
+        if (!switchWalletNetworkDTO.success) {
+          console.error(log(`Failed to switch wallet network to ${network.name} ${network.chainId}`));
+          toastService?.openToast(
+            {
+              status: "error",
+              id: "network-switch-failed-toast" + new Date().getTime(),
+              title: "Wallet Network Switch",
+              message: `Failed to switch wallet network to ${network.name}`,
+            },
+            5000,
+          );
+          return;
+        }
+        toastService?.openToast(
+          {
+            status: "success",
+            id: "network-switch-success-toast" + new Date().getTime(),
+            title: "Wallet Network Switch",
+            message: `Network switched to ${network.name}`,
+          },
+          5000,
+        );
+        console.warn(log(`Wallet Network Change: ${network.name} ${network.chainId}`));
+      })
+      .catch((e) => {
+        console.error(log(`Failed to switch wallet network to ${network.name}`));
+        toastService?.openToast(
+          {
+            status: "error",
+            id: "network-switch-failed-toast" + new Date().getTime(),
+            title: "Wallet Network Switch",
+            message: `Failed to switch wallet network!`,
+          },
+          5000,
+        );
+      });
   };
 
   const supportedNetworks = getSupportedNetworks();
 
-  return <NetworkSelector supportedNetworks={supportedNetworks} activeNetwork={{
-    chainId: S_ActiveNetwork.value.value.chainId,
-    name: S_ActiveNetwork.value.value.name,
-    icon: S_ActiveNetwork.value.value.icon ?? <></>,
-  }} onNetworkChange={handleNetworkChange} />;
+  return (
+    <NetworkSelector
+      supportedNetworks={supportedNetworks}
+      activeNetwork={{
+        chainId: S_ActiveNetwork.value.value.chainId,
+        name: S_ActiveNetwork.value.value.name,
+        icon: S_ActiveNetwork.value.value.icon ?? <></>,
+      }}
+      onNetworkChange={handleNetworkChange}
+    />
+  );
 };

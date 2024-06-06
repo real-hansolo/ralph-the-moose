@@ -42,12 +42,13 @@ export default class ThirdwebWeb3Gateway
   prepareTransaction(
     transactionDetails: TPreparedTransaction,
   ): TPreparedTransactionDTO<PreparedTransaction> {
+    console.log("transactionDetails", transactionDetails);
     try {
       const chain = getThirdWebChain(transactionDetails.network.name);
       const thirdWebTx = prepareTransaction({
         to: transactionDetails.to,
         value: toWei(transactionDetails.value),
-        data: `0x${transactionDetails.data}`,
+        data: `${transactionDetails.data}` as any,
         chain: chain,
         client: this.thirdWebClient,
       });
@@ -60,7 +61,7 @@ export default class ThirdwebWeb3Gateway
         success: false,
         data: {
           type: "prepared_transaction_error",
-          message: `Error preparing transaction using Thirdweb`,
+          message: `Error preparing transaction using Thirdweb. ${(e as Error).message}`,
           to: transactionDetails.to,
           value: transactionDetails.value,
           data: transactionDetails.data,
@@ -95,7 +96,7 @@ export default class ThirdwebWeb3Gateway
       transaction: preparedTransaction,
     });
     const explorerLink = `${transactionDetails.network.explorer.url}/tx/${transactionHash}`;
-    const timestamp = new Date().toLocaleDateString();
+    const timestamp = new Date().getTime();
 
     const txDetailsDTOQuery = await client.rpc.getTransaction.query({
       hash: transactionHash,

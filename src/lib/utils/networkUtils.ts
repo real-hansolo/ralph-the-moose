@@ -15,6 +15,8 @@ export function getThirdWebChain(name: string): Chain {
             return baseSepolia;
         case "Avalanche":
             return avalanche;
+        case "Avax":
+            return avalanche;
         case "Avalanche Fuji":
             return avalancheFuji; 
         default:

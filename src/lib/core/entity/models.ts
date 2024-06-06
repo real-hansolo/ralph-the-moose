@@ -73,7 +73,7 @@ export const ExecutedTransactionSchema = PreparedTransactionSchema.merge(
     status: z.enum(["success", "error", "partial"]),
     hash: z.string(),
     blockNumber: z.number(),
-    timestamp: z.string(),
+    timestamp: z.number(),
     explorerUrl: z.string().url(),
     from: z.string(),
   }),

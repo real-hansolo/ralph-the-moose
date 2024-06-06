@@ -19,7 +19,7 @@ export default class MintingController {
     const walletProvider = clientContainer.get<WalletProviderOutputPort<unknown>>(GATEWAYS.WALLET_PROVIDER);
     const activeWalletDTO = walletProvider.getActiveWallet();
     if (!activeWalletDTO.success) {
-      return Promise.reject(new Error("Could not determine active wallet!"));
+      return Promise.reject(new Error("Could not find a connected wallet!"));
     }
     const S_ActiveNetwork = signalsContainer.get<TSignal<TNetwork>>(SIGNALS.ACTIVE_NETWORK);
     const activeNetwork = S_ActiveNetwork.value.value;

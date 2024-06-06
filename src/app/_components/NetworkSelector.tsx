@@ -53,7 +53,22 @@ export const RalphNetworkSelector = () => {
       console.error(log(`Failed to set active network to ${network.name} ${network.chainId}`));
       return;
     }
-    (S_ActiveNetwork.value.value = activeNetworkDTO.data), console.warn(log(`App Network Change: ${network.name} ${network.chainId}`));
+    S_ActiveNetwork.value.value = activeNetworkDTO.data
+    console.warn(log(`App Network Change: ${network.name} ${network.chainId}`));
+    toastService?.openToast(
+      {
+        status: "success",
+        id: "network-switch-success-toast" + new Date().getTime(),
+        title: "App Network",
+        message: `Network switched to ${network.name}`,
+      },
+      3000,
+    );
+    const activeWalletDTO = walletProvider.getActiveWallet();
+    if(!activeWalletDTO.success) {
+      return;
+    }
+    // only if wallet is connected
     walletProvider
       .switchActiveWalletNetwork(activeNetworkDTO.data)
       .then((switchWalletNetworkDTO) => {
@@ -63,10 +78,10 @@ export const RalphNetworkSelector = () => {
             {
               status: "error",
               id: "network-switch-failed-toast" + new Date().getTime(),
-              title: "Wallet Network Switch",
+              title: "Wallet Network",
               message: `Failed to switch wallet network to ${network.name}`,
             },
-            5000,
+            3000,
           );
           return;
         }
@@ -74,10 +89,10 @@ export const RalphNetworkSelector = () => {
           {
             status: "success",
             id: "network-switch-success-toast" + new Date().getTime(),
-            title: "Wallet Network Switch",
+            title: "Wallet Network",
             message: `Network switched to ${network.name}`,
           },
-          5000,
+          3000,
         );
         console.warn(log(`Wallet Network Change: ${network.name} ${network.chainId}`));
       })
@@ -87,7 +102,7 @@ export const RalphNetworkSelector = () => {
           {
             status: "error",
             id: "network-switch-failed-toast" + new Date().getTime(),
-            title: "Wallet Network Switch",
+            title: "Wallet Network",
             message: `Failed to switch wallet network!`,
           },
           5000,

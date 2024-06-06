@@ -1,7 +1,7 @@
 import { useMemo, useState } from "react";
 import { MintCard } from "@maany_shr/ralph-the-moose-ui-kit";
 import { clientContainer, signalsContainer } from "~/lib/infrastructure/config/ioc/container";
-import { CONTROLLER, SIGNALS } from "~/lib/infrastructure/config/ioc/symbols";
+import { CONTROLLER, GATEWAYS, SIGNALS } from "~/lib/infrastructure/config/ioc/symbols";
 import type { TSignal } from "~/lib/core/entity/signals";
 import type { TNetwork } from "~/lib/core/entity/models";
 import { effect } from "@preact/signals-react";
@@ -9,6 +9,8 @@ import { useQuery } from "@tanstack/react-query";
 import type { TMintingStatsViewModel } from "~/lib/core/view-models/minting-stats-view-model";
 import { useSignals } from "@preact/signals-react/runtime";
 import type MintingStatsController from "~/lib/infrastructure/controllers/minting-stats-controller";
+import { Wallet } from "ethers";
+import WalletProviderOutputPort from "~/lib/core/ports/secondary/wallet-provider-output-port";
 
 export const RalphMintCard = ({ showMintingModal }: { showMintingModal: () => void }) => {
   useSignals();
@@ -24,6 +26,12 @@ export const RalphMintCard = ({ showMintingModal }: { showMintingModal: () => vo
   const [networkMintingEnabled, setNetworkMintingEnabled] = useState<boolean>(S_ACTIVE_NETWORK.value.value.publicMint.enabled);
   const [publicMintAmount, setPublicMintAmount] = useState<number>(S_ACTIVE_NETWORK.value.value.publicMint.amount);
   const [isMinting, setIsMinting] = useState<boolean>(S_IS_MINTING.value.value);
+
+  // Wallet Provider
+  const walletProvider = clientContainer.get<WalletProviderOutputPort<Wallet>>(GATEWAYS.WALLET_PROVIDER);
+  const activeWalletDTO = walletProvider.getActiveWallet();
+  const isWalletConnected = activeWalletDTO.success;
+  console.log(log(`Wallet connected: ${isWalletConnected}`));
 
   effect(() => {
     if (S_ACTIVE_NETWORK.value.value.publicMint.enabled !== networkMintingEnabled) {
@@ -88,7 +96,7 @@ export const RalphMintCard = ({ showMintingModal }: { showMintingModal: () => vo
         totalSupply: mintingStatsViewModel.totalSupply,
         totalMinted: mintingStatsViewModel.totalMinted,
       }}
-      disabled={!networkMintingEnabled}
+      disabled={!isWalletConnected || !networkMintingEnabled}
       isMinting={S_IS_MINTING.value.value}
       fee={S_ACTIVE_NETWORK.value.value.fee.minting}
       allocation={mintingStatsViewModel.allocation}

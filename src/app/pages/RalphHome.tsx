@@ -8,6 +8,7 @@ import { RalphNetworkSelector } from "../_components/NetworkSelector";
 import { RalphMintCard } from "../_components/mint/RalphMintCard";
 import { useState } from "react";
 import RalphMintingModal from "../_components/mint/RalphMintingModal";
+import { RalphBalanceCard } from "../_components/balance/RalphBalanceCard";
 
 export const RalphHome = () => {
   useSignals();
@@ -37,6 +38,7 @@ export const RalphHome = () => {
           }}
         />
         <RalphMintingModal isOpen={isMintingModalOpen} onClose={() => setIsMintingModalOpen(false)} />
+        <RalphBalanceCard />
         {isWalletConnected && <RalphWalletCard />}
       </PageTemplate>
     </div>

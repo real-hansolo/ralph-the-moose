@@ -53,6 +53,11 @@ import type { MintingStatsInputPort } from "~/lib/core/ports/primary/minting-sta
 import type { TMintingStatsViewModel } from "~/lib/core/view-models/minting-stats-view-model";
 import MintingStatsPresenter from "../../presenters/minting-stats-presenter";
 import MintingStatsUsecase from "~/lib/core/usecase/minting-stats-usecase";
+import type { BalanceInfoInputPort } from "~/lib/core/ports/primary/balance-info-primary-ports";
+import type { TBalanceInfoViewModel } from "~/lib/core/view-models/balance-info-view-model";
+import BalanceInfoPresenter from "../../presenters/balance-info-presenter";
+import BalanceInfoUsecase from "~/lib/core/usecase/balance-info-usecase";
+import BalanceInfoController from "../../controllers/balance-info-controller";
 
 const clientContainer = new Container();
 const signalsContainer = new Container();
@@ -140,6 +145,21 @@ clientContainer
     return new BridgingUsecase(presenter, bridgeHeadGateway, ralphTokenGateway);
   });
 
+
+/**
+ * Feature: Balance Info
+ */
+clientContainer.bind<BalanceInfoController>(CONTROLLER.BALANCE_INFO_CONTROLLER).to(BalanceInfoController);
+clientContainer
+  .bind<interfaces.Factory<BalanceInfoInputPort, [TSignal<TBalanceInfoViewModel>]>>(USECASE.BALANCE_INFO_USECASE_FACTORY)
+  .toFactory<BalanceInfoInputPort, [TSignal<TBalanceInfoViewModel>]>((context: interfaces.Context) => (response: TSignal<TBalanceInfoViewModel>) => {
+    const presenter = new BalanceInfoPresenter(response);
+    const ralphTokenGateway = context.container.get<RalphTokenOutputPort>(GATEWAYS.RALPH_TOKEN_GATEWAY);
+    const ralphReservoirGateway = context.container.get<RalphReservoirOutputPort>(GATEWAYS.RALPH_RESERVOIR_GATEWAY);
+    const indexerGatewayFactory: (network: TNetwork) => IndexerGatewayOutputPort = context.container.get(GATEWAYS.INDEXER_GATEWAY_FACTORY);
+    return new BalanceInfoUsecase(presenter, ralphTokenGateway, ralphReservoirGateway, indexerGatewayFactory);
+  });
+
 /**
  * Feature: Minting Stats
  */
@@ -183,6 +203,18 @@ signalsContainer.bind<TSignal<TMintingStatsViewModel>>(SIGNALS.MINTING_STATS).to
     value: signal<TMintingStatsViewModel>({
       status: "error",
       message: "Minting stats signal not initialized",
+    }),
+  };
+});
+signalsContainer.bind<TSignal<TBalanceInfoViewModel>>(SIGNALS.BALANCE_INFO).toDynamicValue((context: interfaces.Context) => {
+  return {
+    name: `Balance Info ${new Date().getTime()}`,
+    description: "Signal to show balance info",
+    value: signal<TBalanceInfoViewModel>({
+      status: "error",
+      data: {
+        message: "Balance info signal not initialized",
+      }
     }),
   };
 });

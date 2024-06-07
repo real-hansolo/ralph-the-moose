@@ -1,15 +1,12 @@
 import { inject, injectable } from "inversify";
-import type {
-  TGetTransactionByHashDTO,
-  TGetRpcURLDTO,
-} from "~/lib/core/dto/rpc-gateway-dto";
+import type { TGetTransactionByHashDTO, TGetRpcURLDTO } from "~/lib/core/dto/rpc-gateway-dto";
 import type RPCGatewayOutputPort from "~/lib/core/ports/secondary/rpc-gateway-output-port";
 import { GATEWAYS } from "../config/ioc/symbols";
 // eslint-disable-next-line @typescript-eslint/consistent-type-imports
 import type NetworkGatewayOutputPort from "~/lib/core/ports/secondary/network-gateway-output-port";
 import { env } from "~/env";
 import axios from "axios";
-import https from 'https';
+import https from "https";
 
 @injectable()
 export default class RpcGateway implements RPCGatewayOutputPort {
@@ -78,6 +75,22 @@ export default class RpcGateway implements RPCGatewayOutputPort {
             message: `rpcProvider ${network.rpcProvider} not supported for network ${network.name}`,
           },
         };
+      case "AVAX":
+        if (network.rpcProvider === "infura") {
+          return {
+            success: true,
+            data: {
+              url: `https://avalanche-mainnet.infura.io/v3/${env.INFURA_API_KEY}`,
+            },
+          };
+        }
+        return {
+          success: false,
+          data: {
+            type: "rpc_provider_not_supported",
+            message: `rpcProvider ${network.rpcProvider} not supported for network ${network.name}`,
+          },
+        };
       case "AVALANCHE_FUJI":
         if (network.rpcProvider === "infura") {
           return {
@@ -105,23 +118,20 @@ export default class RpcGateway implements RPCGatewayOutputPort {
     }
   }
 
-  async getTransactionByHash(
-    networkId: number,
-    hash: string,
-  ): Promise<TGetTransactionByHashDTO> {
+  async getTransactionByHash(networkId: number, hash: string): Promise<TGetTransactionByHashDTO> {
     const getRpcUrlDTO = this.getRpcURL(networkId);
     if (!getRpcUrlDTO.success) {
       return getRpcUrlDTO;
     }
     try {
       const rpcUrl = getRpcUrlDTO.data.url;
-      console.log(rpcUrl)
+      console.log(rpcUrl);
       const instance = axios.create({
         // eslint-disable-next-line @typescript-eslint/no-unsafe-call
         httpsAgent: new https.Agent({
-            rejectUnauthorized: false,
-            }),
-        });
+          rejectUnauthorized: false,
+        }),
+      });
       const response = await instance.post(rpcUrl, {
         jsonrpc: "2.0",
         method: "eth_getTransactionByHash",

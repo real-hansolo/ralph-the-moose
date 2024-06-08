@@ -1,12 +1,13 @@
 import { BalanceCard } from "@maany_shr/ralph-the-moose-ui-kit";
 import { useSignals } from "@preact/signals-react/runtime";
 import { useQuery } from "@tanstack/react-query";
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import type { TSignal } from "~/lib/core/entity/signals";
 import type { TBalanceInfoViewModel } from "~/lib/core/view-models/balance-info-view-model";
 import { clientContainer, signalsContainer } from "~/lib/infrastructure/config/ioc/container";
 import { CONTROLLER, SIGNALS } from "~/lib/infrastructure/config/ioc/symbols";
 import type BalanceInfoController from "~/lib/infrastructure/controllers/balance-info-controller";
+import RalphMintClaimModal from "./RalphMintClaimModal";
 
 export const RalphBalanceCard = () => {
   useSignals();
@@ -14,6 +15,7 @@ export const RalphBalanceCard = () => {
     const timestamp = new Date().toISOString();
     return `[RalphBalanceCard] [${timestamp}] ${message}`;
   };
+  const [variant, setVariant] = useState<"default" | "bridge" | "wrap-claim" | "unwrap">("default");
   // Signals
   const S_BALANCE_INFO = signalsContainer.get<TSignal<TBalanceInfoViewModel>>(SIGNALS.BALANCE_INFO);
   const balanceInfoController = clientContainer.get<BalanceInfoController>(CONTROLLER.BALANCE_INFO_CONTROLLER);
@@ -51,13 +53,28 @@ export const RalphBalanceCard = () => {
   }, [data, isLoading, isError]);
 
   return (
-    <BalanceCard
-      inscriptionBalance={balanceInfoViewModel.inscriptions}
-      wrappedBalance={balanceInfoViewModel.wrapped}
-      tokenShortName={"PR"}
-      showBridgeVariant={() => {}}
-      showUnwrapVariant={() => {}}
-      showWrapClaimVariant={() => {}}
-    />
+    <div>
+      <BalanceCard
+        inscriptionBalance={balanceInfoViewModel.inscriptions}
+        wrappedBalance={balanceInfoViewModel.wrapped}
+        tokenShortName={"PR"}
+        showBridgeVariant={() => {
+          setVariant("bridge");
+        }}
+        showUnwrapVariant={() => {
+          setVariant("unwrap");
+        }}
+        showWrapClaimVariant={() => {
+          setVariant("wrap-claim");
+        }}
+      />
+      {variant === "wrap-claim" && (
+        <RalphMintClaimModal
+          onClose={() => {
+            setVariant("default");
+          }}
+        />
+      )}
+    </div>
   );
 };

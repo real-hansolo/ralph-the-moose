@@ -4,6 +4,9 @@ const SIGNALS = {
     TRANSACTION_GAS_STATUS: Symbol.for('TransactionGasStatus'),
     IS_MINTING: Symbol.for('IsMinting'),
     MINTING_STATS: Symbol.for('MintingStats'),
+    IS_WRAPPING: Symbol.for('IsWrapping'),
+    IS_CLAIMING: Symbol.for('IsClaiming'),
+    IS_BRIDGING: Symbol.for('IsBridging'),
 }
 
 const GATEWAYS = {

@@ -180,7 +180,21 @@ signalsContainer.bind<TSignal<boolean>>(SIGNALS.IS_MINTING).toConstantValue({
   description: "Signal is true if minting is in progress",
   value: signal<boolean>(false),
 });
-
+signalsContainer.bind<TSignal<boolean>>(SIGNALS.IS_WRAPPING).toConstantValue({
+  name: "Wrapping in progress Signal",
+  description: "Signal is true if wrapping is in progress",
+  value: signal<boolean>(false),
+});
+signalsContainer.bind<TSignal<boolean>>(SIGNALS.IS_CLAIMING).toConstantValue({
+  name: "Claiming in progress Signal",
+  description: "Signal is true if claiming is in progress",
+  value: signal<boolean>(false),
+});
+signalsContainer.bind<TSignal<boolean>>(SIGNALS.IS_BRIDGING).toConstantValue({
+  name: "Brdiging in progress Signal",
+  description: "Signal is true if bridging is in progress",
+  value: signal<boolean>(false),
+});
 const networkGateway = clientContainer.get<NetworkGatewayOutputPort>(GATEWAYS.NETWORK_GATEWAY);
 const defaultNetworkDTO = networkGateway.getDefaultNetwork();
 if (defaultNetworkDTO.success) {

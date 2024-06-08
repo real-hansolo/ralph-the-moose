@@ -1,5 +1,6 @@
 import { z } from "zod";
 import { ExecutedTransactionSchema, NetworkSchema, WalletSchema } from "../entity/models";
+import { BaseViewModelRequestSchema } from "~/sdk/view-model";
 
 
 export const WrappingSuccessViewModelSchema = z.object({
@@ -25,10 +26,12 @@ export const WrappingTransactionGasStatusSchema = z.object({
     wallet: WalletSchema,
 })
 
+    
 export const WrappingViewModelSchema = z.discriminatedUnion("status", [
     WrappingSuccessViewModelSchema,
     WrappingNonSuccessViewModelSchema,
     WrappingTransactionGasStatusSchema,
+    BaseViewModelRequestSchema,
 ])
 
 export type TWrappingViewModel = z.infer<typeof WrappingViewModelSchema>

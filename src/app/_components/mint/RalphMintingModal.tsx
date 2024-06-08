@@ -3,7 +3,7 @@ import type { Wallet } from "@maany_shr/thirdweb/wallets";
 import { useSignal } from "@preact/signals-react";
 import { useSignals } from "@preact/signals-react/runtime";
 import React, { useEffect, useState } from "react";
-import { TNetwork, TWallet } from "~/lib/core/entity/models";
+import type { TNetwork, TWallet } from "~/lib/core/entity/models";
 import type { TSignal } from "~/lib/core/entity/signals";
 import type WalletProviderOutputPort from "~/lib/core/ports/secondary/wallet-provider-output-port";
 import type { TMintingStatsViewModel } from "~/lib/core/view-models/minting-stats-view-model";

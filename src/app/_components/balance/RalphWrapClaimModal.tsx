@@ -1,7 +1,7 @@
-import { LightFrame, Modal, RalphLogo, WrapClaimModal } from "@maany_shr/ralph-the-moose-ui-kit";
+import { RalphLogo, WrapClaimModal } from "@maany_shr/ralph-the-moose-ui-kit";
 import { useSignal, useSignals } from "@preact/signals-react/runtime";
 import { useQuery } from "@tanstack/react-query";
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import type { TSignal } from "~/lib/core/entity/signals";
 import type { TBalanceInfoViewModel } from "~/lib/core/view-models/balance-info-view-model";
 import type { TWrappingViewModel } from "~/lib/core/view-models/wrapping-view-model";
@@ -11,7 +11,6 @@ import type BalanceInfoController from "~/lib/infrastructure/controllers/balance
 import type WrappingController from "~/lib/infrastructure/controllers/wrapping-controller";
 import { useToast } from "@maany_shr/ralph-the-moose-ui-kit";
 import { TNetwork } from "~/lib/core/entity/models";
-import { effect } from "@preact/signals-react";
 
 export interface RalphMingintModalProps {
   onClose: () => void;
@@ -110,7 +109,7 @@ export default function RalphWrapClaimModal({ onClose }: RalphMingintModalProps)
         console.error(log("Wrapping Exception"), e);
         S_Wrapping_Status.value.value = {
           status: "error",
-          message: "Wrapping Failed",
+          message: `${(e as Error).message} `,
           amount: amount,
         };
       })

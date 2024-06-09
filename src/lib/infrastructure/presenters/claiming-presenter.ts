@@ -10,22 +10,30 @@ export default class ClaimingPresenter implements ClaimingOutputPort<TSignal<TCl
     }
 
     presentProgress(progress: TClaimingProgressResponse): void {
-        this.response.value.value = {
-            ...this.response.value.value,
-            status: "in-progress",
-            amount: progress.amount,
-            message: progress.message,
-            transaction: progress.transaction,
-        };
+        if (progress.type === "awaiting-transaction") {
+            this.response.value.value = {
+                ...this.response.value.value,
+                status: "awaiting-transaction",
+                amount: progress.amount,
+            };
+            return;
+        }
+        if(progress.type === "verifying") {
+            this.response.value.value = {
+                ...this.response.value.value,
+                status: "verifying",
+                amount: progress.amount,
+                transaction: progress.transaction,
+                attempt: progress.attempt,
+            };
+            return;
+        }
     }
 
     presentSuccess(success: TClaimingSuccessResponse): void {
         this.response.value.value = {
             status: "success",
             amount: success.amount,
-            message: success.message,
-            network: success.network,
-            wallet: success.wallet,
             transaction: success.transaction
         };  
     }
@@ -35,8 +43,6 @@ export default class ClaimingPresenter implements ClaimingOutputPort<TSignal<TCl
             status: "error",
             message: error.message,
             amount: error.details.amount,
-            network: error.details.network,
-            wallet: error.details.wallet
         };
     }
 }

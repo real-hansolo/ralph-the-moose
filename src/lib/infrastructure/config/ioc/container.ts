@@ -232,6 +232,7 @@ signalsContainer.bind<TSignal<TBalanceInfoViewModel>>(SIGNALS.BALANCE_INFO).toDy
     }),
   };
 });
+
 /*
 Server Side Gateways
 */

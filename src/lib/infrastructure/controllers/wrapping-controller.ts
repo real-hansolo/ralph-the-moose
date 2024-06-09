@@ -1,15 +1,14 @@
 import type { TSignal } from "~/lib/core/entity/signals";
 import type { TWrappingViewModel } from "~/lib/core/view-models/wrapping-view-model";
-import type { TWallet, TNetwork } from "~/lib/core/entity/models";
-import { WrappingRequestSchema } from "~/lib/core/usecase-models/wrapping-usecase-models";
+import type { TNetwork } from "~/lib/core/entity/models";
 import type { WrappingInputPort } from "~/lib/core/ports/primary/wrapping-primary-ports";
-import { clientContainer } from "../config/ioc/container";
-import { USECASE } from "../config/ioc/symbols";
+import { WrappingRequestSchema } from "~/lib/core/usecase-models/wrapping-usecase-models";
+import { clientContainer, signalsContainer } from "../config/ioc/container";
+import { GATEWAYS, SIGNALS, USECASE } from "../config/ioc/symbols";
 import { injectable } from "inversify";
+import type WalletProviderOutputPort from "~/lib/core/ports/secondary/wallet-provider-output-port";
 
 export interface TWrappingControllerParameters {
-  wallet: TWallet;
-  network: TNetwork;
   amount: number;
   response: TSignal<TWrappingViewModel>;
 }
@@ -17,10 +16,22 @@ export interface TWrappingControllerParameters {
 @injectable()
 export default class WrappingController {
   async execute(controllerParameters: TWrappingControllerParameters): Promise<void> {
+    const S_ActiveNetwork = signalsContainer.get<TSignal<TNetwork>>(SIGNALS.ACTIVE_NETWORK);
+    const activeNetwork = S_ActiveNetwork.value.value;
+    if (activeNetwork === undefined) {
+      return Promise.reject(new Error("Could not determine active network!"));
+    }
+    const walletProvider = clientContainer.get<WalletProviderOutputPort<unknown>>(GATEWAYS.WALLET_PROVIDER);
+    const activeWalletDTO = walletProvider.getActiveWallet();
+    if (!activeWalletDTO.success) {
+      return Promise.reject(new Error("Could not find a connected wallet!"));
+    }
+    const activeWallet = activeWalletDTO.data;
+
     const wrappingRequest = WrappingRequestSchema.parse({
-      network: controllerParameters.network,
-      wallet: controllerParameters.wallet,
       amount: controllerParameters.amount,
+      network: activeNetwork,
+      wallet: activeWallet,
     });
     const usecaseFactory: (response: TSignal<TWrappingViewModel>) => WrappingInputPort = clientContainer.get(USECASE.WRAPPING_USECASE_FACTORY);
     const usecase = usecaseFactory(controllerParameters.response);

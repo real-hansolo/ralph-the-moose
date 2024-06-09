@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { TNetwork } from "../entity/models";
 import type { BalanceInfoInputPort, BalanceInfoOutputPort } from "../ports/primary/balance-info-primary-ports";
 import type IndexerGatewayOutputPort from "../ports/secondary/indexer-gateway-output-port";
@@ -44,7 +45,7 @@ export default class BalanceInfoUsecase implements BalanceInfoInputPort {
     if (!inscriptionBalanceDTO.success) {
       this.presenter.presentError({
         status: "error",
-        message: `Error getting inscription balance on ${network.name} for wallet ${wallet.activeAccount}. If you're like a nerd or sth, here's the message from the backend: ${inscriptionBalanceDTO.data.message}`,
+        message: `Error getting inscription balance on ${network.name} for wallet ${wallet.activeAccount}. If you're like a nerd or sth, here's the message from the backend: ${inscriptionBalanceDTO.data.msg}`,
         details: {
           network: network,
           wallet: wallet,

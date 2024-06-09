@@ -1,6 +1,11 @@
 import type { TSignal } from "~/lib/core/entity/signals";
 import type { WrappingOutputPort } from "~/lib/core/ports/primary/wrapping-primary-ports";
-import type { TWrappingErrorResponse, TWrappingProgressResponse, TWrappingSuccessResponse } from "~/lib/core/usecase-models/wrapping-usecase-models";
+import type {
+  TWrappingErrorResponse,
+  TWrappingEstimatedGasResponse,
+  TWrappingProgressResponse,
+  TWrappingSuccessResponse,
+} from "~/lib/core/usecase-models/wrapping-usecase-models";
 import type { TWrappingViewModel } from "~/lib/core/view-models/wrapping-view-model";
 
 export default class WrappingPresenter implements WrappingOutputPort<TSignal<TWrappingViewModel>> {
@@ -10,16 +15,30 @@ export default class WrappingPresenter implements WrappingOutputPort<TSignal<TWr
   }
 
   presentProgress(progress: TWrappingProgressResponse): void {
-    this.response.value.value = {
-      status: progress.type,
-      message: progress.message,
-      amount: progress.amount,
-      wrapTransaction: progress.transaction,
-      wrapFound: progress.wrapFound,
-    };
+    if (progress.type === "awaiting-transaction") {
+      this.response.value.value = {
+        status: progress.type,
+        amount: progress.amount,
+        network: progress.network,
+        wallet: progress.wallet,
+      };
+      return;
+    } else if (progress.type === "estimated-gas") {
+      this.presentEstimatedGas(progress);
+      return;
+    } else if (progress.type === "verifying") {
+      this.response.value.value = {
+        status: progress.type,
+        amount: progress.amount,
+        network: progress.network,
+        wallet: progress.wallet,
+        wrapTransaction: progress.transaction,
+        attempt: progress.attempt,
+      };
+    }
   }
 
-  presentEstimatedGas(gasEstimation: TWrappingProgressResponse): void {
+  presentEstimatedGas(gasEstimation: TWrappingEstimatedGasResponse): void {
     const estimatedGas = gasEstimation.estimatedGas;
     if (estimatedGas === undefined) {
       this.presentError({
@@ -29,17 +48,15 @@ export default class WrappingPresenter implements WrappingOutputPort<TSignal<TWr
           amount: gasEstimation.amount,
           network: gasEstimation.network,
           wallet: gasEstimation.wallet,
-          wrapFound: false,
         },
       });
       return;
     }
     this.response.value.value = {
-      status: "estimated-gas",
-      amount: gasEstimation.amount,
-      network: gasEstimation.network,
-      wallet: gasEstimation.wallet,
+      status: "estimating-gas",
       estimatedGas: estimatedGas,
+      gasLimit: gasEstimation.network.gasLimit,
+      amount: gasEstimation.amount,
     };
   }
 
@@ -49,7 +66,6 @@ export default class WrappingPresenter implements WrappingOutputPort<TSignal<TWr
       message: error.message,
       amount: error.details.amount,
       wrapTransaction: error.details.transaction,
-      wrapFound: error.details.wrapFound,
     };
   }
 

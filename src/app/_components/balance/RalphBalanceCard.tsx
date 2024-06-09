@@ -7,7 +7,7 @@ import type { TBalanceInfoViewModel } from "~/lib/core/view-models/balance-info-
 import { clientContainer, signalsContainer } from "~/lib/infrastructure/config/ioc/container";
 import { CONTROLLER, SIGNALS } from "~/lib/infrastructure/config/ioc/symbols";
 import type BalanceInfoController from "~/lib/infrastructure/controllers/balance-info-controller";
-import RalphMintClaimModal from "./RalphMintClaimModal";
+import RalphWrapClaimModal from "./RalphWrapClaimModal";
 
 export const RalphBalanceCard = () => {
   useSignals();
@@ -65,11 +65,12 @@ export const RalphBalanceCard = () => {
           setVariant("unwrap");
         }}
         showWrapClaimVariant={() => {
+          console.error(log("showWrapClaimVariant"));
           setVariant("wrap-claim");
         }}
       />
       {variant === "wrap-claim" && (
-        <RalphMintClaimModal
+        <RalphWrapClaimModal
           onClose={() => {
             setVariant("default");
           }}

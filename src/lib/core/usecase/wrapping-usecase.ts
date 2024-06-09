@@ -33,7 +33,6 @@ export default class WrappingUsecase implements WrappingInputPort {
   };
 
   async execute(request: TWrappingRequest): Promise<void> {
-    // Implement the wrapping usecase here
     const { wallet, network, amount } = request;
     const indexerGateway = this.indexerGatewayFactory(network);
     const wrapAmount = fromHumanReadableNumber(amount);
@@ -41,15 +40,20 @@ export default class WrappingUsecase implements WrappingInputPort {
     const S_GAS_STATUS = signalsContainer.get<TSignal<TTransactionGasStatus>>(SIGNALS.TRANSACTION_GAS_STATUS);
     const s_gas_signal = S_GAS_STATUS.value;
 
+    this.presenter.presentProgress({
+      type: "awaiting-transaction",
+      network: network,
+      wallet: wallet,
+      amount: amount,
+    });
+    console.log("[DEBUG DEBUG] : Time to show awaiting transaction")
     effect(() => {
-      return this.presenter.presentEstimatedGas({
-        type: "awaiting-transaction",
+      return this.presenter.presentProgress({
+        type: "estimated-gas",
         network: network,
         wallet: wallet,
-        message: "Estimating gas for wrapping",
         estimatedGas: s_gas_signal.value?.estimatedGas,
         amount: amount,
-        wrapFound: false,
       });
     });
 
@@ -70,7 +74,6 @@ export default class WrappingUsecase implements WrappingInputPort {
           amount: amount,
           network: network,
           wallet: wallet,
-          wrapFound: false,
         },
       });
       return;
@@ -85,8 +88,8 @@ export default class WrappingUsecase implements WrappingInputPort {
         amount: amount,
         network: network,
         wallet: wallet,
-        message: `Awaiting relayer confirmation! Attempt ${attempt}`,
-        wrapFound: false,
+        transaction: wrapTransactionDTO.data,
+        attempt: attempt,
       });
       attempt++;
       await new Promise((resolve) => setTimeout(resolve, 1000));

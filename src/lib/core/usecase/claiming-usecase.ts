@@ -64,17 +64,18 @@ export default class ClaimingUsecase implements ClaimingInputPort {
 
     const S_GAS_SIGNAL = signalsContainer.get<TSignal<TTransactionGasStatus>>(SIGNALS.TRANSACTION_GAS_STATUS);
     this.presenter.presentProgress({
-      amount: amount,
+      type: "awaiting-transaction",
       network: network,
       wallet: wallet,
-      message: `Claiming ${amount} PR tokens!`,
+      amount: amount,
+      message: `Preparing to release ${amount} PR tokens to your wallet!`,
     });
 
     const claimDTO = await this.ralphReservoirGateway.claim(wallet, network, amount, S_GAS_SIGNAL);
     if (!claimDTO.success) {
       this.presenter.presentError({
         status: "error",
-        message: "Error claiming PR tokens",
+        message: `Error claiming PR tokens: ${claimDTO.data.message}`,
         details: {
           amount: amount,
           network: network,
@@ -85,16 +86,15 @@ export default class ClaimingUsecase implements ClaimingInputPort {
     }
     this.presenter.presentProgress({
       amount: amount,
-      network: network,
-      wallet: wallet,
-      message: `Verifying balance after claiming ${amount} PR tokens!`,
+      type: "verifying",
+      attempt: 1,
       transaction: claimDTO.data,
     });
     let currentBalanceDTO = await this.ralphTokenGateway.getBalance(wallet.activeAccount, network);
     if (!currentBalanceDTO.success) {
       this.presenter.presentError({
         status: "error",
-        message: "Error getting PR token balance",
+        message: `Error getting PR token balance after claiming ${amount} PR tokens!. ${currentBalanceDTO.data.message}`,
         details: {
           amount: amount,
           network: network,
@@ -106,15 +106,14 @@ export default class ClaimingUsecase implements ClaimingInputPort {
     let currentBalance = currentBalanceDTO.data.balance;
     let attempt = 1;
     while (currentBalance < expectedBalance) {
+      this.presenter.presentProgress({
+        amount: amount,
+        type: "verifying",
+        attempt: attempt,
+        transaction: claimDTO.data,
+      });
       currentBalanceDTO = await this.ralphTokenGateway.getBalance(wallet.activeAccount, network);
       if (!currentBalanceDTO.success) {
-        this.presenter.presentProgress({
-          amount: amount,
-          network: network,
-          wallet: wallet,
-          message: `Verifying balance after claiming ${amount} PR tokens! Attempt ${attempt}!`,
-          transaction: claimDTO.data,
-        });
         this.presenter.presentError({
           status: "error",
           message: "Error getting PR token balance",

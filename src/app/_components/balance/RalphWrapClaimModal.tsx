@@ -12,6 +12,8 @@ import type WrappingController from "~/lib/infrastructure/controllers/wrapping-c
 import { useToast } from "@maany_shr/ralph-the-moose-ui-kit";
 import { TNetwork } from "~/lib/core/entity/models";
 import { effect } from "@preact/signals-react";
+import ClaimingController from "~/lib/infrastructure/controllers/claiming-controller";
+import { TClaimingViewModel } from "~/lib/core/view-models/claiming-view-model";
 
 export interface RalphMingintModalProps {
   onClose: () => void;
@@ -29,7 +31,7 @@ export default function RalphWrapClaimModal({ onClose }: RalphMingintModalProps)
   const S_ACTIVE_NETWORK = signalsContainer.get<TSignal<TNetwork>>(SIGNALS.ACTIVE_NETWORK);
   const S_IS_WRAPPING = signalsContainer.get<TSignal<boolean>>(SIGNALS.IS_WRAPPING);
   const S_IS_CLAIMING = signalsContainer.get<TSignal<boolean>>(SIGNALS.IS_CLAIMING);
-  
+
   const S_Wrapping_Status = {
     name: "Wrapping Status Signal",
     description: "Signal for Wrapping Status",
@@ -41,7 +43,7 @@ export default function RalphWrapClaimModal({ onClose }: RalphMingintModalProps)
   const S_Claiming_Status = {
     name: "Claiming Status Signal",
     description: "Signal for Claiming Status",
-    value: useSignal<TWrappingViewModel>({
+    value: useSignal<TClaimingViewModel>({
       status: "request",
       message: "Initiating Claiming",
     }),
@@ -112,6 +114,15 @@ export default function RalphWrapClaimModal({ onClose }: RalphMingintModalProps)
           message: `${(e as Error).message} `,
           amount: amount,
         };
+        toast?.openToast(
+          {
+            message: `Failed to wrap ${amount} PR.} `,
+            status: "error",
+            id: `wrapping-${S_Wrapping_Status.value.value.status}-${Date.now()}`,
+            title: "Wrapping Failed!",
+          },
+          5000,
+        );
       })
       .finally(() => {
         setTimeout(() => {
@@ -121,25 +132,80 @@ export default function RalphWrapClaimModal({ onClose }: RalphMingintModalProps)
   };
   const handleClaiming = (amount: number) => {
     S_IS_CLAIMING.value.value = true;
+    const claimingController = clientContainer.get<ClaimingController>(CONTROLLER.CLAIMING_CONTROLLER);
+    claimingController
+      .execute({
+        amount,
+        response: S_Claiming_Status,
+      })
+      .then(() => {
+        if (S_Claiming_Status.value.value.status === "success") {
+          console.info(log("Claiming Successful" + JSON.stringify(S_Claiming_Status.value.value)));
+          toast?.openToast(
+            {
+              message: `You have successfully claimed ${S_Claiming_Status.value.value.status === "success" ? S_Claiming_Status.value.value.amount : amount} PR. `,
+              status: "success",
+              id: `claiming-${S_Claiming_Status.value.value.status}-${Date.now()}`,
+              title: "Claimed!",
+            },
+            5000,
+          );
+        } else if (S_Claiming_Status.value.value.status === "error") {
+          console.error(log(`${S_Claiming_Status.value.value.message}`));
+          toast?.openToast(
+            {
+              message: `Failed to claim ${amount} PR. `,
+              status: "error",
+              id: `claiming-${S_Claiming_Status.value.value.status}-${Date.now()}`,
+              title: "Claiming Failed!",
+            },
+            5000,
+          );
+        }
+      })
+      .catch((e) => {
+        console.error(log("Claiming Exception"), e);
+        S_Claiming_Status.value.value = {
+          status: "error",
+          message: `${(e as Error).message} `,
+          amount: amount,
+        };
+        toast?.openToast(
+          {
+            message: `Failed to claim ${amount} PR.} `,
+            status: "error",
+            id: `claiming-${S_Claiming_Status.value.value.status}-${Date.now()}`,
+            title: "Claiming Failed!",
+          },
+          5000,
+        );
+      })
+      .finally(() => {
+        setTimeout(() => {
+          S_IS_CLAIMING.value.value = false;
+        }, 5000);
+      });
   };
 
   effect(() => {
     if (S_IS_WRAPPING.value.value) {
-      if(view!=="wrapping") setView("wrapping");
+      if (view !== "wrapping") setView("wrapping");
     } else if (S_IS_CLAIMING.value.value) {
-      if(view!="claiming") setView("claiming");
+      if (view != "claiming") setView("claiming");
+    } else if (balanceInfoViewModel.claimable > 0) {
+      if (view !== "claim") setView("claim");
     } else {
-      if(view!=="wrap") setView("wrap");
+      if (view !== "wrap") setView("wrap");
     }
   });
   return (
     <div>
       {view === "claim" && (
         <WrapClaimModal
-          claimableAmount={100000}
+          claimableAmount={balanceInfoViewModel.claimable}
           network={{
-            chainId: 1,
-            name: "Ethereum",
+            chainId: S_ACTIVE_NETWORK.value.value.chainId,
+            name: S_ACTIVE_NETWORK.value.value.name,
           }}
           onClaim={handleClaiming}
           token={{
@@ -150,7 +216,19 @@ export default function RalphWrapClaimModal({ onClose }: RalphMingintModalProps)
           onClose={onClose}
         />
       )}
-      {view === "claiming" && <div>Claiming</div>}
+      {view === "claiming" && (
+        <WrapClaimModal
+          claimableAmount={balanceInfoViewModel.claimable}
+          network={S_ACTIVE_NETWORK.value.value}
+          token={{
+            icon: <RalphLogo variant="icon" />,
+            shortName: "PR",
+          }}
+          status={S_Claiming_Status.value.value}
+          variant="claiming"
+          onClose={onClose}
+        />
+      )}
       {view === "wrapping" && (
         <div>
           (

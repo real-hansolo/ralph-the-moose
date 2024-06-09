@@ -11,6 +11,7 @@ import type BalanceInfoController from "~/lib/infrastructure/controllers/balance
 import type WrappingController from "~/lib/infrastructure/controllers/wrapping-controller";
 import { useToast } from "@maany_shr/ralph-the-moose-ui-kit";
 import { TNetwork } from "~/lib/core/entity/models";
+import { effect } from "@preact/signals-react";
 
 export interface RalphMingintModalProps {
   onClose: () => void;
@@ -83,7 +84,6 @@ export default function RalphWrapClaimModal({ onClose }: RalphMingintModalProps)
   }, [data, isLoading, isError]);
 
   const handleWrapping = (amount: number) => {
-    setView("wrapping");
     S_IS_WRAPPING.value.value = true;
     const wrappingController = clientContainer.get<WrappingController>(CONTROLLER.WRAPPING_CONTROLLER);
     wrappingController
@@ -123,6 +123,15 @@ export default function RalphWrapClaimModal({ onClose }: RalphMingintModalProps)
     S_IS_CLAIMING.value.value = true;
   };
 
+  effect(() => {
+    if (S_IS_WRAPPING.value.value) {
+      if(view!=="wrapping") setView("wrapping");
+    } else if (S_IS_CLAIMING.value.value) {
+      if(view!="claiming") setView("claiming");
+    } else {
+      if(view!=="wrap") setView("wrap");
+    }
+  });
   return (
     <div>
       {view === "claim" && (

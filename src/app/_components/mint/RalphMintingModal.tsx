@@ -95,6 +95,7 @@ export default function RalphMintingModal({ isOpen, onClose }: RalphMintingModal
           S_IS_MINTING.value.value = false;
         });
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isOpen]);
   if (!isOpen) return null;
   return <MintingModal {...{ ...S_Minting_Status.value.value }} onClose={onClose} />;

@@ -10,10 +10,10 @@ import { CONTROLLER, SIGNALS } from "~/lib/infrastructure/config/ioc/symbols";
 import type BalanceInfoController from "~/lib/infrastructure/controllers/balance-info-controller";
 import type WrappingController from "~/lib/infrastructure/controllers/wrapping-controller";
 import { useToast } from "@maany_shr/ralph-the-moose-ui-kit";
-import { TNetwork } from "~/lib/core/entity/models";
+import type { TNetwork } from "~/lib/core/entity/models";
 import { effect } from "@preact/signals-react";
-import ClaimingController from "~/lib/infrastructure/controllers/claiming-controller";
-import { TClaimingViewModel } from "~/lib/core/view-models/claiming-view-model";
+import type ClaimingController from "~/lib/infrastructure/controllers/claiming-controller";
+import type { TClaimingViewModel } from "~/lib/core/view-models/claiming-view-model";
 
 export interface RalphMingintModalProps {
   onClose: () => void;

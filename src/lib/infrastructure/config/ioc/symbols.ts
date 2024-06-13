@@ -7,6 +7,7 @@ const SIGNALS = {
     IS_WRAPPING: Symbol.for('IsWrapping'),
     IS_CLAIMING: Symbol.for('IsClaiming'),
     IS_BRIDGING: Symbol.for('IsBridging'),
+    IS_UNWRAPPING: Symbol.for('IsUnwrapping'),
 }
 
 const GATEWAYS = {

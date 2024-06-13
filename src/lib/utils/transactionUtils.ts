@@ -97,6 +97,7 @@ export const callThirdWebContractUtil = async (
   }
   const web3GatewayPreparedContractCall = preparedTransactionDTO.preparedContractCall;
 
+  console.log("web3GatewayPreparedContractCall", JSON.stringify({...web3GatewayPreparedContractCall, value: web3GatewayPreparedContractCall.value.toString()}));
   if (!web3GatewayPreparedContractCall) {
     return {
       success: false,
@@ -114,6 +115,7 @@ export const callThirdWebContractUtil = async (
   if (gasStatusSignal) {
     const estimatedGasDTO = await web3Gateway.estimateGas(web3GatewayPreparedContractCall);
     if (estimatedGasDTO.success) {
+      console.error("estimatedGasDTO", estimatedGasDTO.success);
       gasStatusSignal.value.value = {
         estimatedGas: Number(estimatedGasDTO.data), // Convert bigint to number
         gasLimit: preparedContractCall.contract.network.gasLimit,
@@ -244,7 +246,7 @@ export const sendThirdWebTransactionUtil = async (
   return executedTransactionDTO;
 };
 
-export const aproveRalphReservoir = async (amount: number, wallet: TWallet, network: TNetwork): Promise<ApproveReservoirDTO | undefined> => {
+export const approveRalphReservoir = async (amount: number, wallet: TWallet, network: TNetwork): Promise<ApproveReservoirDTO | undefined> => {
   const ralphTokenGateway = clientContainer.get<RalphTokenOutputPort>(GATEWAYS.RALPH_TOKEN_GATEWAY);
   const spendingAllowance = await ralphTokenGateway.getSpendingAllowance(wallet, network);
   if (!spendingAllowance.success) {

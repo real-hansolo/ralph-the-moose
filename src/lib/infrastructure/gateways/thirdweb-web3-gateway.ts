@@ -12,36 +12,23 @@ import {
 import { type Wallet } from "@maany_shr/thirdweb/wallets";
 import { getThirdWebChain } from "~/lib/utils/networkUtils";
 import { env } from "~/env";
-import type {
-  TPreparedTransactionDTO,
-  TExecutedTransactionDTO,
-  TEstimateGasDTO,
-  TPreparedContractCallDTO,
-} from "~/lib/core/dto/web3-gateway-dto";
-import type {
-  TPreparedContractCall,
-  TPreparedTransaction,
-} from "~/lib/core/entity/models";
+import type { TPreparedTransactionDTO, TExecutedTransactionDTO, TEstimateGasDTO, TPreparedContractCallDTO } from "~/lib/core/dto/web3-gateway-dto";
+import type { TPreparedContractCall, TPreparedTransaction } from "~/lib/core/entity/models";
 import type Web3GatewayOutputPort from "~/lib/core/ports/secondary/web3-gateway-output-port";
 import { injectable } from "inversify";
 import { client } from "../trpc/vanilla";
+import { string } from "zod";
 
 @injectable()
-export default class ThirdwebWeb3Gateway
-  implements
-    Web3GatewayOutputPort<Wallet, PreparedTransaction, PreparedTransaction>
-{
+export default class ThirdwebWeb3Gateway implements Web3GatewayOutputPort<Wallet, PreparedTransaction, PreparedTransaction> {
   private thirdWebClient: ThirdwebClient;
-  constructor(
-  ) {
+  constructor() {
     this.thirdWebClient = createThirdwebClient({
       clientId: env.NEXT_PUBLIC_THIRDWEB_CLIENT_ID,
     });
   }
 
-  prepareTransaction(
-    transactionDetails: TPreparedTransaction,
-  ): TPreparedTransactionDTO<PreparedTransaction> {
+  prepareTransaction(transactionDetails: TPreparedTransaction): TPreparedTransactionDTO<PreparedTransaction> {
     console.log("transactionDetails", transactionDetails);
     try {
       const chain = getThirdWebChain(transactionDetails.network.name);
@@ -72,11 +59,7 @@ export default class ThirdwebWeb3Gateway
     }
   }
 
-  async sendTransaction(
-    preparedTransaction: PreparedTransaction,
-    transactionDetails: TPreparedTransaction,
-    wallet: Wallet,
-  ): Promise<TExecutedTransactionDTO> {
+  async sendTransaction(preparedTransaction: PreparedTransaction, transactionDetails: TPreparedTransaction, wallet: Wallet): Promise<TExecutedTransactionDTO> {
     const thirdwebAccount = wallet.getAccount();
     if (!thirdwebAccount) {
       return {
@@ -103,9 +86,8 @@ export default class ThirdwebWeb3Gateway
       hash: transactionHash,
       networkId: transactionDetails.network.chainId,
     });
-    if (
-      !txDetailsDTOQuery.success) {
-      return { 
+    if (!txDetailsDTOQuery.success) {
+      return {
         success: true,
         data: {
           status: "partial",
@@ -141,14 +123,10 @@ export default class ThirdwebWeb3Gateway
     };
   }
 
-  prepareContractCall(
-    preparedContractCall: TPreparedContractCall,
-  ): TPreparedContractCallDTO<PreparedTransaction> {
+  prepareContractCall(preparedContractCall: TPreparedContractCall): TPreparedContractCallDTO<PreparedTransaction> {
     let thirdwebChain;
     try {
-      thirdwebChain = getThirdWebChain(
-        preparedContractCall.contract.network.name,
-      );
+      thirdwebChain = getThirdWebChain(preparedContractCall.contract.network.name);
     } catch (e) {
       return {
         success: false,
@@ -165,6 +143,8 @@ export default class ThirdwebWeb3Gateway
         address: preparedContractCall.contract.address,
         chain: thirdwebChain,
       });
+      const stringParams = preparedContractCall.params.map((param) => `${param}`);
+      console.log("Prepared Contract call", preparedContractCall.method, stringParams, preparedContractCall.value);
       const transaction = prepareContractCall({
         contract: thirdwebContract,
         method: {
@@ -203,15 +183,23 @@ export default class ThirdwebWeb3Gateway
     return executedTransactionDTO;
   }
 
-  async estimateGas(
-    preparedTransaction: PreparedTransaction,
-  ): Promise<TEstimateGasDTO> {
-    const estimatedGas = await thirdWebEsimtateGas({
-      transaction: preparedTransaction,
-    });
-    return {
-      success: true,
-      data: estimatedGas,
-    };
+  async estimateGas(preparedTransaction: PreparedTransaction): Promise<TEstimateGasDTO> {
+    try {
+      const estimatedGas = await thirdWebEsimtateGas({
+        transaction: preparedTransaction,
+      });
+      return {
+        success: true,
+        data: estimatedGas,
+      };
+    } catch (e) {
+      return {
+        success: false,
+        data: {
+          type: "estimate_gas_error",
+          message: `Error estimating gas using Thirdweb. ${(e as Error).message}`,
+        },
+      };
+    }
   }
 }

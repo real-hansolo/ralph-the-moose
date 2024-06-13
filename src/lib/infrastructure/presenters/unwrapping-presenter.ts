@@ -15,7 +15,7 @@ export default class UnwrappingPresenter implements UnWrappingOutputPort<TSignal
             message: progress.message,
             amount: progress.amount,
             unwrapTransaction: progress.transaction,
-            type: "progress",
+            type: "progress"
         };
     }
 
@@ -38,9 +38,9 @@ export default class UnwrappingPresenter implements UnWrappingOutputPort<TSignal
         this.response.value.value = {
             status: "estimated-gas",
             amount: gasEstimation.amount,
-            network: gasEstimation.network,
             estimatedGas: estimatedGas,
-            wallet: gasEstimation.wallet,
+            gasLimit: gasEstimation.network.gasLimit,
+            network: gasEstimation.network,
         };
     }
 

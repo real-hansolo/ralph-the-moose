@@ -8,6 +8,7 @@ import { clientContainer, signalsContainer } from "~/lib/infrastructure/config/i
 import { CONTROLLER, SIGNALS } from "~/lib/infrastructure/config/ioc/symbols";
 import type BalanceInfoController from "~/lib/infrastructure/controllers/balance-info-controller";
 import RalphWrapClaimModal from "./RalphWrapClaimModal";
+import RalphUnwrapModal from "./RalphUnwrapModal";
 
 export const RalphBalanceCard = () => {
   useSignals();
@@ -71,6 +72,13 @@ export const RalphBalanceCard = () => {
       />
       {variant === "wrap-claim" && (
         <RalphWrapClaimModal
+          onClose={() => {
+            setVariant("default");
+          }}
+        />
+      )}
+      {variant === "unwrap" && (
+        <RalphUnwrapModal
           onClose={() => {
             setVariant("default");
           }}

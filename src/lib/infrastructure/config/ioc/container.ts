@@ -185,6 +185,11 @@ signalsContainer.bind<TSignal<boolean>>(SIGNALS.IS_WRAPPING).toConstantValue({
   description: "Signal is true if wrapping is in progress",
   value: signal<boolean>(false),
 });
+signalsContainer.bind<TSignal<boolean>>(SIGNALS.IS_UNWRAPPING).toConstantValue({
+  name: "Unwrapping in progress Signal",
+  description: "Signal is true if unwrapping is in progress",
+  value: signal<boolean>(false),
+});
 signalsContainer.bind<TSignal<boolean>>(SIGNALS.IS_CLAIMING).toConstantValue({
   name: "Claiming in progress Signal",
   description: "Signal is true if claiming is in progress",

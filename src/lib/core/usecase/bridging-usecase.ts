@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { aproveRalphReservoir } from "~/lib/utils/transactionUtils";
+import { approveRalphReservoir } from "~/lib/utils/transactionUtils";
 import type { BridgingInputPort, BridgingOutputPort } from "../ports/primary/bridging-primary-ports";
 import type ElkBridgeHeadOutputPort from "../ports/secondary/elk-bridgehead-output-port";
 import type RalphTokenOutputPort from "../ports/secondary/ralph-token-output-port";
@@ -84,7 +84,7 @@ export default class BridgingUsecase implements BridgingInputPort {
       message: "Bridging in progress...",
     });
 
-    const approvalRessult = await aproveRalphReservoir(amount, wallet, network);
+    const approvalRessult = await approveRalphReservoir(amount, wallet, network);
     if (approvalRessult && !approvalRessult.success) {
       this.presenter.presentError({
         status: "error",

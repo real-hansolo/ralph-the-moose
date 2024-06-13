@@ -74,7 +74,7 @@ export const EstimateGasDTOSchema = DTOSchemaFactory(
   z.object({
     type: z.enum(["estimate_gas_error"]),
     message: z.string(),
-    preparedTransaction: PreparedTransactionSchema.or(PreparedContractCallSchema),
+    preparedTransaction: PreparedTransactionSchema.or(PreparedContractCallSchema).optional(),
   }),
 );
 

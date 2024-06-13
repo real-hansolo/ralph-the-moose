@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { ExecutedTransactionSchema, NetworkSchema, WalletSchema } from "../entity/models";
+import { ExecutedTransactionSchema } from "../entity/models";
 import { BaseViewModelRequestSchema } from "~/sdk/view-model";
 
    

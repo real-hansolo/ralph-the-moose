@@ -10,7 +10,7 @@ export const BASE: TNetwork = {
     },
     rpcProvider: "alchemy",
     nativeCurrency: "ETH",
-    gasLimit: 200000,
+    gasLimit: 500000,
     fee: { 
         minting: 0.00123,
         wrapping: 0.00123,

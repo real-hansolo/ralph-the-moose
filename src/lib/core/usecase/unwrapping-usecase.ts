@@ -8,7 +8,7 @@ import type { TSignal, TTransactionGasStatus } from "../entity/signals";
 import { signalsContainer } from "~/lib/infrastructure/config/ioc/container";
 import { SIGNALS } from "~/lib/infrastructure/config/ioc/symbols";
 import { effect } from "@preact/signals-react";
-import { aproveRalphReservoir } from "~/lib/utils/transactionUtils";
+import { approveRalphReservoir } from "~/lib/utils/transactionUtils";
 
 export default class UnwrappingUsecase implements UnWrappingInputPort {
   presenter: UnWrappingOutputPort<any>;
@@ -41,7 +41,7 @@ export default class UnwrappingUsecase implements UnWrappingInputPort {
       return;
     }
     const initialBalance = balanceDTO.data.balance;
-    const approvalResult  = await aproveRalphReservoir(amount, wallet, network);
+    const approvalResult  = await approveRalphReservoir(amount, wallet, network);
     if(approvalResult && !approvalResult.success) {
       this.presenter.presentError({
         status: "error",

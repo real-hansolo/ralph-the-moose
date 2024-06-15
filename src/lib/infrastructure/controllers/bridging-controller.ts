@@ -4,26 +4,28 @@ import type { BridgingInputPort } from "~/lib/core/ports/primary/bridging-primar
 import { clientContainer } from "../config/ioc/container";
 import { GATEWAYS, USECASE } from "../config/ioc/symbols";
 import { injectable } from "inversify";
-import type BridgingController from "~/lib/core/controller/bridging-controller-ports";
-import type { Wallet } from "@maany_shr/thirdweb/wallets";
-import type { TBridgingControllerParameters } from "~/lib/core/controller-parameters/bridging-controller-parameters";
 import type WalletProviderOutputPort from "~/lib/core/ports/secondary/wallet-provider-output-port";
 import type NetworkGatewayOutputPort from "~/lib/core/ports/secondary/network-gateway-output-port";
 
+export interface TBridgingControllerParameters {
+    networkId: number;
+    toNetworkId: number;
+    amount: number;
+    response: TSignal<TBridgingViewModel>;
+}
+
 @injectable()
-export default class ThirdwebBridgingController implements BridgingController<Wallet> {
-  async execute(controllerParameters: TBridgingControllerParameters<Wallet>): Promise<void> {
-    const { wallet, networkId, toNetworkId, amount, response } = controllerParameters;
-    const walletProvider = clientContainer.get<WalletProviderOutputPort<Wallet>>(GATEWAYS.WALLET_PROVIDER);
+export default class BridgingController {
+  async execute(controllerParameters: TBridgingControllerParameters): Promise<void> {
+    const { networkId, toNetworkId, amount, response } = controllerParameters;
+    const walletProvider = clientContainer.get<WalletProviderOutputPort<unknown>>(GATEWAYS.WALLET_PROVIDER);
     const networkGateway = clientContainer.get<NetworkGatewayOutputPort>(GATEWAYS.NETWORK_GATEWAY);
-    if (wallet === undefined) {
-      return Promise.reject(new Error("Wallet is not connected!"));
+
+    const activeWalletDTO = walletProvider.getActiveWallet();
+    if (!activeWalletDTO.success) {
+      return Promise.reject(new Error("Could not find a connected wallet!"));
     }
-    const convertedWalletDTO = walletProvider.fromWalletInstance(wallet);
-    if (!convertedWalletDTO.success) {
-      return Promise.reject(new Error("Error converting wallet to appropriate format"));
-    }
-    const convertedWallet = convertedWalletDTO.data;
+    const activeWallet = activeWalletDTO.data;
 
     const networkDTO = networkGateway.getNetwork(networkId);
     if (!networkDTO.success) {
@@ -40,7 +42,7 @@ export default class ThirdwebBridgingController implements BridgingController<Wa
     const toNetwork = toNetworkDTO.data;
 
     const bridgingRequest = {
-      wallet: convertedWallet,
+      wallet: activeWallet,
       network: network,
       toNetwork: toNetwork,
       amount: amount,

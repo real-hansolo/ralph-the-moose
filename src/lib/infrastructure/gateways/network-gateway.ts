@@ -31,7 +31,7 @@ export default class NetworkGateway implements NetworkGatewayOutputPort {
   getSupportedNetworks(): TListNetworkDTO {
     return {
       success: true,
-      data: [BASE, BASE_SEPOLIA, AVALANCHE],
+      data: [BASE, AVALANCHE],
     };
   }
 

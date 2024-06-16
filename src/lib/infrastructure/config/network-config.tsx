@@ -84,7 +84,7 @@ export const AVALANCHE: TNetwork = {
     },
     rpcProvider: "infura",
     nativeCurrency: "AVAX",
-    gasLimit: 200000,
+    gasLimit: 500000,
     fee: { 
         minting: 0.0572523,
         wrapping: 0.0572523,

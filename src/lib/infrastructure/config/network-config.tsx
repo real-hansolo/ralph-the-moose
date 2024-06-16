@@ -86,9 +86,9 @@ export const AVALANCHE: TNetwork = {
     nativeCurrency: "AVAX",
     gasLimit: 500000,
     fee: { 
-        minting: 0.0572523,
-        wrapping: 0.0572523,
-        unwrapping: 0.0572523,
+        minting: 0.123,
+        wrapping: 0.123,
+        unwrapping: 0.123,
         bridging: 0.0123
     },
     contracts: {

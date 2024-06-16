@@ -28,6 +28,13 @@ export default class ClaimingController {
     }
     const activeWallet = activeWalletDTO.data;
 
+    const activeWalletNetwork = activeWallet.activeNetwork;
+    if (activeWalletNetwork.chainId !== activeNetwork.chainId) {
+      const switchWalletNetworkDTO = await walletProvider.switchActiveWalletNetwork(activeNetwork);
+      if (!switchWalletNetworkDTO.success) {
+        return Promise.reject(new Error(`Error switching wallet network to ${activeNetwork.name}`));
+      }
+    }
     const claimingRequest = ClaimingRequestSchema.parse({
       amount: controllerParameters.amount,
       network: activeNetwork,

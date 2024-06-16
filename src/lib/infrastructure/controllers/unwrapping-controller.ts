@@ -27,6 +27,14 @@ export default class UnwrappingController {
           return Promise.reject(new Error("Could not find a connected wallet!"));
         }
         const activeWallet = activeWalletDTO.data;
+
+        const activeWalletNetwork = activeWallet.activeNetwork;
+        if (activeWalletNetwork.chainId !== activeNetwork.chainId) {
+          const switchWalletNetworkDTO = await walletProvider.switchActiveWalletNetwork(activeNetwork);
+          if (!switchWalletNetworkDTO.success) {
+            return Promise.reject(new Error(`Error switching wallet network to ${activeNetwork.name}`));
+          }
+        }
         const unwrappingRequest = UnwrappingRequestSchema.parse({
             network: activeNetwork,
             wallet: activeWallet,

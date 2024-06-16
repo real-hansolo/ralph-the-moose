@@ -1,6 +1,6 @@
 import type { TSignal } from "~/lib/core/entity/signals";
 import type { BridgingOutputPort } from "~/lib/core/ports/primary/bridging-primary-ports";
-import type { TBridgingErrorResponse, TBridgingProgressResponse, TBridgingSuccessResponse } from "~/lib/core/usecase-models/bridging-usecase-models";
+import type { TBridgingErrorResponse, TBridgingEstimateGasResponse, TBridgingProgressResponse, TBridgingSuccessResponse } from "~/lib/core/usecase-models/bridging-usecase-models";
 import type { TBridgingViewModel } from "~/lib/core/view-models/bridging-view-model";
 
 export default class BridgingPresenter implements BridgingOutputPort<TSignal<TBridgingViewModel>> {
@@ -16,27 +16,22 @@ export default class BridgingPresenter implements BridgingOutputPort<TSignal<TBr
       message: progress.message,
       amount: progress.amount,
       wallet: progress.wallet,
-      network: progress.network,
+      fromNetwork: progress.network,
       toNetwork: progress.toNetwork,
-      estimateGas: progress.estimateGas ?? 0,
     };
   }
 
-  presentEstimatedGas(gasEstimation: TBridgingProgressResponse): void {
-    const estimatedGas = gasEstimation.estimateGas;
+  presentEstimatedGas(gasEstimation: TBridgingEstimateGasResponse): void {
+    const estimatedGas = gasEstimation.estimatedGas;
     if (estimatedGas === undefined) {
       return;
     }
     this.response.value.value = {
       status: "in-progress",
-      type: "gas",
+      type: "estimated-gas",
       amount: gasEstimation.amount,
-      network: gasEstimation.network,
-      estimateGas: estimatedGas,
-      wallet: gasEstimation.wallet,
-      toNetwork: gasEstimation.toNetwork,
-      transaction: gasEstimation.transaction,
-      message: gasEstimation.message,
+      estimatedGas: estimatedGas,
+      gasLimit: gasEstimation.gasLimit,
     };
   }
 
@@ -47,7 +42,7 @@ export default class BridgingPresenter implements BridgingOutputPort<TSignal<TBr
       amount: error.details.amount,
       message: error.message,
       wallet: error.details.wallet,
-      network: error.details.network,
+      fromNetwork: error.details.network,
       toNetwork: error.details.toNetwork,
     };
   }
@@ -58,7 +53,7 @@ export default class BridgingPresenter implements BridgingOutputPort<TSignal<TBr
       message: success.message,
       amount: success.amount,
       wallet: success.wallet,
-      network: success.network,
+      fromNetwork: success.network,
       toNetwork: success.toNetwork,
       transaction: success.transaction,
     };

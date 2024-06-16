@@ -39,7 +39,7 @@ export type TBridgingErrorResponse = z.infer<typeof BridgingErrorResponseSchema>
 
 export const BridgingProgressResponseSchema = z.object({
     transaction: ExecutedTransactionSchema.optional(),
-    type: z.enum(["awaiting-verification", "awaiting-approval", "sending-transaction", "gas", "update"]),
+    type: z.enum(["awaiting-verification", "awaiting-approval", "sending-transaction", "update"]),
     amount: z.number(),
     network: NetworkSchema,
     wallet: WalletSchema,
@@ -47,5 +47,15 @@ export const BridgingProgressResponseSchema = z.object({
     estimateGas: z.number().optional(),
     message: z.string(),
 })
-
 export type TBridgingProgressResponse = z.infer<typeof BridgingProgressResponseSchema>
+
+
+export const BridgingEstimateGasResponseSchema = z.object({
+    status: z.literal("in-progress"),
+    type: z.literal("estimated-gas"),
+    amount: z.number(),
+    estimatedGas: z.number(),
+    gasLimit: z.number()
+})
+
+export type TBridgingEstimateGasResponse = z.infer<typeof BridgingEstimateGasResponseSchema>

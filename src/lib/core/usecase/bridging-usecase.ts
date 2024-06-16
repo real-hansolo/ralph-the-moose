@@ -4,6 +4,10 @@ import type { BridgingInputPort, BridgingOutputPort } from "../ports/primary/bri
 import type ElkBridgeHeadOutputPort from "../ports/secondary/elk-bridgehead-output-port";
 import type RalphTokenOutputPort from "../ports/secondary/ralph-token-output-port";
 import type { TBridgingRequest } from "../usecase-models/bridging-usecase-models";
+import { effect } from "@preact/signals-react";
+import { signalsContainer } from "~/lib/infrastructure/config/ioc/container";
+import { SIGNALS } from "~/lib/infrastructure/config/ioc/symbols";
+import type { TSignal, TTransactionGasStatus } from "../entity/signals";
 
 export default class BridgingUsecase implements BridgingInputPort {
   presenter: BridgingOutputPort<any>;
@@ -99,8 +103,19 @@ export default class BridgingUsecase implements BridgingInputPort {
       });
       return;
     }
+    const S_GAS_STATUS = signalsContainer.get<TSignal<TTransactionGasStatus>>(SIGNALS.TRANSACTION_GAS_STATUS);
+    const s_gas_signal = S_GAS_STATUS.value;
+    effect(() => {
+      return this.presenter.presentEstimatedGas({
+        status: "in-progress",
+        type: "estimated-gas",
+        estimatedGas: s_gas_signal.value?.estimatedGas,
+        amount: amount,
+        gasLimit: s_gas_signal.value?.gasLimit,
+      });
+    });
 
-    const bridgeTokensDTO = await this.elkBridgeHead.bridgeTokens(wallet, network, amount, toNetwork);
+    const bridgeTokensDTO = await this.elkBridgeHead.bridgeTokens(wallet, network, amount, toNetwork, S_GAS_STATUS);
     if (!bridgeTokensDTO.success) {
       this.presenter.presentError({
         status: "error",
@@ -115,7 +130,6 @@ export default class BridgingUsecase implements BridgingInputPort {
       });
       return;
     }
-    // TODO: check if the balance updated on the other chain
 
     this.presenter.presentProgress({
       type: "awaiting-verification",
@@ -142,7 +156,7 @@ export default class BridgingUsecase implements BridgingInputPort {
             amount: amount,
           },
         });
-        return;
+        continue;
       }
       destinationNetworkBalance = destinationNetworkBalanceDTO.data.balance;
       await new Promise((resolve) => setTimeout(resolve, 1000));

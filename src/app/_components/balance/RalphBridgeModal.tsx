@@ -41,6 +41,9 @@ export default function RalphBridgeModal({ onClose }: RalphBridgeModal) {
     value: useSignal<TBridgingViewModel>({
       status: "request",
       message: "Initiating Bridging",
+      fromNetwork: S_ACTIVE_NETWORK.value.value,
+      toNetwork: S_ACTIVE_NETWORK.value.value,
+      amount: amount,
     }),
   };
 
@@ -90,9 +93,14 @@ export default function RalphBridgeModal({ onClose }: RalphBridgeModal) {
     return;
   }
 
-  const supportedChains = supportedChainsDTO.data;
+  const supportedChains = supportedChainsDTO.data.map((network) => ({
+    ...network,
+    bridgingFee: network.fee.bridging,
+    nativeCurrency: network.nativeCurrency,
+  }));
 
   const handleBridging = (destinationChainId: number, amount: number) => {
+    S_IS_BRIDGING.value.value = true;
     setAmount(amount);
     const destinationChainDTO = networkGateway.getNetwork(destinationChainId);
     if (!destinationChainDTO.success) {
@@ -121,8 +129,17 @@ export default function RalphBridgeModal({ onClose }: RalphBridgeModal) {
         if (S_Bridging_Status.value.value.status === "success") {
           setAmount(amount);
           setDestinationChain(destinationChain);
-        } else {
+        } else if (S_Bridging_Status.value.value.status === "error") {
           console.error(log(`${S_Bridging_Status.value.value.message}`));
+          toast?.openToast(
+            {
+              status: "error",
+              id: `bridging-error-${new Date().getTime()}`,
+              title: "Bridging Error",
+              message: S_Bridging_Status.value.value.message,
+            },
+            5000,
+          );
         }
       })
       .catch((error) => {
@@ -136,6 +153,14 @@ export default function RalphBridgeModal({ onClose }: RalphBridgeModal) {
           },
           5000,
         );
+        S_Bridging_Status.value.value = {
+          status: "error",
+          type: "generic-error",
+          message: (error as Error).message,
+          amount: amount,
+          fromNetwork: S_ACTIVE_NETWORK.value.value,
+          toNetwork: destinationChainDTO.data,
+        };
       })
       .finally(() => {
         setTimeout(() => {
@@ -158,7 +183,7 @@ export default function RalphBridgeModal({ onClose }: RalphBridgeModal) {
             icon: <RalphLogo variant="icon" />,
           }}
           balance={{
-            inscriptions: balanceInfoViewModel.inscriptions,
+            inscriptions: balanceInfoViewModel.wrapped,
           }}
           callbacks={{
             onBridge: handleBridging,
@@ -167,27 +192,7 @@ export default function RalphBridgeModal({ onClose }: RalphBridgeModal) {
           supportedChains={supportedChains}
         />
       )}
-      {S_IS_BRIDGING.value.value && destinationChain && (
-        <BridgeModalBridgingVariant
-          amount={amount}
-          fromNetwork={S_ACTIVE_NETWORK.value.value}
-          onClose={onClose}
-          status="success"
-          toNetwork={destinationChain}
-          transaction={{
-            blockNumber: 123456,
-            explorerUrl: "https://etherscan.io/tx/0x1234567890",
-            from: "0x1234567890",
-            hash: "0x1234567890",
-            network: {
-              chainId: 1,
-              name: "Ethereum",
-            },
-            status: "error",
-            timestamp: 1234567890,
-          }}
-        />
-      )}
+      {S_IS_BRIDGING.value.value && destinationChain && <BridgeModalBridgingVariant {...{ ...S_Bridging_Status.value.value }} onClose={onClose} />}
     </div>
   );
 }

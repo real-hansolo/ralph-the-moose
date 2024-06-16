@@ -116,7 +116,7 @@ export default function RalphWrapClaimModal({ onClose }: RalphMingintModalProps)
         };
         toast?.openToast(
           {
-            message: `Failed to wrap ${amount} PR.} `,
+            message: `Failed to wrap ${amount} PR. `,
             status: "error",
             id: `wrapping-${S_Wrapping_Status.value.value.status}-${Date.now()}`,
             title: "Wrapping Failed!",
@@ -172,7 +172,7 @@ export default function RalphWrapClaimModal({ onClose }: RalphMingintModalProps)
         };
         toast?.openToast(
           {
-            message: `Failed to claim ${amount} PR.} `,
+            message: `Failed to claim ${amount} PR. `,
             status: "error",
             id: `claiming-${S_Claiming_Status.value.value.status}-${Date.now()}`,
             title: "Claiming Failed!",

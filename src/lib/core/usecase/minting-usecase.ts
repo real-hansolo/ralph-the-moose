@@ -143,20 +143,25 @@ export default class MintingUsecase implements MintingInputPort {
       await new Promise((resolve) => setTimeout(resolve, 1000));
     } while (latestIndexerBlockNumber < transactionBlockNumber);
 
-    const inscrptionStatusDTO = await indexerGateway.getInscriptionStatus(mintTransactionDTO.data.hash);
-    if (!inscrptionStatusDTO.success) {
-      this.presenter.presentError({
-        status: "error",
-        message: `Error getting inscription status for the transaction ${mintTransactionDTO.data.hash}. `,
-        details: {
-          type: "indexer-error",
+    let inscriptionFound = false;
+    let inscrptionStatusDTO = await indexerGateway.getInscriptionStatus(mintTransactionDTO.data.hash);
+    while (!inscriptionFound) {
+      inscrptionStatusDTO = await indexerGateway.getInscriptionStatus(mintTransactionDTO.data.hash);
+      if (!inscrptionStatusDTO.success) {
+        this.presenter.presentProgress({
+          type: "awaiting-indexer",
           amount: amount,
-          indexerBlockNumber: latestIndexerBlockNumber,
-          wallet: wallet,
           network: network,
-        },
-      });
-      return;
+          wallet: wallet,
+          indexerBlockNumber: latestIndexerBlockNumber,
+          initialIndexerBlockNumber: intialIndexerBlockNumber,
+          message: "Waiting for your mint transaction to be picked up by the indexer",
+          transaction: mintTransactionDTO.data,
+        });
+        await new Promise((resolve) => setTimeout(resolve, 1000));
+      } else {
+        inscriptionFound = true;
+      }
     }
 
     if (inscrptionStatusDTO.data.valid === 0) {

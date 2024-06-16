@@ -41,6 +41,14 @@ export default class BridgingController {
 
     const toNetwork = toNetworkDTO.data;
 
+    const activeWalletNetwork = activeWallet.activeNetwork;
+    if(activeWalletNetwork.chainId !== networkId) {
+      const switchWalletNetworkDTO = await walletProvider.switchActiveWalletNetwork(network);
+      if (!switchWalletNetworkDTO.success) {
+        return Promise.reject(new Error(`Error switching wallet network to ${network.name}`));
+      }
+    }
+
     const bridgingRequest = {
       wallet: activeWallet,
       network: network,

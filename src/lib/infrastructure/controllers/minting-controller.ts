@@ -34,8 +34,12 @@ export default class MintingController {
     const walletNetwork = walletNetworkDTO.data;
 
     if (walletNetwork.chainId !== activeNetwork.chainId) {
-      return Promise.reject(new Error(`Wallet's on ${walletNetwork.name}! Please switch to ${activeNetwork.name}!`));
+      const switchWalletNetworkDTO = await walletProvider.switchActiveWalletNetwork(activeNetwork);
+      if (!switchWalletNetworkDTO.success) {
+        return Promise.reject(new Error(`Error switching wallet network to ${activeNetwork.name}`));
+      }
     }
+    
     const mintingRequest = MintingRequestSchema.parse({
       network: activeNetwork,
       amount: controllerParameters.amount,

@@ -24,7 +24,7 @@ export const BASE: TNetwork = {
     },
     icon: <IconNetworkBase />,
     indexer: {
-        url: "http://162.244.82.115:8000", // TODO: move to env
+        url: "https://ralph-indexer-01.devmaany.com", // TODO: move to env
         secure: false,
     },
     urls: {
@@ -98,7 +98,7 @@ export const AVALANCHE: TNetwork = {
     },
     icon: <IconNetworkAvax />,
     indexer: {
-        url: "http://162.244.82.115:8001", // TODO: move to env
+        url: "https://ralph-indexer-02.devmaany.com", // TODO: move to env
         secure: false
     },
     urls: {

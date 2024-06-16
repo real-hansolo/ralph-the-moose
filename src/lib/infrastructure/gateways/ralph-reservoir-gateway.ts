@@ -139,7 +139,7 @@ export default class RalphReservoirGateway implements RalphReservoirOutputPort {
         ],
         name: "unwrap",
         outputs: [],
-        stateMutability: "nonpayable",
+        stateMutability: "payable",
         type: "function",
       },
       params: [BigInt(amountToUnwrap.toBigInt())],

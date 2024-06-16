@@ -57,6 +57,7 @@ export const RalphBalanceCard = () => {
   return (
     <div>
       <BalanceCard
+        isLoading={isLoading}
         inscriptionBalance={balanceInfoViewModel.inscriptions}
         wrappedBalance={balanceInfoViewModel.wrapped}
         tokenShortName={"PR"}

@@ -114,7 +114,7 @@ export const callThirdWebContractUtil = async (
     const estimatedGasDTO = await web3Gateway.estimateGas(web3GatewayPreparedContractCall);
     if (estimatedGasDTO.success) {
       gasStatusSignal.value.value = {
-        estimatedGas: Number(estimatedGasDTO.data), // Convert bigint to number
+        estimatedGas: Number(estimatedGasDTO.data), // TODO: Convert bigint to number
         gasLimit: preparedContractCall.contract.network.gasLimit,
         preparedTransaction: preparedContractCall,
       };

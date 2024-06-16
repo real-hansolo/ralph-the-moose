@@ -15,7 +15,7 @@ export const BASE: TNetwork = {
         minting: 0.00123,
         wrapping: 0.00123,
         unwrapping: 0.00123,
-        bridging: 0.00123
+        bridging: 0.000123
     },
     contracts: {
         ralphReservoirAddress: "0x27e964E016B68EeFbe958Ace62174af0e1CeD053",
@@ -52,7 +52,7 @@ export const BASE_SEPOLIA: TNetwork = {
         minting: 0.00123,
         wrapping: 0.00123,
         unwrapping: 0.00123,
-        bridging: 0.00123
+        bridging: 0.000123
     },
     contracts: {
         ralphReservoirAddress: "0x296271298780966bC0550a6B10c8e5BE60fE282f",

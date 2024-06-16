@@ -20,7 +20,7 @@ export const BASE: TNetwork = {
     contracts: {
         ralphReservoirAddress: "0x27e964E016B68EeFbe958Ace62174af0e1CeD053",
         ralphTokenAddress: "0x05F1938646a897008e813fb03CE7C575eAE45738",
-        bridgeHeadAddress: "0x4AA52f3c113EC9345bb265beb084172cCa479dE9"
+        bridgeHeadAddress: "0xcAB6F73BbCb36eFf4bEc05713F61eE6B6438F57e"
     },
     icon: <IconNetworkBase />,
     indexer: {
@@ -57,7 +57,7 @@ export const BASE_SEPOLIA: TNetwork = {
     contracts: {
         ralphReservoirAddress: "0x296271298780966bC0550a6B10c8e5BE60fE282f",
         ralphTokenAddress: "0xA415b2Df73D9E1D0415de58f012E2cB3E059F2E1",
-        bridgeHeadAddress: "0x4AA52f3c113EC9345bb265beb084172cCa479dE9"
+        bridgeHeadAddress: "0xcAB6F73BbCb36eFf4bEc05713F61eE6B6438F57e"
     },
     icon: <IconNetworkBase />,
     indexer: {
@@ -94,7 +94,7 @@ export const AVALANCHE: TNetwork = {
     contracts: {
         ralphReservoirAddress: "0x27e964E016B68EeFbe958Ace62174af0e1CeD053",
         ralphTokenAddress: "0x05F1938646a897008e813fb03CE7C575eAE45738",
-        bridgeHeadAddress: "0x4AA52f3c113EC9345bb265beb084172cCa479dE9"
+        bridgeHeadAddress: "0xcAB6F73BbCb36eFf4bEc05713F61eE6B6438F57e"
     },
     icon: <IconNetworkAvax />,
     indexer: {

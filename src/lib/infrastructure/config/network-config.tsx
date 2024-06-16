@@ -89,7 +89,7 @@ export const AVALANCHE: TNetwork = {
         minting: 0.0572523,
         wrapping: 0.0572523,
         unwrapping: 0.0572523,
-        bridging: 0.0572523
+        bridging: 0.0123
     },
     contracts: {
         ralphReservoirAddress: "0x27e964E016B68EeFbe958Ace62174af0e1CeD053",

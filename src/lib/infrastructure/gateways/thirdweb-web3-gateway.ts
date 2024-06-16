@@ -17,7 +17,6 @@ import type { TPreparedContractCall, TPreparedTransaction } from "~/lib/core/ent
 import type Web3GatewayOutputPort from "~/lib/core/ports/secondary/web3-gateway-output-port";
 import { injectable } from "inversify";
 import { client } from "../trpc/vanilla";
-import { string } from "zod";
 
 @injectable()
 export default class ThirdwebWeb3Gateway implements Web3GatewayOutputPort<Wallet, PreparedTransaction, PreparedTransaction> {
@@ -29,17 +28,29 @@ export default class ThirdwebWeb3Gateway implements Web3GatewayOutputPort<Wallet
   }
 
   prepareTransaction(transactionDetails: TPreparedTransaction): TPreparedTransactionDTO<PreparedTransaction> {
-    console.log("transactionDetails", transactionDetails);
     try {
       const chain = getThirdWebChain(transactionDetails.network.name);
-      const thirdWebTx = prepareTransaction({
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      let transaction: any = {
         to: transactionDetails.to,
-        value: toWei(transactionDetails.value),
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        data: `${transactionDetails.data}` as any,
         chain: chain,
         client: this.thirdWebClient,
-      });
+      };
+      if(transactionDetails.data) {
+        transaction = {
+          ...transaction,
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          data: `${transactionDetails.data}` as any,
+        };
+      }
+      if(transactionDetails.value) {
+        transaction = {
+          ...transaction,
+          value: toWei(transactionDetails.value),
+        };
+      }
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
+      const thirdWebTx = prepareTransaction(transaction);
       return {
         success: true,
         preparedTransaction: thirdWebTx as PreparedTransaction,
@@ -143,9 +154,8 @@ export default class ThirdwebWeb3Gateway implements Web3GatewayOutputPort<Wallet
         address: preparedContractCall.contract.address,
         chain: thirdwebChain,
       });
-      const stringParams = preparedContractCall.params.map((param) => `${param}`);
-      console.log("Prepared Contract call", preparedContractCall.method, stringParams, preparedContractCall.value);
-      const transaction = prepareContractCall({
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      let transaction: any = {
         contract: thirdwebContract,
         method: {
           name: preparedContractCall.method.name,
@@ -155,11 +165,20 @@ export default class ThirdwebWeb3Gateway implements Web3GatewayOutputPort<Wallet
           stateMutability: preparedContractCall.method.stateMutability,
         },
         params: preparedContractCall.params,
-        value: toWei(preparedContractCall.value),
-      });
+        gas: BigInt(preparedContractCall.contract.network.gasLimit),
+      };
+      if(preparedContractCall.value) {
+        transaction = {
+          ...transaction,
+          value: toWei(preparedContractCall.value),
+        };
+      }
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
+      const thirdwebTx = prepareContractCall(transaction);
+
       return {
         success: true,
-        preparedContractCall: transaction as PreparedTransaction,
+        preparedContractCall: thirdwebTx as PreparedTransaction,
       };
     } catch (e) {
       return {

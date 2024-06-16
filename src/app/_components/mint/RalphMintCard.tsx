@@ -89,6 +89,7 @@ export const RalphMintCard = ({ showMintingModal }: { showMintingModal: () => vo
 
   return (
     <MintCard
+      isLoading={isLoading}
       stats={{
         mintedPercentage: mintingStatsViewModel.percentage,
         mintLimit: mintingStatsViewModel.limit,

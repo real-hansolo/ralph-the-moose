@@ -54,7 +54,7 @@ export default class ElkBridgeHeadGateway implements ElkBridgeHeadOutputPort {
         ],
         name: "bridgeTokens",
         outputs: [],
-        stateMutability: "nonpayable",
+        stateMutability: "payable",
         type: "function",
       },
       params: [toNetwork.chainId, wallet.activeAccount, amountToThirdWeb, "0x"],

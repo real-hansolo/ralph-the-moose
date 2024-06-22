@@ -110,9 +110,28 @@ export default class MintingUsecase implements MintingInputPort {
       });
       return;
     }
-
-    const transactionBlockNumber = mintTransactionDTO.data.blockNumber;
+    
+    if(mintTransactionDTO.data.status === "error") {
+      this.presenter.presentError({
+        status: "error",
+        message: `Transaction : ${mintTransactionDTO.data.hash} failed!`,
+        details: {
+          type: "transaction-error",
+          amount: amount,
+          indexerBlockNumber: 0,
+          wallet: wallet,
+          network: network,
+        },
+      });
+      return;
+    }
+    let transactionBlockNumber = mintTransactionDTO.data.blockNumber;
     let latestIndexerBlockNumber = 0;
+
+    if(mintTransactionDTO.data.status === "partial") {
+      // Skip waiting for indexer to catch up
+      transactionBlockNumber = intialIndexerBlockNumber;
+    }
     do {
       const latestIndexerBlockNumberDTO = await indexerGateway.getLatestBlock();
       if (!latestIndexerBlockNumberDTO.success) {

@@ -125,7 +125,6 @@ export default class RpcGateway implements RPCGatewayOutputPort {
     }
     try {
       const rpcUrl = getRpcUrlDTO.data.url;
-      console.log(rpcUrl);
       const instance = axios.create({
         // eslint-disable-next-line @typescript-eslint/no-unsafe-call
         httpsAgent: new https.Agent({
@@ -140,7 +139,7 @@ export default class RpcGateway implements RPCGatewayOutputPort {
       });
       return {
         success: true,
-        data: response.data,
+        data: response.data.result,
       } as TGetTransactionByHashDTO;
     } catch (error: unknown) {
       return {

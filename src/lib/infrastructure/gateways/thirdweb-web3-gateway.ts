@@ -36,14 +36,14 @@ export default class ThirdwebWeb3Gateway implements Web3GatewayOutputPort<Wallet
         chain: chain,
         client: this.thirdWebClient,
       };
-      if(transactionDetails.data) {
+      if (transactionDetails.data) {
         transaction = {
           ...transaction,
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
           data: `${transactionDetails.data}` as any,
         };
       }
-      if(transactionDetails.value) {
+      if (transactionDetails.value) {
         transaction = {
           ...transaction,
           value: toWei(transactionDetails.value),
@@ -93,20 +93,29 @@ export default class ThirdwebWeb3Gateway implements Web3GatewayOutputPort<Wallet
     const explorerLink = `${transactionDetails.network.explorer.url}/tx/${transactionHash}`;
     const timestamp = new Date().getTime();
 
-    const txDetailsDTOQuery = await client.rpc.getTransaction.query({
-      hash: transactionHash,
-      networkId: transactionDetails.network.chainId,
-    });
-    if (!txDetailsDTOQuery.success) {
+    let blockNumber: number | undefined = undefined;
+    let retryCount = 0;
+    while (!blockNumber && retryCount < 60) {
+      const txDetailsDTOQuery = await client.rpc.getTransaction.query({
+        hash: transactionHash,
+        networkId: transactionDetails.network.chainId,
+      });
+      if (txDetailsDTOQuery.success && txDetailsDTOQuery.data) {
+        blockNumber = Number(txDetailsDTOQuery.data.blockNumber);
+      }
+      retryCount++;
+      await new Promise((resolve) => setTimeout(resolve, 1000));
+    }
+    if (!blockNumber) {
       return {
         success: true,
         data: {
           status: "partial",
-          blockNumber: -1,
           hash: transactionHash,
           explorerUrl: explorerLink,
-          timestamp: timestamp,
           from: thirdwebAccount.address,
+          blockNumber: 1,
+          timestamp: timestamp,
           to: transactionDetails.to,
           value: transactionDetails.value,
           data: transactionDetails.data,
@@ -114,8 +123,6 @@ export default class ThirdwebWeb3Gateway implements Web3GatewayOutputPort<Wallet
         },
       };
     }
-    const txDetails = txDetailsDTOQuery.data;
-    const blockNumber = txDetails.blockNumber;
 
     return {
       success: true,
@@ -167,7 +174,7 @@ export default class ThirdwebWeb3Gateway implements Web3GatewayOutputPort<Wallet
         params: preparedContractCall.params,
         gas: BigInt(preparedContractCall.contract.network.gasLimit),
       };
-      if(preparedContractCall.value) {
+      if (preparedContractCall.value) {
         transaction = {
           ...transaction,
           value: toWei(preparedContractCall.value),

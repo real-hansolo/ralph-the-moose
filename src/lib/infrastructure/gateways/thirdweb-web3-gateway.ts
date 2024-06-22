@@ -172,7 +172,7 @@ export default class ThirdwebWeb3Gateway implements Web3GatewayOutputPort<Wallet
           stateMutability: preparedContractCall.method.stateMutability,
         },
         params: preparedContractCall.params,
-        gas: BigInt(preparedContractCall.contract.network.gasLimit),
+        // gas: BigInt(preparedContractCall.contract.network.gasLimit),
       };
       if (preparedContractCall.value) {
         transaction = {

@@ -30,7 +30,7 @@ export default class BridgingPresenter implements BridgingOutputPort<TSignal<TBr
       status: "in-progress",
       type: "estimated-gas",
       amount: gasEstimation.amount,
-      estimatedGas: estimatedGas,
+      estimatedGas: gasEstimation.estimatedGas,
       gasLimit: gasEstimation.gasLimit,
     };
   }

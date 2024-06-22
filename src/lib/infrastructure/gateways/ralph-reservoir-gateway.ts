@@ -17,7 +17,6 @@ import {
   toHumanReadableNumber,
 } from "~/lib/utils/tokenUtils";
 import { injectable } from "inversify";
-import type { TSignal, TTransactionGasStatus } from "~/lib/core/entity/signals";
 import { callThirdWebContractUtil } from "~/lib/utils/transactionUtils";
 import { client } from "../trpc/vanilla";
 
@@ -82,7 +81,6 @@ export default class RalphReservoirGateway implements RalphReservoirOutputPort {
     wallet: TWallet,
     network: TNetwork,
     amount: number,
-    gasStatusSignal: TSignal<TTransactionGasStatus>,
   ): Promise<ClaimDTO> {
     const amountToClaim = fromHumanReadableNumber(amount);
     const preparedContractCall: TPreparedContractCall = {
@@ -105,7 +103,7 @@ export default class RalphReservoirGateway implements RalphReservoirOutputPort {
     };
 
     // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-    const executedTransactionDTO = await callThirdWebContractUtil(wallet, preparedContractCall, gasStatusSignal);
+    const executedTransactionDTO = await callThirdWebContractUtil(wallet, preparedContractCall);
     if(!executedTransactionDTO.success) {
       return {
         success: false,
@@ -123,7 +121,6 @@ export default class RalphReservoirGateway implements RalphReservoirOutputPort {
     wallet: TWallet,
     network: TNetwork,
     amount: number,
-    gasStatusSignal: TSignal<TTransactionGasStatus>,
   ): Promise<UnwrapDTO> {
     const amountToUnwrap = fromHumanReadableNumber(amount);
     const contract = this.__getContract(network);
@@ -147,7 +144,7 @@ export default class RalphReservoirGateway implements RalphReservoirOutputPort {
     };
    
 
-    const executedTransactionDTO = await callThirdWebContractUtil(wallet, contractCallDetails, gasStatusSignal);
+    const executedTransactionDTO = await callThirdWebContractUtil(wallet, contractCallDetails);
     if(!executedTransactionDTO.success) {
       return {
         success: false,

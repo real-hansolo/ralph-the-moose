@@ -6,7 +6,7 @@ import type { TClaimingViewModel } from "~/lib/core/view-models/claiming-view-mo
 import { clientContainer, signalsContainer } from "../config/ioc/container";
 import { GATEWAYS, SIGNALS, USECASE } from "../config/ioc/symbols";
 import { injectable } from "inversify";
-import WalletProviderOutputPort from "~/lib/core/ports/secondary/wallet-provider-output-port";
+import type WalletProviderOutputPort from "~/lib/core/ports/secondary/wallet-provider-output-port";
 
 export interface TClaimingControllerParameters {
   amount: number;

@@ -84,12 +84,21 @@ export default function RalphUnwrapModal({ onClose }: RalphUnwrapModalProps) {
         amount: amount,
       })
       .then(() => {
+        if(S_Unwrapping_Status.value.value.status === "success") {
         toast?.openToast({
           message: "Your presents are in your wallet. Enjoy!",
           status: "success",
           id: `unwrap-success-${Date.now()}`,
           title: "It's Unwrapped!",
         }, 5000);
+        } else {
+          toast?.openToast({
+            message: `Couldn't unwrap your presents.`,
+            status: "error",
+            id: `unwrap-failed-${Date.now()}`,
+            title: "Unwrapping Failed",
+          }, 5000);
+        }
       })
       .catch((e) => {
         S_Unwrapping_Status.value.value = {

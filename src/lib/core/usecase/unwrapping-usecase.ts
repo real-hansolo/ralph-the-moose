@@ -4,10 +4,6 @@ import type { UnWrappingInputPort, UnWrappingOutputPort } from "../ports/primary
 import type RalphReservoirOutputPort from "../ports/secondary/ralph-reservoir-output-port";
 import type RalphTokenOutputPort from "../ports/secondary/ralph-token-output-port";
 import type { TUnwrappingRequest } from "../usecase-models/unwrapping-usecase-models";
-import type { TSignal, TTransactionGasStatus } from "../entity/signals";
-import { signalsContainer } from "~/lib/infrastructure/config/ioc/container";
-import { SIGNALS } from "~/lib/infrastructure/config/ioc/symbols";
-import { effect } from "@preact/signals-react";
 import { approveRalphReservoir } from "~/lib/utils/transactionUtils";
 
 export default class UnwrappingUsecase implements UnWrappingInputPort {
@@ -23,8 +19,6 @@ export default class UnwrappingUsecase implements UnWrappingInputPort {
   async execute(request: TUnwrappingRequest): Promise<void> {
     // Implement the unwrapping usecase here
     const { wallet, network, amount } = request;
-    const S_GAS_STATUS = signalsContainer.get<TSignal<TTransactionGasStatus>>(SIGNALS.TRANSACTION_GAS_STATUS);
-    const s_gas_signal = S_GAS_STATUS.value;
     const balanceDTO = await this.ralphTokenGateway.getBalance(wallet.activeAccount, network);
     if (!balanceDTO.success) {
       this.presenter.presentError({
@@ -57,18 +51,7 @@ export default class UnwrappingUsecase implements UnWrappingInputPort {
       return;
     }
 
-    effect(() => {
-      return this.presenter.presentEstimatedGas({
-        status: "in-progress",
-        network: network,
-        wallet: wallet,
-        message: "Estimating gas for unwrapping",
-        estimatedGas: s_gas_signal.value?.estimatedGas,
-        amount: amount,
-      });
-    });
-
-    const unwrapDTO = await this.ralphReservoirGateway.unwrap(wallet, network, amount, S_GAS_STATUS);
+    const unwrapDTO = await this.ralphReservoirGateway.unwrap(wallet, network, amount);
     if (!unwrapDTO.success) {
       this.presenter.presentError({
         status: "error",

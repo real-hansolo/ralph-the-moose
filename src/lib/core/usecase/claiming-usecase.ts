@@ -3,9 +3,6 @@ import type RalphReservoirOutputPort from "~/lib/core/ports/secondary/ralph-rese
 import type { ClaimingInputPort, ClaimingOutputPort } from "../ports/primary/claiming-primary-ports";
 import type RalphTokenOutputPort from "../ports/secondary/ralph-token-output-port";
 import type { TClaimingRequest } from "../usecase-models/claiming-usecase-models";
-import { signalsContainer } from "~/lib/infrastructure/config/ioc/container";
-import { SIGNALS } from "~/lib/infrastructure/config/ioc/symbols";
-import type { TSignal, TTransactionGasStatus } from "../entity/signals";
 
 export default class ClaimingUsecase implements ClaimingInputPort {
   presenter: ClaimingOutputPort<any>;
@@ -62,16 +59,9 @@ export default class ClaimingUsecase implements ClaimingInputPort {
     const intitialBalance = initialBalanceDTO.data.balance;
     const expectedBalance = intitialBalance + amount;
 
-    const S_GAS_SIGNAL = signalsContainer.get<TSignal<TTransactionGasStatus>>(SIGNALS.TRANSACTION_GAS_STATUS);
-    this.presenter.presentProgress({
-      type: "awaiting-transaction",
-      network: network,
-      wallet: wallet,
-      amount: amount,
-      message: `Preparing to release ${amount} PR tokens to your wallet!`,
-    });
+    
 
-    const claimDTO = await this.ralphReservoirGateway.claim(wallet, network, amount, S_GAS_SIGNAL);
+    const claimDTO = await this.ralphReservoirGateway.claim(wallet, network, amount);
     if (!claimDTO.success) {
       this.presenter.presentError({
         status: "error",

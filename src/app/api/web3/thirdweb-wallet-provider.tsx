@@ -152,9 +152,19 @@ export class ThirdwebWalletProvider implements WalletProviderOutputPort<Wallet> 
         },
       };
     }
+    const walletInstanceDTO = this.getWalletInstance(S_ACTIVE_WALLET.value.value);
+    if (!walletInstanceDTO.success) {
+      return {
+        success: false,
+        data: {
+          type: "wallet_not_supported",
+        },
+      };
+    }
     return {
       success: true,
-      data: S_ACTIVE_WALLET.value.value,
+      data: {...S_ACTIVE_WALLET.value.value},
+      walletInstance: walletInstanceDTO.data,
     };
   }
 

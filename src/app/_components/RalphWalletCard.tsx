@@ -44,10 +44,18 @@ export const RalphWalletCard = () => {
     const activeWalletDTO = walletProvider.getActiveWallet();
     if (activeWalletDTO.success) {
       const connectedWallet = activeWalletDTO.data;
-      return connectedWallet.name;
+
+      return {
+        name: connectedWallet.name,
+        icon: connectedWallet.icon,
+      };
+
     } else {
       console.error(log("Failed to get active wallet"));
-      return undefined;
+      return {
+        name: "",
+        icon: <></>,
+      }
     }
   }
 
@@ -56,8 +64,8 @@ export const RalphWalletCard = () => {
   const isWalletConnected = walletInstance !== undefined;
 
   const walletAddress = walletInstance?.getAccount()?.address;
-  const walletProviderName = getActiveWalletProvider();
-  console.info(log(`Wallet Provider: ${walletProviderName} ${walletAddress}`));
+  const walletMetadata = getActiveWalletProvider();
+  console.info(log(`Wallet Provider: ${walletMetadata.name} ${walletAddress}`));
   /**
    * Disconnect Wallet
    */
@@ -157,7 +165,8 @@ export const RalphWalletCard = () => {
     <WalletCard
       status={isWalletConnected ? "connected" : "disconnected"}
       address={walletAddress ? walletAddress : ""}
-      walletName={walletProviderName ? walletProviderName : ""}
+      walletName={walletMetadata.name ? walletMetadata.name : ""}
+      walletIcon={walletMetadata.icon ? walletMetadata.icon : <></>}
       connectButton={connectButton}
       disconnectButton={disconnectButton}
     />

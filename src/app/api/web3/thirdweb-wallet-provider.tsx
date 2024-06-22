@@ -16,10 +16,11 @@ import { inject, injectable } from "inversify";
 import { GATEWAYS } from "~/lib/infrastructure/config/ioc/symbols";
 import NetworkGateway from "~/lib/infrastructure/gateways/network-gateway";
 import { getNetworkFromThirdwebChain, getThirdWebChain } from "~/lib/utils/networkUtils";
+import { IconMetaMaskWallet } from "@maany_shr/ralph-the-moose-ui-kit";
 
 @injectable()
 export class ThirdwebWalletProvider implements WalletProviderOutputPort<Wallet> {
-  constructor(@inject(GATEWAYS.NETWORK_GATEWAY) private networkGateway: NetworkGateway) {}
+  constructor(@inject(GATEWAYS.NETWORK_GATEWAY) private networkGateway: NetworkGateway) { }
   getName(): string {
     return "thirdweb";
   }
@@ -64,10 +65,28 @@ export class ThirdwebWalletProvider implements WalletProviderOutputPort<Wallet> 
       };
     }
     const walletNetwork = getNetworkFromThirdwebChain(walletChain);
+    const SupportedWalletsDTO = this.getSupportedWallets();
+
+    if (!SupportedWalletsDTO.success) {
+      return {
+        success: false,
+        data: {
+          type: "wallet_provider_error",
+          message: SupportedWalletsDTO.data.message,
+        },
+      };
+    }
+
+    const walletName = SupportedWalletsDTO.data.find((wallet) => wallet.id === walletInstance.id)?.name ?? walletInstance.id;
+
+    const walletIcon = SupportedWalletsDTO.data.find((wallet) => wallet.id === walletInstance.id)?.icon;
+
+
     return {
       success: true,
       data: {
-        name: walletInstance.id,
+        name: walletName,
+        icon: walletIcon,
         id: walletInstance.id,
         provider: "thirdweb",
         activeAccount: activeAccount?.address,
@@ -82,9 +101,10 @@ export class ThirdwebWalletProvider implements WalletProviderOutputPort<Wallet> 
       success: true,
       data: [
         {
-          name: "io.metamask",
+          name: "MetaMask",
           id: "io.metamask",
           provider: "thirdweb",
+          icon: <IconMetaMaskWallet />,
         },
       ],
     };

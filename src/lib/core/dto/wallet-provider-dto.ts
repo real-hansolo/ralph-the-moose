@@ -1,3 +1,4 @@
+import type React from "react";
 import { z } from "zod";
 import { type TWallet, WalletSchema, type TNetwork } from "~/lib/core/entity/models";
 import { DTOSchemaFactory } from "~/sdk/dto";
@@ -36,6 +37,7 @@ export type SupportedWalletsDTO = {
     name: string;
     id: string;
     provider: string;
+    icon: React.ReactNode;
   }[];
 } | {
   success: false;

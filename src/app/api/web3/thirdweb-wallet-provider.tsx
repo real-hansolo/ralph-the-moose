@@ -18,6 +18,7 @@ import NetworkGateway from "~/lib/infrastructure/gateways/network-gateway";
 import { getNetworkFromThirdwebChain, getThirdWebChain } from "~/lib/utils/networkUtils";
 import { signalsContainer } from "~/lib/infrastructure/config/ioc/container";
 import type { TSignal } from "~/lib/core/entity/signals";
+import { IconMetaMaskWallet } from "@maany_shr/ralph-the-moose-ui-kit";
 
 @injectable()
 export class ThirdwebWalletProvider implements WalletProviderOutputPort<Wallet> {
@@ -116,12 +117,34 @@ export class ThirdwebWalletProvider implements WalletProviderOutputPort<Wallet> 
       };
     }
     const walletNetwork = getNetworkFromThirdwebChain(walletChain);
+
+    const supportedWalletsDto: SupportedWalletsDTO = this.getSupportedWallets();
+    if (!supportedWalletsDto.success) {
+      return {
+        success: false,
+        data: {
+          type: "wallet_provider_error",
+          message: supportedWalletsDto.data.message,
+        },
+      };
+    }
+
+    const supportedWallet = supportedWalletsDto.data.find((supportedWallet) => supportedWallet.id === walletInstance.id);
+
+    if (supportedWallet === undefined) {
+      return {
+        success: false,
+        data: {
+          type: "wallet_provider_error",
+          message: `Wallet ${walletInstance.id} is not supported by thirdweb provider!`,
+        },
+      };
+    }
+
     return {
       success: true,
       data: {
-        name: walletInstance.id,
-        id: walletInstance.id,
-        provider: "thirdweb",
+        ...supportedWallet,
         activeAccount: activeAccount?.address,
         availableAccounts: [],
         activeNetwork: walletNetwork,
@@ -134,7 +157,8 @@ export class ThirdwebWalletProvider implements WalletProviderOutputPort<Wallet> 
       success: true,
       data: [
         {
-          name: "io.metamask",
+          name: "MetaMask",
+          icon: <IconMetaMaskWallet />,
           id: "io.metamask",
           provider: "thirdweb",
         },
@@ -163,7 +187,7 @@ export class ThirdwebWalletProvider implements WalletProviderOutputPort<Wallet> 
     }
     return {
       success: true,
-      data: {...S_ACTIVE_WALLET.value.value},
+      data: { ...S_ACTIVE_WALLET.value.value },
       walletInstance: walletInstanceDTO.data,
     };
   }

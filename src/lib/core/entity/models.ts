@@ -45,7 +45,7 @@ export const WalletSchema = z.object({
   provider: z.string(),
   activeAccount: z.string(),
   availableAccounts: z.array(z.string()),
-  activeNetwork: NetworkSchema,
+  activeNetwork: NetworkSchema.or(z.literal("unsupported-wallet-network")),
 });
 
 export type TWallet = z.infer<typeof WalletSchema>;

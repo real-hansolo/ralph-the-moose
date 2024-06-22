@@ -3,12 +3,15 @@ import { RalphWalletCard } from "../_components/RalphWalletCard";
 import { PageTemplate } from "@maany_shr/ralph-the-moose-ui-kit";
 import { useSignals } from "@preact/signals-react/runtime";
 import { RalphMenu } from "../_components/RalphMenu";
-import { useActiveWallet } from "@maany_shr/thirdweb/react";
 import { RalphNetworkSelector } from "../_components/NetworkSelector";
 import { RalphMintCard } from "../_components/mint/RalphMintCard";
 import { useState } from "react";
 import RalphMintingModal from "../_components/mint/RalphMintingModal";
 import { RalphBalanceCard } from "../_components/balance/RalphBalanceCard";
+import { signalsContainer } from "~/lib/infrastructure/config/ioc/container";
+import { SIGNALS } from "~/lib/infrastructure/config/ioc/symbols";
+import type { TWallet } from "~/lib/core/entity/models";
+import type { TSignal } from "~/lib/core/entity/signals";
 
 export const RalphHome = () => {
   useSignals();
@@ -18,15 +21,15 @@ export const RalphHome = () => {
     return `[RalphHome] [${timestamp}] ${message}`;
   };
 
+
+  const S_ACTIVE_WALLET = signalsContainer.get<TSignal<TWallet | undefined>>(SIGNALS.ACTIVE_WALLET);
+
   /**
    * Hooks and Wallet Information
    */
-  const walletInstance = useActiveWallet();
+  const walletInstance = S_ACTIVE_WALLET.value.value;
   const isWalletConnected = walletInstance !== undefined;
 
-  /**
-   * [Signal] Toasts: Store the toasts to be displayed on the screen.
-   */
 
   return (
     <div id="app-container">

@@ -13,13 +13,65 @@ import type {
   SwitchActiveWalletNetworkDTO,
 } from "~/lib/core/dto/wallet-provider-dto";
 import { inject, injectable } from "inversify";
-import { GATEWAYS } from "~/lib/infrastructure/config/ioc/symbols";
+import { GATEWAYS, SIGNALS } from "~/lib/infrastructure/config/ioc/symbols";
 import NetworkGateway from "~/lib/infrastructure/gateways/network-gateway";
 import { getNetworkFromThirdwebChain, getThirdWebChain } from "~/lib/utils/networkUtils";
+import { signalsContainer } from "~/lib/infrastructure/config/ioc/container";
+import type { TSignal } from "~/lib/core/entity/signals";
 
 @injectable()
 export class ThirdwebWalletProvider implements WalletProviderOutputPort<Wallet> {
-  constructor(@inject(GATEWAYS.NETWORK_GATEWAY) private networkGateway: NetworkGateway) {}
+  log(message: string): string {
+    const timestamp = new Date().toISOString();
+    return `[ThirdwebWalletProvider] [${timestamp}] ${message}`;
+  }
+  constructor(@inject(GATEWAYS.NETWORK_GATEWAY) private networkGateway: NetworkGateway) {
+    // subscribe to wallet changes
+    const walletStore = connectionManager.activeWalletStore;
+    walletStore.subscribe(() => {
+      const thirdWebWallet = walletStore.getValue();
+      const S_ACTIVE_WALLET = signalsContainer.get<TSignal<TWallet | undefined>>(SIGNALS.ACTIVE_WALLET);
+      if (thirdWebWallet === undefined) {
+        console.error(this.log("Failed to get active wallet"));
+        S_ACTIVE_WALLET.value.value = undefined;
+        return;
+      }
+      const walletInstanceDTO = this.fromWalletInstance(thirdWebWallet);
+      if (!walletInstanceDTO.success) {
+        console.error(this.log("Failed to get wallet instance for active wallet"));
+        S_ACTIVE_WALLET.value.value = undefined;
+        return;
+      }
+      const wallet = walletInstanceDTO.data;
+      console.log(this.log(`Wallet changed to: ${wallet.activeAccount}`));
+      S_ACTIVE_WALLET.value.value = wallet;
+    });
+
+    const walletNetworkStore = connectionManager.activeWalletChainStore;
+
+    walletNetworkStore.subscribe(() => {
+      const thirdWebChain = walletNetworkStore.getValue();
+      const S_ACTIVE_WALLET_NETWORK = signalsContainer.get<TSignal<TNetwork | undefined | "unsupported-wallet-network">>(SIGNALS.ACTIVE_WALLET_NETWORK);
+      if (thirdWebChain === undefined) {
+        console.error(this.log("Thirdweb: Failed to get active wallet chain"));
+        S_ACTIVE_WALLET_NETWORK.value.value = undefined;
+        return;
+      }
+      try {
+        const activeWalletNetwork = getNetworkFromThirdwebChain(thirdWebChain);
+        S_ACTIVE_WALLET_NETWORK.value.value = activeWalletNetwork;
+        console.log(
+          this.log(
+            `Wallet network changed to: ${activeWalletNetwork === "unsupported-wallet-network" ? "unsupported-wallet-network" : activeWalletNetwork.name}`,
+          ),
+        );
+      } catch (error) {
+        console.error(this.log((error as Error).message));
+        S_ACTIVE_WALLET_NETWORK.value.value = "unsupported-wallet-network";
+        return;
+      }
+    });
+  }
   getName(): string {
     return "thirdweb";
   }
@@ -91,27 +143,8 @@ export class ThirdwebWalletProvider implements WalletProviderOutputPort<Wallet> 
   }
 
   getActiveWallet(): ActiveWalletDTO<Wallet> {
-    const walletStore = connectionManager.activeWalletStore;
-    const thidwebWallet: Wallet | undefined = walletStore.getValue();
-    if (thidwebWallet === undefined) {
-      return {
-        success: false,
-        data: {
-          type: "wallet_not_connected",
-        },
-      };
-    }
-    const dto = this.fromWalletInstance(thidwebWallet);
-    if (!dto.success) {
-      return {
-        success: false,
-        data: {
-          type: "wallet_not_connected",
-        },
-      };
-    }
-    const wallet = dto.data;
-    if (!wallet.activeAccount) {
+    const S_ACTIVE_WALLET = signalsContainer.get<TSignal<TWallet | undefined>>(SIGNALS.ACTIVE_WALLET);
+    if (S_ACTIVE_WALLET.value.value === undefined) {
       return {
         success: false,
         data: {
@@ -121,11 +154,7 @@ export class ThirdwebWalletProvider implements WalletProviderOutputPort<Wallet> 
     }
     return {
       success: true,
-      data: {
-        ...wallet,
-        activeAccount: wallet.activeAccount,
-      },
-      walletInstance: thidwebWallet,
+      data: S_ACTIVE_WALLET.value.value,
     };
   }
 
@@ -203,31 +232,29 @@ export class ThirdwebWalletProvider implements WalletProviderOutputPort<Wallet> 
   }
 
   getActiveWalletNetwork(): GetActiveWalletNetworkDTO {
-    const store = connectionManager.activeWalletChainStore;
-    const activeChain = store.getValue();
-    if (activeChain === undefined) {
+    const S_ACTIVE_WALLET_NETWORK = signalsContainer.get<TSignal<TNetwork | undefined | "unsupported-wallet-network">>(SIGNALS.ACTIVE_WALLET_NETWORK);
+    if (S_ACTIVE_WALLET_NETWORK.value.value === undefined) {
       return {
         success: false,
         data: {
           type: "wallet_provider_error",
-          message: "No active thirdweb chain found!",
+          message: "No thirdweb chain found for active wallet! Maybe the wallet is not connected.",
         },
       };
     }
-    try {
-      const network = getNetworkFromThirdwebChain(activeChain);
-      return {
-        success: true,
-        data: network,
-      };
-    } catch (error) {
+    if (S_ACTIVE_WALLET_NETWORK.value.value === "unsupported-wallet-network") {
       return {
         success: false,
         data: {
           type: "wallet_provider_error",
-          message: (error as Error).message,
+          message: "Unsupported wallet network",
         },
       };
     }
+
+    return {
+      success: true,
+      data: S_ACTIVE_WALLET_NETWORK.value.value,
+    };
   }
 }

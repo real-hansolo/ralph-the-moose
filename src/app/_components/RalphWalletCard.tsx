@@ -5,9 +5,11 @@ import { env } from "~/env";
 import { TextButton, WalletCard } from "@maany_shr/ralph-the-moose-ui-kit";
 import { RALPH_PUBLIC_ICON_URL } from "~/lib/infrastructure/config/ralph_public_assets";
 import { SUPPORTED_WALLETS } from "~/lib/infrastructure/config/wallets";
-import { clientContainer } from "~/lib/infrastructure/config/ioc/container";
+import { clientContainer, signalsContainer } from "~/lib/infrastructure/config/ioc/container";
 import type WalletProviderOutputPort from "~/lib/core/ports/secondary/wallet-provider-output-port";
-import { GATEWAYS } from "~/lib/infrastructure/config/ioc/symbols";
+import { GATEWAYS, SIGNALS } from "~/lib/infrastructure/config/ioc/symbols";
+import type { TWallet } from "~/lib/core/entity/models";
+import type { TSignal } from "~/lib/core/entity/signals";
 
 
 /**
@@ -22,23 +24,10 @@ export const RalphWalletCard = () => {
   const walletProvider = clientContainer.get<WalletProviderOutputPort<Wallet>>(
     GATEWAYS.WALLET_PROVIDER,
   );
-  const getActiveWalletInstance = () => {
-    const activeWalletDTO = walletProvider.getActiveWallet();
-    if (activeWalletDTO.success) {
-      const connectedWallet = activeWalletDTO.data;
-      const walletInstanceDTO = walletProvider.getWalletInstance(connectedWallet);
-      if (walletInstanceDTO.success) {
-        const walletInstance = walletInstanceDTO.data;
-        return walletInstance;
-      } else {
-        console.error(log("Failed to get wallet instance for active wallet"));
-        return undefined;
-      }
-    } else {
-      console.error(log("Failed to get active wallet"));
-      return undefined;
-    }
-  };
+  const S_ACTIVE_WALLET = signalsContainer.get<TSignal<TWallet | undefined>>(
+    SIGNALS.ACTIVE_WALLET,
+  );
+
 
   const getActiveWalletProvider = () => {
     const activeWalletDTO = walletProvider.getActiveWallet();
@@ -46,25 +35,31 @@ export const RalphWalletCard = () => {
       const connectedWallet = activeWalletDTO.data;
       return connectedWallet.name;
     } else {
-      console.error(log("Failed to get active wallet"));
+      // console.error(log("Failed to get active wallet"));
       return undefined;
     }
   }
 
 
-  const walletInstance = getActiveWalletInstance();
+  const walletInstance = S_ACTIVE_WALLET.value.value;
   const isWalletConnected = walletInstance !== undefined;
 
-  const walletAddress = walletInstance?.getAccount()?.address;
+  const walletAddress = walletInstance?.activeAccount;
   const walletProviderName = getActiveWalletProvider();
-  console.info(log(`Wallet Provider: ${walletProviderName} ${walletAddress}`));
   /**
    * Disconnect Wallet
    */
   const onDisconnect = () => {
-    const connectedWalletInstance = walletInstance;
-    if (!connectedWalletInstance) return;
-    walletProvider.disconnect(connectedWalletInstance);
+    if(!walletInstance) {
+      console.error(log("Cannot disconnect wallet. No active wallet"));
+      return;
+    }
+    const thirdwebWalletInstanceDTO = walletProvider.getWalletInstance(walletInstance)
+    if (!thirdwebWalletInstanceDTO.success) {
+      console.error(log("Cannot discoonect wallet. Failed to get active wallet"));
+      return;
+    }
+    walletProvider.disconnect(thirdwebWalletInstanceDTO.data);
   };
 
   const disconnectButton = (

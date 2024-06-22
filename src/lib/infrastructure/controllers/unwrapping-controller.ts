@@ -1,4 +1,4 @@
-import type { TWallet, TNetwork } from "~/lib/core/entity/models";
+import type { TNetwork } from "~/lib/core/entity/models";
 import type { TSignal } from "~/lib/core/entity/signals";
 import type { UnWrappingInputPort } from "~/lib/core/ports/primary/unwrapping-primary-ports";
 import { UnwrappingRequestSchema } from "~/lib/core/usecase-models/unwrapping-usecase-models";
@@ -6,7 +6,7 @@ import type { TUnwrappingViewModel } from "~/lib/core/view-models/unwrapping-vie
 import { clientContainer, signalsContainer } from "../config/ioc/container";
 import { GATEWAYS, SIGNALS, USECASE } from "../config/ioc/symbols";
 import { injectable } from "inversify";
-import WalletProviderOutputPort from "~/lib/core/ports/secondary/wallet-provider-output-port";
+import type WalletProviderOutputPort from "~/lib/core/ports/secondary/wallet-provider-output-port";
 
 export interface TUnwrappingControllerParameters {
     amount: number;

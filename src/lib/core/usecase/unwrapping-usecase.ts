@@ -78,8 +78,8 @@ export default class UnwrappingUsecase implements UnWrappingInputPort {
     });
     let newBalanceDTO = await this.ralphTokenGateway.getBalance(wallet.activeAccount, network);
     let balance = initialBalance;
-    const expectedBalance = initialBalance + amount;
-    while (balance <= expectedBalance && attempt <= maxAttempts) {
+    const expectedBalance = initialBalance - amount;
+    while (balance > expectedBalance && attempt <= maxAttempts) {
       newBalanceDTO = await this.ralphTokenGateway.getBalance(wallet.activeAccount, network);
       if (!newBalanceDTO.success) {
         this.presenter.presentError({

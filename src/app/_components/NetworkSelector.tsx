@@ -140,7 +140,7 @@ export const RalphNetworkSelector = () => {
         }, 1000);
       }
     }
-  }, [S_ACTIVE_WALLET_NETWORK.value.value, S_ACTIVE_WALLET.value.value]);
+  }, [S_ACTIVE_WALLET_NETWORK.value.value, S_ACTIVE_WALLET.value.value, S_ACTIVE_NETWORK.value.value]);
 
   const handleNetworkChange = (network: { chainId: number; name: string }) => {
     const newNetworkDTO = networkGateway.getNetwork(network.chainId);

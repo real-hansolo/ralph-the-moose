@@ -28,29 +28,17 @@ export const RalphWalletCard = () => {
     SIGNALS.ACTIVE_WALLET,
   );
 
-
-  const getActiveWalletProvider = () => {
-    const activeWalletDTO = walletProvider.getActiveWallet();
-    if (activeWalletDTO.success) {
-      const connectedWallet = activeWalletDTO.data;
-      return connectedWallet.name;
-    } else {
-      // console.error(log("Failed to get active wallet"));
-      return undefined;
-    }
-  }
-
-
   const walletInstance = S_ACTIVE_WALLET.value.value;
   const isWalletConnected = walletInstance !== undefined;
 
   const walletAddress = walletInstance?.activeAccount;
-  const walletProviderName = getActiveWalletProvider();
+  const walletProviderName = walletInstance?.name ?? "";
+  const walletProviderIcon = walletInstance?.icon ?? <></>;
   /**
    * Disconnect Wallet
    */
   const onDisconnect = () => {
-    if(!walletInstance) {
+    if (!walletInstance) {
       console.error(log("Cannot disconnect wallet. No active wallet"));
       return;
     }
@@ -152,7 +140,8 @@ export const RalphWalletCard = () => {
     <WalletCard
       status={isWalletConnected ? "connected" : "disconnected"}
       address={walletAddress ? walletAddress : ""}
-      walletName={walletProviderName ? walletProviderName : ""}
+      walletName={walletProviderName}
+      walletIcon={walletProviderIcon}
       connectButton={connectButton}
       disconnectButton={disconnectButton}
     />

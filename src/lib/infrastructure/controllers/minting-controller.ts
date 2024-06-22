@@ -29,7 +29,7 @@ export default class MintingController {
     const activeWallet = activeWalletDTO.data;
     const walletNetworkDTO = walletProvider.getActiveWalletNetwork();
     if (!walletNetworkDTO.success) {
-      return Promise.reject(new Error("Could not determine active wallet network!"));
+      return Promise.reject(new Error(`Could not determine active wallet network! : ${walletNetworkDTO.data.message}`));
     }
     const walletNetwork = walletNetworkDTO.data;
 

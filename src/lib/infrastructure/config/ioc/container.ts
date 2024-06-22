@@ -18,7 +18,7 @@ import type RalphTokenOutputPort from "~/lib/core/ports/secondary/ralph-token-ou
 import type RalphReservoirOutputPort from "~/lib/core/ports/secondary/ralph-reservoir-output-port";
 import RalphReservoirGateway from "../../gateways/ralph-reservoir-gateway";
 import type IndexerGatewayOutputPort from "~/lib/core/ports/secondary/indexer-gateway-output-port";
-import { type TNetwork } from "~/lib/core/entity/models";
+import { type TWallet, type TNetwork } from "~/lib/core/entity/models";
 import IndexerGateway from "../../gateways/indexer-gateway";
 import type { MintingInputPort, MintingOutputPort } from "~/lib/core/ports/primary/minting-primary-ports";
 import MintingUsecase from "~/lib/core/usecase/minting-usecase";
@@ -144,7 +144,6 @@ clientContainer
     return new BridgingUsecase(presenter, bridgeHeadGateway, ralphTokenGateway);
   });
 
-
 /**
  * Feature: Balance Info
  */
@@ -208,6 +207,18 @@ if (defaultNetworkDTO.success) {
     value: signal<TNetwork>(defaultNetworkDTO.data),
   });
 }
+
+signalsContainer.bind<TSignal<TWallet | undefined>>(SIGNALS.ACTIVE_WALLET).toConstantValue({
+  name: "Active Wallet Signal",
+  description: "Signal to set the active wallet",
+  value: signal<TWallet | undefined>(undefined),
+});
+
+signalsContainer.bind<TSignal<TNetwork | undefined | "unsupported-wallet-network">>(SIGNALS.ACTIVE_WALLET_NETWORK).toConstantValue({
+  name: "Active Wallet Network Signal",
+  description: "Signal to read the active wallet network",
+  value: signal<TNetwork | undefined | "unsupported-wallet-network">(undefined),
+});
 /*
 Client Side Dynamic Signals
 */
@@ -232,7 +243,7 @@ signalsContainer.bind<TSignal<TBalanceInfoViewModel>>(SIGNALS.BALANCE_INFO).toDy
       status: "error",
       data: {
         message: "Balance info signal not initialized",
-      }
+      },
     }),
   };
 });

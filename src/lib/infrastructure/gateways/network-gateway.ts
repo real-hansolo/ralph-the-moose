@@ -5,6 +5,9 @@ import { type TNetwork } from "~/lib/core/entity/models";
 import type { TListNetworkDTO, TNetworkDTO, TNetworkSwitchDTO } from "~/lib/core/dto/network-dto";
 import { AVALANCHE, BASE, BASE_SEPOLIA } from "../config/network-config";
 import { env } from "~/env";
+import { signalsContainer } from "../config/ioc/container";
+import { SIGNALS } from "../config/ioc/symbols";
+import type { TSignal } from "~/lib/core/entity/signals";
 
 @injectable()
 export default class NetworkGateway implements NetworkGatewayOutputPort {
@@ -36,21 +39,10 @@ export default class NetworkGateway implements NetworkGatewayOutputPort {
   }
 
   getActiveNetwork(): TNetworkDTO {
-    let activeNetwork = this.activeNetwork?.value;
-    if(!activeNetwork) {
-      const defaultNetworkDTO = this.getDefaultNetwork();
-      if (defaultNetworkDTO.success) {
-        activeNetwork = defaultNetworkDTO.data;
-      } else {
-        return {
-          success: false,
-          data: defaultNetworkDTO.data,
-        };
-      }
-    }
+    const S_ACTIVE_NETWORK = signalsContainer.get<TSignal<TNetwork>>(SIGNALS.ACTIVE_NETWORK);
     return {
       success: true,
-      data: activeNetwork,
+      data: S_ACTIVE_NETWORK.value.value,
     };
   }
 
@@ -92,9 +84,8 @@ export default class NetworkGateway implements NetworkGatewayOutputPort {
         }
       }
     }
-    if(!this.activeNetwork) {
-      this.activeNetwork = signal<TNetwork>(networkDTO.data);
-    }
+    const S_ACTIVE_NETWORK = signalsContainer.get<TSignal<TNetwork>>(SIGNALS.ACTIVE_NETWORK);
+    S_ACTIVE_NETWORK.value.value  = networkDTO.data;
     return {
       success: true,
       data: `Switched to ${networkDTO.data.name} successfully!`

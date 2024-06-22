@@ -24,15 +24,13 @@ export function getThirdWebChain(name: string): Chain {
     }
 }
 
-export function getNetworkFromThirdwebChain(chain: Chain): TNetwork {
+export function getNetworkFromThirdwebChain(chain: Chain): TNetwork | "unsupported-wallet-network" {
     const networkGateway = clientContainer.get<NetworkGatewayOutputPort>(GATEWAYS.NETWORK_GATEWAY);
     const walletNetworkDTO: TNetworkDTO = networkGateway.getNetwork(
         chain.id,
       );
       if (!walletNetworkDTO.success) {
-        throw new Error(
-          `Wallet network ${chain.name}: ${chain.id} is not supported!`,
-        );
+        return "unsupported-wallet-network";
       }
       return walletNetworkDTO.data;
 }

@@ -127,8 +127,15 @@ export default function RalphBridgeModal({ onClose }: RalphBridgeModal) {
       })
       .then(() => {
         if (S_Bridging_Status.value.value.status === "success") {
-          setAmount(amount);
-          setDestinationChain(destinationChain);
+          toast?.openToast(
+            {
+              status: "success",
+              id: `bridging-success-${new Date().getTime()}`,
+              title: "Bridging Success",
+              message: `Successfully bridged ${amount} PR from ${S_ACTIVE_NETWORK.value.value.name} to ${destinationChainDTO.data.name}`,
+            },
+            5000,
+          );
         } else if (S_Bridging_Status.value.value.status === "error") {
           console.error(log(`${S_Bridging_Status.value.value.message}`));
           toast?.openToast(
@@ -144,6 +151,14 @@ export default function RalphBridgeModal({ onClose }: RalphBridgeModal) {
       })
       .catch((error) => {
         console.error(log("Failed to bridge"), (error as Error).message);
+        S_Bridging_Status.value.value = {
+          status: "error",
+          type: "generic-error",
+          message: (error as Error).message,
+          amount: amount,
+          fromNetwork: S_ACTIVE_NETWORK.value.value,
+          toNetwork: destinationChainDTO.data,
+        };
         toast?.openToast(
           {
             status: "error",
@@ -153,14 +168,6 @@ export default function RalphBridgeModal({ onClose }: RalphBridgeModal) {
           },
           5000,
         );
-        S_Bridging_Status.value.value = {
-          status: "error",
-          type: "generic-error",
-          message: (error as Error).message,
-          amount: amount,
-          fromNetwork: S_ACTIVE_NETWORK.value.value,
-          toNetwork: destinationChainDTO.data,
-        };
       })
       .finally(() => {
         setTimeout(() => {

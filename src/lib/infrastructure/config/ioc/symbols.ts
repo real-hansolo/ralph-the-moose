@@ -1,5 +1,7 @@
 const SIGNALS = {
     ACTIVE_NETWORK: Symbol.for('ActiveNetwork'),
+    ACTIVE_WALLET: Symbol.for('ActiveWallet'),
+    ACTIVE_WALLET_NETWORK: Symbol.for('ActiveWalletNetwork'),
     BALANCE_INFO: Symbol.for('BalanceInfo'),
     TRANSACTION_GAS_STATUS: Symbol.for('TransactionGasStatus'),
     IS_MINTING: Symbol.for('IsMinting'),

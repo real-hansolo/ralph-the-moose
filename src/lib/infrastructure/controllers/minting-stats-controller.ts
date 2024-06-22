@@ -25,10 +25,7 @@ export default class MintingStatsController {
 
     const S_ActiveNetwork = signalsContainer.get<TSignal<TNetwork>>(SIGNALS.ACTIVE_NETWORK);
     const activeNetwork = S_ActiveNetwork.value.value;
-
-    if (activeNetwork === undefined) {
-      await Promise.reject("[Controller]-[Minting Stats]: Could not determine active network!");
-    }
+   
     const mintingStatsRequest = MintingStatsRequestSchema.parse({
       network: activeNetwork,
       walletAddress: walletAddress,

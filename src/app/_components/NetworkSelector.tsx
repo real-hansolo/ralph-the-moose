@@ -217,6 +217,7 @@ export const RalphNetworkSelector = () => {
   const supportedNetworks = getSupportedNetworks();
 
   return (
+    <div className="z-50">
     <NetworkSelector
       supportedNetworks={supportedNetworks}
       activeNetwork={{
@@ -226,5 +227,6 @@ export const RalphNetworkSelector = () => {
       }}
       onNetworkChange={handleNetworkChange}
     />
+  </div>
   );
 };

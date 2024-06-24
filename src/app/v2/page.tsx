@@ -1,13 +1,11 @@
 "use client";
 import "reflect-metadata"; // Client side Inversion of Control
 import { unstable_noStore as noStore } from "next/cache";
-import { useSignals } from "@preact/signals-react/runtime";
 import {} from "~/lib/infrastructure/config/chains";
-import { RalphHome } from "./pages/RalphHome";
 import { ThirdwebProvider } from "@maany_shr/thirdweb/react";
-import { Card, Heading, HeadingVariant, LightFrame, PageTemplate, Paragraph } from "@maany_shr/ralph-the-moose-ui-kit";
-import { RalphNetworkSelector } from "./_components/NetworkSelector";
-import { RalphMenu } from "./_components/RalphMenu";
+import { Heading, HeadingVariant, LightFrame, PageTemplate, Paragraph } from "@maany_shr/ralph-the-moose-ui-kit";
+import { RalphNetworkSelector } from "../_components/NetworkSelector";
+import { RalphMenu } from "../_components/RalphMenu";
 
 export default function Home() {
   noStore();

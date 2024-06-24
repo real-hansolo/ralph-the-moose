@@ -1,2 +1,0 @@
-# Ralph The Moose
-

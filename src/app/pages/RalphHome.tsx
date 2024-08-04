@@ -35,12 +35,12 @@ export const RalphHome = () => {
     <div id="app-container">
       <PageTemplate menu={<RalphMenu />} networkSelector={<RalphNetworkSelector />} footerContent={""}>
         {!isWalletConnected && <RalphWalletCard />}
-        <RalphMintCard
+        {/* <RalphMintCard
           showMintingModal={() => {
             setIsMintingModalOpen(true);
           }}
-        />
-        <RalphMintingModal isOpen={isMintingModalOpen} onClose={() => setIsMintingModalOpen(false)} />
+        /> */}
+        {/* <RalphMintingModal isOpen={isMintingModalOpen} onClose={() => setIsMintingModalOpen(false)} /> */}
         <RalphBalanceCard />
         {isWalletConnected && <RalphWalletCard />}
       </PageTemplate>

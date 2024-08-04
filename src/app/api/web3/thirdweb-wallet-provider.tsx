@@ -14,7 +14,7 @@ import type {
 } from "~/lib/core/dto/wallet-provider-dto";
 import { inject, injectable } from "inversify";
 import { GATEWAYS, SIGNALS } from "~/lib/infrastructure/config/ioc/symbols";
-import NetworkGateway from "~/lib/infrastructure/gateways/network-gateway";
+import type NetworkGateway from "~/lib/infrastructure/gateways/network-gateway";
 import { getNetworkFromThirdwebChain, getThirdWebChain } from "~/lib/utils/networkUtils";
 import { signalsContainer } from "~/lib/infrastructure/config/ioc/container";
 import type { TSignal } from "~/lib/core/entity/signals";

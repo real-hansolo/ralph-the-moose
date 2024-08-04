@@ -1,6 +1,6 @@
 "use client";
 import { type Chain } from "@maany_shr/thirdweb";
-import { avalanche, avalancheFuji, base, baseSepolia } from "@maany_shr/thirdweb/chains";
+import { avalanche, avalancheFuji, base, baseSepolia, arthera } from "@maany_shr/thirdweb/chains";
 import type { TNetwork } from "../core/entity/models";
 import { GATEWAYS } from "../infrastructure/config/ioc/symbols";
 import type NetworkGatewayOutputPort from "../core/ports/secondary/network-gateway-output-port";
@@ -19,6 +19,8 @@ export function getThirdWebChain(name: string): Chain {
             return avalanche;
         case "Avalanche Fuji":
             return avalancheFuji; 
+        case "Arthera":
+            return arthera;
         default:
             throw new Error(`Config Error: Could not find thirdweb chain ${name} `);
     }

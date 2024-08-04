@@ -1,4 +1,4 @@
-import { IconNetworkAvax, IconNetworkBase } from "@maany_shr/ralph-the-moose-ui-kit";
+import { IconNetworkAvax, IconNetworkBase, IconNetworkArthera } from "@maany_shr/ralph-the-moose-ui-kit";
 import type { TNetwork } from "~/lib/core/entity/models";
 
 export const BASE: TNetwork = {
@@ -109,5 +109,48 @@ export const AVALANCHE: TNetwork = {
     publicMint: {
         enabled: true,
         amount: 10
+    }
+}
+
+export const ARTHERA: TNetwork = {
+    chainId: 10242,
+    name: "Arthera",
+    explorer: { 
+        name: "Arthera Explorer",
+        url: "https://explorer.arthera.net/" 
+    },
+    rpcProvider: "url",
+    nativeCurrency: "AA",
+    gasLimit: 500000,
+    fee: { 
+        minting: 999999999999999,
+        wrapping: 999999999999999,
+        unwrapping: 99999999999999,
+        bridging: 0.0
+    },
+    contracts: {
+        ralphReservoirAddress: "0x27e964E016B68EeFbe958Ace62174af0e1CeD053",
+        ralphTokenAddress: "0x05F1938646a897008e813fb03CE7C575eAE45738",
+        bridgeHeadAddress: "0xcAB6F73BbCb36eFf4bEc05713F61eE6B6438F57e"
+    },
+    icon: <IconNetworkArthera />,
+    indexer: {
+        url: "", // TODO: move to env
+        secure: false
+    },
+    urls: {
+        elkdex: "https://app.elk.finance/swap/10242/USDT/PR",
+        uniswap: "https://app.uniswap.org/swap",
+        farm: "https://app.elk.finance/farms/all/"
+    },
+    publicMint: {
+        enabled: false,
+        amount: 10
+    },
+    features: {
+        mint: false,
+        wrapClaim: false,
+        unwrap: false,
+        bridge: true    
     }
 }

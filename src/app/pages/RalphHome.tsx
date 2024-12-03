@@ -10,7 +10,7 @@ import RalphMintingModal from "../_components/mint/RalphMintingModal";
 import { RalphBalanceCard } from "../_components/balance/RalphBalanceCard";
 import { signalsContainer } from "~/lib/infrastructure/config/ioc/container";
 import { SIGNALS } from "~/lib/infrastructure/config/ioc/symbols";
-import type { TWallet } from "~/lib/core/entity/models";
+import type { TNetwork, TWallet } from "~/lib/core/entity/models";
 import type { TSignal } from "~/lib/core/entity/signals";
 
 export const RalphHome = () => {
@@ -21,7 +21,6 @@ export const RalphHome = () => {
     return `[RalphHome] [${timestamp}] ${message}`;
   };
 
-
   const S_ACTIVE_WALLET = signalsContainer.get<TSignal<TWallet | undefined>>(SIGNALS.ACTIVE_WALLET);
 
   /**
@@ -30,17 +29,26 @@ export const RalphHome = () => {
   const walletInstance = S_ACTIVE_WALLET.value.value;
   const isWalletConnected = walletInstance !== undefined;
 
+  /**
+   * Network Config
+   */
+  const S_ACTIVE_NETWORK = signalsContainer.get<TSignal<TNetwork>>(SIGNALS.ACTIVE_NETWORK);
+  const activeNetwork = S_ACTIVE_NETWORK.value.value;
 
   return (
     <div id="app-container">
       <PageTemplate menu={<RalphMenu />} networkSelector={<RalphNetworkSelector />} footerContent={""}>
         {!isWalletConnected && <RalphWalletCard />}
-        {/* <RalphMintCard
-          showMintingModal={() => {
-            setIsMintingModalOpen(true);
-          }}
-        /> */}
-        {/* <RalphMintingModal isOpen={isMintingModalOpen} onClose={() => setIsMintingModalOpen(false)} /> */}
+        {activeNetwork.features.mint && (
+          <div>
+            <RalphMintCard
+              showMintingModal={() => {
+                setIsMintingModalOpen(true);
+              }}
+            />
+            <RalphMintingModal isOpen={isMintingModalOpen} onClose={() => setIsMintingModalOpen(false)} />
+          </div>
+        )}
         <RalphBalanceCard />
         {isWalletConnected && <RalphWalletCard />}
       </PageTemplate>

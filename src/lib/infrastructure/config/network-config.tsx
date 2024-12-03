@@ -35,6 +35,12 @@ export const BASE: TNetwork = {
     publicMint: {
         enabled: false,
         amount: 10
+    },
+    features: {
+        mint: true,
+        wrapClaim: true,
+        unwrap: true,
+        bridge: true    
     }
 }
 
@@ -72,6 +78,12 @@ export const BASE_SEPOLIA: TNetwork = {
     publicMint: {
         enabled: false,
         amount: 10
+    },
+    features: {
+        mint: false,
+        wrapClaim: false,
+        unwrap: false,
+        bridge: true    
     }
 }
 
@@ -109,6 +121,12 @@ export const AVALANCHE: TNetwork = {
     publicMint: {
         enabled: true,
         amount: 10
+    },
+    features: {
+        mint: true,
+        wrapClaim: true,
+        unwrap: true,
+        bridge: true    
     }
 }
 

@@ -15,7 +15,7 @@ describe("Minting", () => {
         
     })
     it("should mint 10 PR", () => {
-        // const controller = clientContainer.get<MintingController>(CONTROLLER.MINTING_CONTROLLER)
+        const controller = clientContainer.get<MintingController>(CONTROLLER.MINTING_CONTROLLER)
         // const network = BASE_SEPOLIA
         // const wallet: TWallet = {
         //     name: "metamask",

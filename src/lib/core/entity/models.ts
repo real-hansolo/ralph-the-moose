@@ -35,6 +35,12 @@ export const NetworkSchema = z.object({
     enabled: z.boolean(),
     amount: z.number(),
   }),
+  features: z.object({
+    mint: z.boolean(),
+    wrapClaim: z.boolean(),
+    unwrap: z.boolean(),
+    bridge: z.boolean(),
+  }),
 });
 
 export type TNetwork = z.infer<typeof NetworkSchema>;

@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unsafe-argument */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import "reflect-metadata";
@@ -128,6 +129,7 @@ clientContainer
     const presenter = new UnwrappingPresenter(response);
     const ralphTokenGateway = context.container.get<RalphTokenOutputPort>(GATEWAYS.RALPH_TOKEN_GATEWAY);
     const ralphReservoirGateway = context.container.get<RalphReservoirOutputPort>(GATEWAYS.RALPH_RESERVOIR_GATEWAY);
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
     return new UnwrappingUsecase(presenter, ralphTokenGateway, ralphReservoirGateway);
   });
 

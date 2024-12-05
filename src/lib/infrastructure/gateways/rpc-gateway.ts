@@ -107,6 +107,22 @@ export default class RpcGateway implements RPCGatewayOutputPort {
             message: `rpcProvider ${network.rpcProvider} not supported for network ${network.name}`,
           },
         };
+      case "ARTHERA":
+        if (network.rpcProvider === "url") {
+          return {
+            success: true,
+            data: {
+              url: "https://rpc.arthera.net",
+            },
+          };
+        }
+        return {
+          success: false,
+          data: {
+            type: "rpc_provider_not_supported",
+            message: `rpcProvider ${network.rpcProvider} not supported for network ${network.name}`,
+          },
+        };
       default:
         return {
           success: false,

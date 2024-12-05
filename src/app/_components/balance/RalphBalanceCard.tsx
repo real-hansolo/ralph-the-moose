@@ -10,6 +10,7 @@ import type BalanceInfoController from "~/lib/infrastructure/controllers/balance
 import RalphWrapClaimModal from "./RalphWrapClaimModal";
 import RalphUnwrapModal from "./RalphUnwrapModal";
 import RalphBridgeModal from "./RalphBridgeModal";
+import type { TNetwork } from "~/lib/core/entity/models";
 
 export const RalphBalanceCard = () => {
   useSignals();
@@ -21,6 +22,10 @@ export const RalphBalanceCard = () => {
   // Signals
   const S_BALANCE_INFO = signalsContainer.get<TSignal<TBalanceInfoViewModel>>(SIGNALS.BALANCE_INFO);
   const balanceInfoController = clientContainer.get<BalanceInfoController>(CONTROLLER.BALANCE_INFO_CONTROLLER);
+
+  const S_ACTIVE_NETWORK = signalsContainer.get<TSignal<TNetwork>>(SIGNALS.ACTIVE_NETWORK);
+  const activeNetwork = S_ACTIVE_NETWORK.value.value;
+
 
   const { data, isLoading, isError } = useQuery<TBalanceInfoViewModel>({
     queryKey: ["BalanceInfo"],
@@ -71,6 +76,13 @@ export const RalphBalanceCard = () => {
           console.error(log("showWrapClaimVariant"));
           setVariant("wrap-claim");
         }}
+        features={
+          {
+            inscriptionBalanceSection: activeNetwork.features.wrapClaim,
+            unwrap: activeNetwork.features.unwrap,
+            bridge: activeNetwork.features.bridge,
+          }
+        }
       />
       {variant === "wrap-claim" && (
         <RalphWrapClaimModal

@@ -20,7 +20,7 @@
   },
   "dependencies": {
     "@highlight-run/next": "^7.3.5",
-    "@maany_shr/ralph-the-moose-ui-kit": "3.1.0",
+    "@maany_shr/ralph-the-moose-ui-kit": "3.1.1",
     "@maany_shr/thirdweb": "^5.17.2",
     "@preact/signals-react": "^2.0.1",
     "@t3-oss/env-nextjs": "^0.7.1",
